@@ -511,6 +511,9 @@ def default_project():
         "part2": "T",
         "part3": "",
         "hmi_loc": "1",
+        "operator_load": {"enabled": False, "count": "1"},
+        "drop_part_robot": {"enabled": False, "count": "1", "robot_names": []},
+        "pick_part_robot": {"enabled": False, "count": "1", "robot_names": []},
         "robot_count": 0,
         "robot_names": [],
         "islands": [
@@ -620,6 +623,7 @@ class AWLGeneratorApp:
         self._build_station_config(scroll_frame)
         self._build_robot_config(scroll_frame)
         self._build_valve_config(scroll_frame)
+        self._build_additional_config(scroll_frame)
         self._build_action_buttons(scroll_frame)
 
     def _build_station_config(self, parent):
@@ -714,6 +718,12 @@ class AWLGeneratorApp:
         if hasattr(self, 'robot_name_vars'):
             for i in range(len(self.robot_name_vars)):
                 self._validate_robot_name(i)
+        if hasattr(self, 'drop_robot_name_vars'):
+            for i in range(len(self.drop_robot_name_vars)):
+                self._validate_ext_robot(self.drop_robot_name_vars, self.drop_robot_valid_labels, i)
+        if hasattr(self, 'pick_robot_name_vars'):
+            for i in range(len(self.pick_robot_name_vars)):
+                self._validate_ext_robot(self.pick_robot_name_vars, self.pick_robot_valid_labels, i)
 
     def _build_robot_config(self, parent):
         frame = ttk.LabelFrame(parent, text="Robot Configuration", padding=8)
@@ -900,6 +910,156 @@ class AWLGeneratorApp:
         if v_idx < len(self.valve_unit_vars[isl_idx]):
             self.project["islands"][isl_idx]["valves"][v_idx]["units"] = \
                 self.valve_unit_vars[isl_idx][v_idx].get()
+
+    def _build_additional_config(self, parent):
+        frame = ttk.LabelFrame(parent, text="Additional Configuration", padding=8)
+        frame.pack(fill=tk.X, padx=5, pady=5)
+
+        # --- Operator Load ---
+        row1 = ttk.Frame(frame)
+        row1.pack(fill=tk.X, pady=2)
+        ttk.Label(row1, text="Operator Load:", width=22, anchor="w").pack(side=tk.LEFT)
+        self.op_load_var = tk.BooleanVar(value=self.project.get("operator_load", {}).get("enabled", False))
+        ttk.Radiobutton(row1, text="No", variable=self.op_load_var, value=False,
+                        command=self._on_op_load_change).pack(side=tk.LEFT)
+        ttk.Radiobutton(row1, text="Yes", variable=self.op_load_var, value=True,
+                        command=self._on_op_load_change).pack(side=tk.LEFT, padx=(5, 0))
+        self.op_load_count_var = tk.StringVar(value=self.project.get("operator_load", {}).get("count", "1"))
+        self.op_load_detail = ttk.Frame(frame)
+        self.op_load_detail.pack(fill=tk.X, padx=(160, 0))
+        self._rebuild_op_load_detail()
+
+        # --- Drop Part With Robot ---
+        row2 = ttk.Frame(frame)
+        row2.pack(fill=tk.X, pady=2)
+        ttk.Label(row2, text="Drop Part With Robot:", width=22, anchor="w").pack(side=tk.LEFT)
+        self.drop_robot_var = tk.BooleanVar(value=self.project.get("drop_part_robot", {}).get("enabled", False))
+        ttk.Radiobutton(row2, text="No", variable=self.drop_robot_var, value=False,
+                        command=self._on_drop_robot_change).pack(side=tk.LEFT)
+        ttk.Radiobutton(row2, text="Yes", variable=self.drop_robot_var, value=True,
+                        command=self._on_drop_robot_change).pack(side=tk.LEFT, padx=(5, 0))
+        self.drop_robot_count_var = tk.StringVar(value=self.project.get("drop_part_robot", {}).get("count", "1"))
+        self.drop_robot_name_vars = []
+        self.drop_robot_valid_labels = []
+        self.drop_robot_detail = ttk.Frame(frame)
+        self.drop_robot_detail.pack(fill=tk.X, padx=(160, 0))
+        self._rebuild_drop_robot_detail()
+
+        # --- Pick Part With Robot ---
+        row3 = ttk.Frame(frame)
+        row3.pack(fill=tk.X, pady=2)
+        ttk.Label(row3, text="Pick Part With Robot:", width=22, anchor="w").pack(side=tk.LEFT)
+        self.pick_robot_var = tk.BooleanVar(value=self.project.get("pick_part_robot", {}).get("enabled", False))
+        ttk.Radiobutton(row3, text="No", variable=self.pick_robot_var, value=False,
+                        command=self._on_pick_robot_change).pack(side=tk.LEFT)
+        ttk.Radiobutton(row3, text="Yes", variable=self.pick_robot_var, value=True,
+                        command=self._on_pick_robot_change).pack(side=tk.LEFT, padx=(5, 0))
+        self.pick_robot_count_var = tk.StringVar(value=self.project.get("pick_part_robot", {}).get("count", "1"))
+        self.pick_robot_name_vars = []
+        self.pick_robot_valid_labels = []
+        self.pick_robot_detail = ttk.Frame(frame)
+        self.pick_robot_detail.pack(fill=tk.X, padx=(160, 0))
+        self._rebuild_pick_robot_detail()
+
+    def _on_op_load_change(self):
+        self.project.setdefault("operator_load", {})["enabled"] = self.op_load_var.get()
+        self._rebuild_op_load_detail()
+
+    def _rebuild_op_load_detail(self):
+        for w in self.op_load_detail.winfo_children():
+            w.destroy()
+        if not self.op_load_var.get():
+            return
+        ttk.Label(self.op_load_detail, text="Count:").pack(side=tk.LEFT, padx=(0, 2))
+        ttk.Combobox(self.op_load_detail, textvariable=self.op_load_count_var,
+                     values=["1", "2"], width=3, state="readonly").pack(side=tk.LEFT)
+
+    def _on_drop_robot_change(self):
+        self.project.setdefault("drop_part_robot", {})["enabled"] = self.drop_robot_var.get()
+        self._rebuild_drop_robot_detail()
+
+    def _rebuild_drop_robot_detail(self):
+        for w in self.drop_robot_detail.winfo_children():
+            w.destroy()
+        self.drop_robot_name_vars = []
+        self.drop_robot_valid_labels = []
+        if not self.drop_robot_var.get():
+            return
+        count_row = ttk.Frame(self.drop_robot_detail)
+        count_row.pack(fill=tk.X, pady=1)
+        ttk.Label(count_row, text="Count:").pack(side=tk.LEFT, padx=(0, 2))
+        count_combo = ttk.Combobox(count_row, textvariable=self.drop_robot_count_var,
+                                    values=["1", "2"], width=3, state="readonly")
+        count_combo.pack(side=tk.LEFT)
+        count_combo.bind("<<ComboboxSelected>>", lambda e: self._rebuild_drop_robot_detail())
+        try:
+            count = int(self.drop_robot_count_var.get())
+        except ValueError:
+            count = 1
+        saved_names = self.project.get("drop_part_robot", {}).get("robot_names", [])
+        for i in range(count):
+            name_row = ttk.Frame(self.drop_robot_detail)
+            name_row.pack(fill=tk.X, pady=1)
+            ttk.Label(name_row, text=f"Robot {i+1}:").pack(side=tk.LEFT)
+            var = tk.StringVar(value=saved_names[i] if i < len(saved_names) else "")
+            ttk.Entry(name_row, textvariable=var, width=10).pack(side=tk.LEFT, padx=2)
+            valid_lbl = ttk.Label(name_row, text="", foreground="red")
+            valid_lbl.pack(side=tk.LEFT)
+            self.drop_robot_name_vars.append(var)
+            self.drop_robot_valid_labels.append(valid_lbl)
+            var.trace_add("write", lambda *a, idx=i: self._validate_ext_robot(
+                self.drop_robot_name_vars, self.drop_robot_valid_labels, idx))
+            self._validate_ext_robot(self.drop_robot_name_vars, self.drop_robot_valid_labels, i)
+
+    def _on_pick_robot_change(self):
+        self.project.setdefault("pick_part_robot", {})["enabled"] = self.pick_robot_var.get()
+        self._rebuild_pick_robot_detail()
+
+    def _rebuild_pick_robot_detail(self):
+        for w in self.pick_robot_detail.winfo_children():
+            w.destroy()
+        self.pick_robot_name_vars = []
+        self.pick_robot_valid_labels = []
+        if not self.pick_robot_var.get():
+            return
+        count_row = ttk.Frame(self.pick_robot_detail)
+        count_row.pack(fill=tk.X, pady=1)
+        ttk.Label(count_row, text="Count:").pack(side=tk.LEFT, padx=(0, 2))
+        count_combo = ttk.Combobox(count_row, textvariable=self.pick_robot_count_var,
+                                    values=["1", "2"], width=3, state="readonly")
+        count_combo.pack(side=tk.LEFT)
+        count_combo.bind("<<ComboboxSelected>>", lambda e: self._rebuild_pick_robot_detail())
+        try:
+            count = int(self.pick_robot_count_var.get())
+        except ValueError:
+            count = 1
+        saved_names = self.project.get("pick_part_robot", {}).get("robot_names", [])
+        for i in range(count):
+            name_row = ttk.Frame(self.pick_robot_detail)
+            name_row.pack(fill=tk.X, pady=1)
+            ttk.Label(name_row, text=f"Robot {i+1}:").pack(side=tk.LEFT)
+            var = tk.StringVar(value=saved_names[i] if i < len(saved_names) else "")
+            ttk.Entry(name_row, textvariable=var, width=10).pack(side=tk.LEFT, padx=2)
+            valid_lbl = ttk.Label(name_row, text="", foreground="red")
+            valid_lbl.pack(side=tk.LEFT)
+            self.pick_robot_name_vars.append(var)
+            self.pick_robot_valid_labels.append(valid_lbl)
+            var.trace_add("write", lambda *a, idx=i: self._validate_ext_robot(
+                self.pick_robot_name_vars, self.pick_robot_valid_labels, idx))
+            self._validate_ext_robot(self.pick_robot_name_vars, self.pick_robot_valid_labels, i)
+
+    def _validate_ext_robot(self, name_vars, valid_labels, idx):
+        if idx >= len(name_vars) or idx >= len(valid_labels):
+            return
+        name = name_vars[idx].get().strip()
+        station_prefix = self.project.get("part1", "")
+        valid = bool(re.match(r'^\d{3}R\d{2}$', name))
+        if valid and station_prefix and name[:3] != station_prefix:
+            valid = False
+        if valid:
+            valid_labels[idx].configure(text="OK", foreground="green")
+        else:
+            valid_labels[idx].configure(text="X", foreground="red")
 
     def _build_action_buttons(self, parent):
         frame = ttk.Frame(parent, padding=8)
@@ -1228,6 +1388,20 @@ class AWLGeneratorApp:
         self.project["part2"] = self.part2_var.get().strip()
         self.project["part3"] = self.part3_var.get().strip()
         self.project["hmi_loc"] = self.hmi_loc_var.get()
+        self.project["operator_load"] = {
+            "enabled": self.op_load_var.get(),
+            "count": self.op_load_count_var.get(),
+        }
+        self.project["drop_part_robot"] = {
+            "enabled": self.drop_robot_var.get(),
+            "count": self.drop_robot_count_var.get(),
+            "robot_names": [v.get().strip() for v in self.drop_robot_name_vars],
+        }
+        self.project["pick_part_robot"] = {
+            "enabled": self.pick_robot_var.get(),
+            "count": self.pick_robot_count_var.get(),
+            "robot_names": [v.get().strip() for v in self.pick_robot_name_vars],
+        }
         self.project["robot_count"] = int(self.robot_count_var.get())
         self.project["robot_names"] = [v.get().strip() for v in self.robot_name_vars]
 
@@ -1284,6 +1458,9 @@ class AWLGeneratorApp:
         self.project.setdefault("part2", "T")
         self.project.setdefault("part3", "")
         self.project.setdefault("hmi_loc", "1")
+        self.project.setdefault("operator_load", {"enabled": False, "count": "1"})
+        self.project.setdefault("drop_part_robot", {"enabled": False, "count": "1", "robot_names": []})
+        self.project.setdefault("pick_part_robot", {"enabled": False, "count": "1", "robot_names": []})
         self.project.setdefault("robot_count", 0)
         self.project.setdefault("robot_names", [])
         self.project.setdefault("islands", [
@@ -1311,6 +1488,19 @@ class AWLGeneratorApp:
         self.part2_var.set(self.project.get("part2", "T"))
         self.part3_var.set(self.project.get("part3", ""))
         self.hmi_loc_var.set(self.project.get("hmi_loc", "1"))
+
+        # Additional config
+        self.op_load_var.set(self.project.get("operator_load", {}).get("enabled", False))
+        self.op_load_count_var.set(self.project.get("operator_load", {}).get("count", "1"))
+        self._rebuild_op_load_detail()
+
+        self.drop_robot_var.set(self.project.get("drop_part_robot", {}).get("enabled", False))
+        self.drop_robot_count_var.set(self.project.get("drop_part_robot", {}).get("count", "1"))
+        self._rebuild_drop_robot_detail()
+
+        self.pick_robot_var.set(self.project.get("pick_part_robot", {}).get("enabled", False))
+        self.pick_robot_count_var.set(self.project.get("pick_part_robot", {}).get("count", "1"))
+        self._rebuild_pick_robot_detail()
 
         # Robot config
         self.robot_count_var.set(str(self.project.get("robot_count", 0)))
