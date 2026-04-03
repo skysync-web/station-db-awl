@@ -510,6 +510,7 @@ def default_project():
         "part1": "",
         "part2": "T",
         "part3": "",
+        "hmi_loc": "1",
         "robot_count": 0,
         "robot_names": [],
         "islands": [
@@ -656,6 +657,15 @@ class AWLGeneratorApp:
 
         self.valid_label = ttk.Label(name_frame, text="", foreground="red", font=("TkDefaultFont", 12))
         self.valid_label.pack(side=tk.LEFT, padx=5)
+
+        # HMI Location
+        hmi_frame = ttk.Frame(frame)
+        hmi_frame.pack(fill=tk.X, pady=2)
+        ttk.Label(hmi_frame, text="HMI Loc:").pack(side=tk.LEFT)
+        self.hmi_loc_var = tk.StringVar(value=self.project.get("hmi_loc", "1"))
+        self.hmi_loc_combo = ttk.Combobox(hmi_frame, textvariable=self.hmi_loc_var,
+                                           values=[str(i) for i in range(1, 9)], width=3, state="readonly")
+        self.hmi_loc_combo.pack(side=tk.LEFT, padx=2)
 
         # DB name display
         db_frame = ttk.Frame(frame)
@@ -1217,6 +1227,7 @@ class AWLGeneratorApp:
         self.project["part1"] = self.part1_var.get().strip()
         self.project["part2"] = self.part2_var.get().strip()
         self.project["part3"] = self.part3_var.get().strip()
+        self.project["hmi_loc"] = self.hmi_loc_var.get()
         self.project["robot_count"] = int(self.robot_count_var.get())
         self.project["robot_names"] = [v.get().strip() for v in self.robot_name_vars]
 
@@ -1272,6 +1283,7 @@ class AWLGeneratorApp:
         self.project.setdefault("part1", "")
         self.project.setdefault("part2", "T")
         self.project.setdefault("part3", "")
+        self.project.setdefault("hmi_loc", "1")
         self.project.setdefault("robot_count", 0)
         self.project.setdefault("robot_names", [])
         self.project.setdefault("islands", [
@@ -1298,6 +1310,7 @@ class AWLGeneratorApp:
         self.part1_var.set(self.project.get("part1", ""))
         self.part2_var.set(self.project.get("part2", "T"))
         self.part3_var.set(self.project.get("part3", ""))
+        self.hmi_loc_var.set(self.project.get("hmi_loc", "1"))
 
         # Robot config
         self.robot_count_var.set(str(self.project.get("robot_count", 0)))
