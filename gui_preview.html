@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DB AWL Generator – GUI Preview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; font-size: 13px; }
+  body { background: #e8e8e8; padding: 8px; }
+  .window { background: #f0f0f0; border: 2px solid #999; box-shadow: 4px 4px 12px #0004; width: 1100px; }
+  .title-bar { background: linear-gradient(to bottom,#3a7bd5,#2563b0); color: white; padding: 6px 12px; font-size: 14px; font-weight: bold; display:flex; justify-content:space-between; align-items:center; }
+  .title-bar span { font-size:12px; opacity:.7; }
+  .menubar { background:#f0f0f0; border-bottom:1px solid #ccc; padding:2px 4px; display:flex; gap:4px; }
+  .menuitem { padding:3px 10px; cursor:pointer; border-radius:3px; }
+  .menuitem:hover { background:#d4e4f7; }
+  .section { border: 1px solid #aaa; margin: 4px; border-radius:3px; }
+  .section-title { background:#ddd; padding:4px 10px; font-weight:bold; color:#333; border-radius:3px 3px 0 0; font-size:12px; }
+  .tab-bar { display:flex; background:#d4d4d4; border-bottom:2px solid #999; }
+  .tab { padding:5px 14px; cursor:pointer; border:1px solid #bbb; border-bottom:none; background:#e8e8e8; margin-right:2px; border-radius:4px 4px 0 0; font-size:12px; }
+  .tab.active { background:#f0f0f0; border-bottom:2px solid #f0f0f0; margin-bottom:-2px; font-weight:bold; color:#2563b0; }
+  .tab-content { background:#f9f9f9; padding:10px; }
+  .row { display:flex; align-items:center; gap:8px; margin:5px 0; }
+  label { width:110px; text-align:right; color:#444; font-size:12px; }
+  input[type=text], select { border:1px solid #bbb; background:white; padding:3px 6px; border-radius:3px; font-size:12px; }
+  input[type=text].wide { width:340px; }
+  input[type=text].small { width:50px; }
+  input[type=text].med { width:90px; }
+  select.type { width:120px; }
+  select.small { width:55px; }
+  .valid { color:#007700; font-weight:bold; font-size:12px; }
+  .radio-group { display:flex; gap:16px; align-items:center; }
+  .radio-group label { width:auto; text-align:left; }
+  .separator { height:1px; background:#ccc; margin:6px 0; }
+  .island-box { border:1px solid #4a90d9; background:#f0f6ff; border-radius:4px; padding:8px; margin:4px 0; }
+  .island-title { color:#2563b0; font-weight:bold; font-size:12px; margin-bottom:6px; }
+  .valve-row { display:flex; align-items:center; gap:6px; margin:3px 0; padding:3px; background:rgba(255,255,255,.6); border-radius:3px; }
+  .valve-label { width:30px; color:#555; font-size:12px; font-weight:bold; }
+  .field-row { display:flex; align-items:center; gap:6px; margin:2px 0; padding:3px 6px; }
+  .field-row:nth-child(even) { background:#f5f5f5; }
+  .field-name { width:200px; font-size:12px; color:#333; font-family:monospace; }
+  .field-struct { color:#0055cc; font-weight:bold; }
+  .field-comment { flex:1; border:1px solid #ccc; padding:2px 5px; border-radius:2px; font-size:12px; background:white; }
+  .field-comment.auto { background:#fffde7; border-color:#f9a825; }
+  .action-bar { display:flex; gap:6px; padding:6px 8px; background:#e8e8e8; border-top:1px solid #ccc; }
+  .btn { padding:5px 16px; border:1px solid #888; border-radius:3px; background:linear-gradient(to bottom,#f8f8f8,#e0e0e0); cursor:pointer; font-size:12px; }
+  .btn:hover { background:linear-gradient(to bottom,#daeeff,#b8d8f8); border-color:#4a90d9; }
+  .btn.primary { background:linear-gradient(to bottom,#4a90d9,#2563b0); color:white; border-color:#1a5299; }
+  .statusbar { background:#e0e0e0; border-top:1px solid #bbb; padding:3px 8px; font-size:11px; color:#555; }
+  .db-tab-bar { display:flex; flex-wrap:wrap; background:#d0d0d0; padding:4px 4px 0; gap:2px; border-bottom:2px solid #999; }
+  .db-tab { padding:4px 10px; background:#ddd; border:1px solid #bbb; border-bottom:none; border-radius:3px 3px 0 0; font-size:11px; cursor:pointer; }
+  .db-tab.active { background:#f0f0f0; font-weight:bold; color:#2563b0; border-bottom:2px solid #f0f0f0; }
+  .note { font-size:11px; color:#888; font-style:italic; }
+</style>
+</head>
+<body>
+<div class="window">
+
+  <!-- Title bar -->
+  <div class="title-bar">
+    Siemens Step7 – Global DB AWL Generator  v4.0
+    <span>db11.AWL template loaded</span>
+  </div>
+
+  <!-- Menu bar -->
+  <div class="menubar">
+    <div class="menuitem">File</div>
+  </div>
+
+  <!-- Top config tabs -->
+  <div class="section">
+    <div class="tab-bar">
+      <div class="tab active">  Station  </div>
+      <div class="tab">  Valve Islands  </div>
+    </div>
+
+    <!-- Station tab content -->
+    <div class="tab-content">
+      <div class="row">
+        <span style="font-size:12px;color:#444;margin-right:8px;">Station Type:</span>
+        <div class="radio-group">
+          <input type="radio" checked id="r1"><label for="r1">Regular Station</label>
+          <input type="radio" id="r2"><label for="r2">Robot Station</label>
+        </div>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <span style="font-size:12px;color:#444;width:110px;">Station Name:</span>
+        <input type="text" class="small" value="040" placeholder="NNN">
+        <span style="font-size:13px;color:#666;"> – </span>
+        <select class="small"><option>T</option><option>TT</option><option>LIFT</option></select>
+        <span style="font-size:13px;color:#666;"> – </span>
+        <input type="text" style="width:40px;" value="01" placeholder="NN">
+        <span class="valid">  ✔  Station: 040T01</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Valve Islands tab (shown when clicked) -->
+  <div class="section" style="display:none;">
+    <div class="tab-content">
+      <div class="row">
+        <span style="font-size:12px;">Number of Valve Islands (BM):</span>
+        <select class="small"><option>1</option><option selected>2</option></select>
+      </div>
+      <div class="island-box">
+        <div class="island-title">BM01 – Valve Island 1</div>
+        <div class="row"><span style="font-size:12px;">Number of valves (1-10):</span><select class="small"><option>6</option></select></div>
+        <div class="valve-row"><span class="valve-label">V01:</span><select class="type"><option>Clamp</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="050C01,060C01"></div>
+        <div class="valve-row"><span class="valve-label">V02:</span><select class="type"><option>Clamp</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="110C01,120C01"></div>
+        <div class="valve-row"><span class="valve-label">V03:</span><select class="type"><option selected>Shift Pin</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="030C01,300C01"></div>
+        <div class="valve-row"><span class="valve-label">V04:</span><select class="type"><option>Clamp</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="130C01,140C01"></div>
+        <div class="valve-row"><span class="valve-label">V05:</span><select class="type"><option>Clamp</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="070C01,080C01"></div>
+        <div class="valve-row"><span class="valve-label">V06:</span><select class="type"><option>Clamp</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="390C01,400C01,410C01,440C01"></div>
+      </div>
+      <div class="island-box">
+        <div class="island-title">BM02 – Valve Island 2</div>
+        <div class="row"><span style="font-size:12px;">Number of valves (1-10):</span><select class="small"><option>4</option></select></div>
+        <div class="valve-row"><span class="valve-label">V01:</span><select class="type"><option selected>Shift Pin</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="370C01,380C01"></div>
+        <div class="valve-row"><span class="valve-label">V02:</span><select class="type"><option>Clamp</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="330C01,340C01"></div>
+        <div class="valve-row"><span class="valve-label">V03:</span><select class="type"><option>Clamp</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="310C01,320C01"></div>
+        <div class="valve-row"><span class="valve-label">V04:</span><select class="type"><option selected>Shift Pin</option></select><span style="font-size:11px;color:#555;">Unit names (NNNCxx):</span><input type="text" class="med" value="350C01,360C01"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DB Notebook (20 tabs) -->
+  <div class="section">
+    <div class="db-tab-bar">
+      <div class="db-tab active">DB11</div>
+      <div class="db-tab">DB12</div>
+      <div class="db-tab">DB13</div>
+      <div class="db-tab">DB14</div>
+      <div class="db-tab">DB15</div>
+      <div class="db-tab">DB16</div>
+      <div class="db-tab">DB17</div>
+      <div class="db-tab">DB18</div>
+      <div class="db-tab">DB19</div>
+      <div class="db-tab">DB20</div>
+      <div class="db-tab">DB21</div>
+      <div class="db-tab">DB22</div>
+      <div class="db-tab">DB23</div>
+      <div class="db-tab">DB24</div>
+      <div class="db-tab">DB25</div>
+      <div class="db-tab">DB26</div>
+      <div class="db-tab">DB27</div>
+      <div class="db-tab">DB28</div>
+      <div class="db-tab">DB29</div>
+      <div class="db-tab">DB30</div>
+    </div>
+
+    <!-- DB11 tab content -->
+    <div style="padding:4px;">
+      <div class="tab-bar" style="margin-bottom:0;">
+        <div class="tab active">Header</div>
+        <div class="tab">F_Gen</div>
+        <div class="tab">Cycle</div>
+        <div class="tab">F_Prim</div>
+        <div class="tab" style="color:#b86000;">O_I ✦</div>
+        <div class="tab" style="color:#b86000;">AB ✦</div>
+        <div class="tab" style="color:#b86000;">A_I ✦</div>
+        <div class="tab">RQM</div>
+        <div class="tab" style="color:#b86000;">RQT ✦</div>
+        <div class="tab" style="color:#b86000;">Aux_Cycle ✦</div>
+        <div class="tab">Mem_Cycle</div>
+        <div class="tab">PICS</div>
+        <div class="tab">MG</div>
+        <div class="tab">TIO_D</div>
+        <div class="tab">Type_Elem</div>
+        <div class="note" style="margin:auto 0 auto 8px;">✦ = auto-generated from valve config</div>
+      </div>
+
+      <!-- Header tab content -->
+      <div class="tab-content" style="border:1px solid #ccc;">
+        <div style="font-weight:bold;margin-bottom:10px;font-size:13px;color:#333;">DB11  Header</div>
+        <div class="row"><label>DB Name :</label><input type="text" class="wide" value="G-DB_040T01"></div>
+        <div class="row"><label>Author :</label><input type="text" class="wide" value="SAUPLI"></div>
+        <div class="row"><label>Version :</label><input type="text" style="width:80px;" value="0.1"></div>
+        <div class="row"><label>Title :</label><input type="text" class="wide" value=""></div>
+      </div>
+
+      <!-- O_I auto preview -->
+      <div style="display:none;" class="tab-content" id="oi-tab">
+        <div style="display:flex; gap:12px; padding:4px 8px; font-weight:bold; font-size:12px; border-bottom:1px solid #ccc; margin-bottom:4px;">
+          <span style="width:200px;">Field</span><span>Comment  (auto-generated ✦)</span>
+        </div>
+        <div class="field-row"><span class="field-name">_00</span><input class="field-comment auto" value="O/I 00 Order Input Clamps at Work position 040T01_01V01A"></div>
+        <div class="field-row"><span class="field-name">_01</span><input class="field-comment auto" value="O/I 01 Order Input Clamps at Rest position 040T01_01V01B"></div>
+        <div class="field-row"><span class="field-name">_02</span><input class="field-comment auto" value="O/I 02 Order Input Clamps at Work position 040T01_01V02A"></div>
+        <div class="field-row"><span class="field-name">_03</span><input class="field-comment auto" value="O/I 03 Order Input Clamps at Rest position 040T01_01V02B"></div>
+        <div class="field-row"><span class="field-name">_04</span><input class="field-comment auto" value="O/I 04 Order Input Shift Pins at Work position 040T01_01V03A"></div>
+        <div class="field-row"><span class="field-name">_05</span><input class="field-comment auto" value="O/I 05 Order Input Shift Pins at Rest position 040T01_01V03B"></div>
+        <div class="field-row"><span class="field-name">_12</span><input class="field-comment auto" value="O/I 12 Order Input Shift Pins at Work position 040T01_02V01A"></div>
+        <div class="field-row"><span class="field-name">_20</span><input class="field-comment" value="RESERVE"></div>
+        <div style="padding:4px 8px;font-size:11px;color:#888;">... (96 entries total, scrollable)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action bar -->
+  <div class="action-bar">
+    <button class="btn">Load Project</button>
+    <button class="btn">Save Project</button>
+    <span style="width:1px;background:#aaa;margin:0 4px;"></span>
+    <button class="btn primary">Generate Current DB</button>
+    <button class="btn primary">Generate ALL DBs</button>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">Ready  –  template: db11.AWL</div>
+</div>
+
+<br>
+<div style="background:white;border:1px solid #ccc;padding:10px;width:1100px;font-size:12px;">
+  <b>Layout Summary:</b>
+  <ul style="margin:6px 0 0 18px;line-height:1.8;">
+    <li><b>Station tab:</b> Station type (Regular/Robot) + 3-part name builder with live validation indicator</li>
+    <li><b>Valve Islands tab:</b> Up to 2 islands (BM01/BM02), each with up to 10 valves. Each valve has: actuator type + unit names (comma-sep, format NNNCxx)</li>
+    <li><b>DB11–DB30 tabs:</b> 20 pages, each with inner section tabs (Header, F_Gen, Cycle, O_I, AB, A_I, RQM, RQT, Aux_Cycle, …)</li>
+    <li><b>✦ auto-generated sections:</b> O_I, A_I, AB, RQT, Aux_Cycle comments fill automatically when valve config changes</li>
+    <li><b>All other sections</b> (F_Gen, Cycle, F_Prim, RQM, Mem_Cycle, PICS, MG, TIO_D, Type_Elem) are manually editable with scrollable field/comment grids</li>
+    <li><b>Aux_Cycle:</b> interlock entries start at _20 (island 1: _20–_39, island 2: _40–_59)</li>
+    <li><b>RQT:</b> same slot layout as AB — island 1 work: _51–_60, island 2 work: _61–_70, rest: _71–_90</li>
+    <li><b>Generate ALL DBs:</b> writes db11.AWL … db30.AWL to chosen folder</li>
+  </ul>
+</div>
+</body>
+</html>
