@@ -1,0 +1,3419 @@
+DATA_BLOCK "G-DB_ST040"
+TITLE =
+{ S7_language := '16(1) Italiano (Italia)  09.02.2008  07:33:54' }
+AUTHOR : SAUPLI
+VERSION : 0.1
+
+
+  STRUCT 	
+   F_Gen : STRUCT 	//GENERAL FUNCTION FOR ST.
+    No_Ma : BOOL ;	//"#FLAG ASS. M/A ST.*** GEN."
+    No_Mp : BOOL ;	//"#FLAG ASS. M/P ST.*** GEN."
+    No_Fmp_sec : BOOL ;	//"#FLAG ASS. M/P ST.*** GEN. FOR STOP END OF CYCLE"
+    No_ma_imm : BOOL ;	//"#FLAG ASS. M/A ST.*** GEN.  INIBIZ. MANUAL MOV."
+    No_ma_weld : BOOL ;	//"#FLAG ASS. M/A WELD GEN.  ST.***"
+    No_mp_sec : BOOL ;	//"#ASS. M/P ST.*** GEN. FOR STOP END OF CYCLE"
+   END_STRUCT ;	
+   Cycle : STRUCT 	//CYCLE SELECTION FOR ST.
+    Manual : BOOL ;	//#CYC. MANO ST.
+    Manual_rem : BOOL ;	//#CYC. MANO TAST. REM. ST.
+    Auto_lin : BOOL ;	//#CYC. AUTO ON LINE ST.
+    Auto_loc : BOOL ;	//#CYC. AUTO LOCAL NORMAL ST.
+    Auto_loc_noweld : BOOL ;	//#CYC. AUTO LOCAL WITHOUT WELD ST.
+    Auto_loc_noelem : BOOL ;	//#CYC. AUTO LOCAL WITHOUT PART ST.
+    Auto_step_step : BOOL ;	//#CYC. AUTO S/S NORMAL ST
+    Auto_st_st_noweld : BOOL ;	//#CYC. AUTO S/S SENZA SLD ST
+    Auto_st_st_noelem : BOOL ;	//#CYC. AUTO S/S WITHOUT PART  ST
+    Change_tool : BOOL ;	//#CYCLE CHANGE TOOL ST.
+    Home_Run : BOOL ;	//#CYCLE HOME RUN S
+    Except : BOOL ;	//#CYCLE EXCEPT ST
+    Auto_lin_no_el : BOOL ;	//#CYCLE AUTO LINE WITHOUT PART
+   END_STRUCT ;	
+   F_Prim : STRUCT 	
+    No_anom : BOOL ;	//#ABSENCE ANOMALY ST.
+    AB_M : BOOL ;	//#AB/M IN MANUAL CYCLE ST.
+    OS_home_run : BOOL ;	//#COMMAND HOME RUN (O/S) ST.
+    Home_run : BOOL ;	//#COMMAND HOME RUN (CONTINUOUS) ST
+    Excl_sec : BOOL ;	//#ESCL. SEC. MANUAL MOTION ST
+    P_E_OK : BOOL ;	//#PART PRESENT OK ST.
+    C_rest : BOOL ;	//#CYCLE AT REST ST.
+    C_Start_up : BOOL ;	//#CYCLE START UP ST. (avviato)
+    C_in_Start_up : BOOL ;	//#CYCLE IN START UP ST. (IN avvio)
+    C_in_run : BOOL ;	//#CYCLE AUTO IN RUN ST. (in run di linea)
+    C_H_R_in_run : BOOL ;	//#CYCLE HOME RUN IN RUN ST. (in run di HOME RUN)
+    C_AutoL_in_run : BOOL ;	//#CYCLE AUTO LOCAL IN RUN ST. (in run di AUTO LOCALE)
+    End_Work : BOOL ;	//#END WORK CYCLE ST.
+    Change_selec : BOOL ;	//#CAHNGE SEL/CYC ST.
+    Open_Out_Cycle : BOOL ;	//#OPENING OUT OF CYCLE ST.
+    NO_MA : BOOL ;	//NON UTILIZZARE
+    NO_MG : BOOL ;	//#FLAG ASS. M/G CYCLE ST.
+    Time_Out : BOOL ;	//#FLAG M/T CYCLE ST.
+    NO_ME : BOOL ;	//#FLAG ASS. M/E CICLO ST.
+    NO_MA_pr : BOOL ;	//#FLAG ASS. M/A CYCLE PRIORITY AT M/E ST.
+    NO_RQM : BOOL ;	//#FLAG ASS. RQM CYCLE ST
+    NO_RQT : BOOL ;	//#FLAG ASS. RQT CYCLE ST.
+    P_E_GEN : BOOL ;	//#P/P GENER. ST.
+    NO_P_E : BOOL ;	//#ABS. PART. ST.
+    Parity_Error : BOOL ;	//#PARITY ERROR ST.
+    NO_RQM_pr : BOOL ;	//#ABS. RQM PRIOR. FOR START CYCLE ST.
+    AB_C_run : BOOL ;	//#CONSENSUS START CYCLE ST.
+    CMD_C_avv : BOOL ;	//#COMMAND START CYCLE ST.
+    AB_inc_cnt : BOOL ;	//#CONSENSUS INCREM. CONTAT. STEP ST.
+    AB_dec_cnt : BOOL ;	//#CONSENSUS DEC. CONTAT. STEP ST.
+    OS_CMD_C_run : BOOL ;	//#ANTIRIP. START CYCLE  ST.
+    OS_Open_Out_Cycle : BOOL ;	//#OPENING OUT OF CYCLE (O/S) ST.
+    AUX_Open_Out_Cycle : BOOL ;	//#AUX OPENING OUT CYCLE ST.
+    RES_TO : BOOL ;	//#RESET T/O CYCLE ST
+    OS_RES_TO : BOOL ;	//#RESET T/O CYCLE (ANTIRIP.) ST.
+    AUX_RES_End_Work : BOOL ;	//#AUX RESET E/W ST
+    Reset_step_counter : BOOL ;	//#RESET STEP COUNTER
+    Conf_Step : BOOL ;	//#CONFERM STEP 
+    OS_Conf_Step : BOOL ;	//#CONFERM STEP O/S
+    AUX_SET_End_Work : BOOL ;	//#AUX SET E/W ST
+   END_STRUCT ;	
+   Reset_anom1 : BOOL ;	//#RESET ANOM
+   Tip_el : INT ;	//#TIPOLOGY PART
+   Step : ARRAY  [0 .. 64 ] OF //#STEP
+   BOOL  := FALSE;	
+   Cnt1 : DINT ;	
+   O_I : STRUCT 	//#O/I
+    _00 : BOOL ;	//O/I 00 Order Imput Clamps at Work position 040T01_01V01A
+    _01 : BOOL ;	//O/I 01 Order Imput Clamps at Rest position 040T01_01V01B
+    _02 : BOOL ;	//O/I 02 Order Imput Clamps at Work position 040T01_01V02A
+    _03 : BOOL ;	//O/I 03 Order Imput Clamps at Rest position 040T01_01V02B
+    _04 : BOOL ;	//O/I 04 Order Imput Shift Pins at Work position 040T01_01V03A
+    _05 : BOOL ;	//O/I 05 Order Imput Shift Pins at Rest position 040T01_01V03B
+    _06 : BOOL ;	//O/I 06 Order Imput Shift Pins at Work position 040T01_01V04A
+    _07 : BOOL ;	//O/I 07 Order Imput Shift Pins at Rest position 040T01_01V04B
+    _08 : BOOL ;	//O/I 08 Order Imput Clamps at Work position 040T01_01V05A
+    _09 : BOOL ;	//O/I 09 Order Imput Clamps at Rest position 040T01_01V05B
+    _10 : BOOL ;	//O/I 10 Order Imput Clamps at Work position 040T01_01V06A
+    _11 : BOOL ;	//O/I 11 Order Imput Clamps at Rest position 040T01_01V06B
+    _12 : BOOL ;	//O/I 12 Order Imput Shift Pins at Work position 040T01_02V01A
+    _13 : BOOL ;	//O/I 13 Order Imput Shift Pins at Rest position 040T01_02V01B
+    _14 : BOOL ;	//O/I 14 Order Imput Clamps at Work position 040T01_02V02A
+    _15 : BOOL ;	//O/I 15 Order Imput Clamps at Rest position 040T01_02V02B
+    _16 : BOOL ;	//O/I 16 Order Imput Clamps at Work position 040T01_02V03A
+    _17 : BOOL ;	//O/I 17 Order Imput Clamps at Rest position 040T01_02V03B
+    _18 : BOOL ;	//O/I 18 Order Imput Shift Pins at Work position 040T01_02V04A
+    _19 : BOOL ;	//O/I 19 Order Imput Shift Pins at Rest position 040T01_02V04B
+    _20 : BOOL ;	//RESERVE
+    _21 : BOOL ;	//RESERVE
+    _22 : BOOL ;	//RESERVE
+    _23 : BOOL ;	//RESERVE
+    _24 : BOOL ;	//RESERVE
+    _25 : BOOL ;	//RESERVE
+    _26 : BOOL ;	//RESERVE
+    _27 : BOOL ;	//RESERVE
+    _28 : BOOL ;	//RESERVE
+    _29 : BOOL ;	//RESERVE
+    _30 : BOOL ;	//RESERVE
+    _31 : BOOL ;	//RESERVE
+    _32 : BOOL ;	//RESERVE
+    _33 : BOOL ;	//RESERVE
+    _34 : BOOL ;	//RESERVE
+    _35 : BOOL ;	//RESERVE
+    _36 : BOOL ;	//RESERVE
+    _37 : BOOL ;	//RESERVE
+    _38 : BOOL ;	//RESERVE
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RESERVE
+    _42 : BOOL ;	//RESERVE
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//RESERVE
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//RESERVE
+    _47 : BOOL ;	//RESERVE
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//RESERVE
+    _51 : BOOL ;	//RESERVE
+    _52 : BOOL ;	//RESERVE
+    _53 : BOOL ;	//RESERVE
+    _54 : BOOL ;	//RESERVE
+    _55 : BOOL ;	//RESERVE
+    _56 : BOOL ;	//RESERVE
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//RESERVE
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//RESERVE
+    _61 : BOOL ;	//RESERVE
+    _62 : BOOL ;	//RESERVE
+    _63 : BOOL ;	//RESERVE
+    _64 : BOOL ;	//RESERVE
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//RESERVE
+    _67 : BOOL ;	//RESERVE
+    _68 : BOOL ;	//RESERVE
+    _69 : BOOL ;	//RESERVE
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//RESERVE
+    _72 : BOOL ;	//RESERVE
+    _73 : BOOL ;	//RESERVE
+    _74 : BOOL ;	//RESERVE
+    _75 : BOOL ;	//RESERVE
+    _76 : BOOL ;	//RESERVE
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//RESERVE
+    _81 : BOOL ;	//RESERVE
+    _82 : BOOL ;	//RESERVE
+    _83 : BOOL ;	//RESERVE
+    _84 : BOOL ;	//RESERVE
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//RESERVE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//RESERVE
+    _94 : BOOL ;	//RESERVE
+    _95 : BOOL ;	//RESERVE
+   END_STRUCT ;	
+   AB : STRUCT 	//#Habilitation
+    _00 : BOOL ;	//[STEP 0] RESET ALL MEMORIES
+    _01 : BOOL ;	//RESERVE
+    _02 : BOOL ;	//RESERVE
+    _03 : BOOL ;	//RESERVE
+    _04 : BOOL ;	//CHECK STATION AND MODEL BEFORE CONSENT TO 35R01
+    _05 : BOOL ;	//CONSENT TO DROP PART 035R01 (JOB3)
+    _06 : BOOL ;	//CHECK PART PRESENTS ON (LOAD 1 35R01)
+    _07 : BOOL ;	//WAITING TOOL REQUEST FROM 035R01
+    _08 : BOOL ;	//CONSENT TOOL RELEASE 035R01 
+    _09 : BOOL ;	//WAITING END OF DROP 035R01 (JOB3)
+    _10 : BOOL ;	//CONSENT TO EXIT 035R01 (ACK JOB3)
+    _11 : BOOL ;	//RESERVE
+    _12 : BOOL ;	//RESERVE
+    _13 : BOOL ;	//RESERVE
+    _14 : BOOL ;	//CHECK STATION AND MODEL BEFORE CONSENT TO 40R03
+    _15 : BOOL ;	//CONSENT TO DROP PART 040R03 (JOB3)
+    _16 : BOOL ;	//CHECK PART PRESENTS ON (LOAD 2 40R03)
+    _17 : BOOL ;	//WAITING END OF DROP 040R03 (JOB3)
+    _18 : BOOL ;	//CONSENT TO OPEN GRIPPER CLAMPS 040R03 (JOB4)
+    _19 : BOOL ;	//WAITING END OF OPEN GRIPPER CLAMPS (JOB4)
+    _20 : BOOL ;	//CONSENT TO EXIT 040R03 (ACK JOB3 - JOB4)
+    _21 : BOOL ;	//RESERVE
+    _22 : BOOL ;	//RESERVE
+    _23 : BOOL ;	//IFL CHECK
+    _24 : BOOL ;	//START ROBOT 040R01
+    _25 : BOOL ;	//START ROBOT 040R02
+    _26 : BOOL ;	//CONSENT TO WELD 040R01 040R02 (JOB1)
+    _27 : BOOL ;	//WAITING END OF WELDING 040R01 040R02 (JOB1)
+    _28 : BOOL ;	//CONSENT TO EXIT 040R01-040R02 (ACK JOB1)
+    _29 : BOOL ;	//RESERVE
+    _30 : BOOL ;	//RESERVE
+    _31 : BOOL ;	//RESERVE
+    _32 : BOOL ;	//RESERVE
+    _33 : BOOL ;	//CHECK STATION AND MODEL BEFORE CONSENT TO 45R01
+    _34 : BOOL ;	//CONSENT TO PICK PART 045R01 (JOB1)
+    _35 : BOOL ;	//CHECK PART PRESENTS OFF 
+    _36 : BOOL ;	//WAITING TOOL REQUEST FROM 045R01
+    _37 : BOOL ;	//CONSENT TOOL RELEASE 045R01 
+    _38 : BOOL ;	//WAITING END OF PICK 045R01 (JOB1)
+    _39 : BOOL ;	//CONSENT TO EXIT 045R01 (ACK JOB1)
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RESERVE
+    _42 : BOOL ;	//RESERVE
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//CHECK 40R03 GRIPPER DOCKING
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//RESERVE
+    _47 : BOOL ;	//RESERVE
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//RESERVE
+    _51 : BOOL ;	//040T01_01V01A CLAMP COMMAND FORWARD
+    _52 : BOOL ;	//040T01_01V02A CLAMP COMMAND FORWARD
+    _53 : BOOL ;	//040T01_01V03A PIN   COMMAND FORWARD
+    _54 : BOOL ;	//040T01_01V04A CLAMP COMMAND FORWARD
+    _55 : BOOL ;	//040T01_01V05A CLAMP COMMAND FORWARD
+    _56 : BOOL ;	//040T01_01V06A CLAMP COMMAND FORWARD
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//RESERVE
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//RESERVE
+    _61 : BOOL ;	//040T01_02V01A PIN COMMAND FORWARD
+    _62 : BOOL ;	//040T01_02V02A CLAMP COMMAND FORWARD
+    _63 : BOOL ;	//040T01_02V03A CLAMP COMMAND FORWARD
+    _64 : BOOL ;	//040T01_02V04A PIN COMMAND FORWARD
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//RESERVE
+    _67 : BOOL ;	//RESERVE
+    _68 : BOOL ;	//RESERVE
+    _69 : BOOL ;	//RESERVE
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//040T01_01V01B CLAMP COMMAND BACKWARD
+    _72 : BOOL ;	//040T01_01V02B CLAMP COMMAND BACKWARD
+    _73 : BOOL ;	//040T01_01V03B PIN   COMMAND BACKWARD
+    _74 : BOOL ;	//040T01_01V04B CLAMP COMMAND BACKWARD
+    _75 : BOOL ;	//040T01_01V05B CLAMP COMMAND BACKWARD
+    _76 : BOOL ;	//040T01_01V06B CLAMP COMMAND BACKWARD
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//RESERVE
+    _81 : BOOL ;	//040T01_02V01B PIN COMMAND BACKWARD
+    _82 : BOOL ;	//040T01_02V02B CLAMP COMMAND BACKWARD
+    _83 : BOOL ;	//040T01_02V03B CLAMP COMMAND BACKWARD
+    _84 : BOOL ;	//040T01_02V04B PIN COMMAND BACKWARD
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//[STEP 0] WAITING CONDITION FOR START NEW CYCLE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//RESERVE
+    _94 : BOOL ;	//RESERVE
+    _95 : BOOL ;	//[STEP 55] END OF WORK
+   END_STRUCT ;	
+   A_I : STRUCT 	//#A/I
+    _00 : BOOL ;	//A/I 00 Update Input Clamps at Work position 040T01_01V01A
+    _01 : BOOL ;	//A/I 01 Update Input Clamps at Rest position 040T01_01V01B
+    _02 : BOOL ;	//A/I 02 Update Input Clamps at Work position 040T01_01V02A
+    _03 : BOOL ;	//A/I 03 Update Input Clamps at Rest position 040T01_01V02B
+    _04 : BOOL ;	//A/I 04 Update Input Shift Pins at Work position 040T01_01V03A
+    _05 : BOOL ;	//A/I 05 Update Input Shift Pins at Rest position 040T01_01V03B
+    _06 : BOOL ;	//A/I 06 Update Input Shift Pins at Work position 040T01_01V04A
+    _07 : BOOL ;	//A/I 07 Update Input Shift Pins at Rest position 040T01_01V04B
+    _08 : BOOL ;	//A/I 08 Update Input Clamps at Work position 040T01_01V05A
+    _09 : BOOL ;	//A/I 09 Update Input Clamps at Rest position 040T01_01V05B
+    _10 : BOOL ;	//A/I 10 Update Input Clamps at Work position 040T01_01V06A
+    _11 : BOOL ;	//A/I 11 Update Input Clamps at Rest position 040T01_01V06B
+    _12 : BOOL ;	//A/I 12 Update Input Shift Pins at Work position 040T01_02V01A
+    _13 : BOOL ;	//A/I 13 Update Input Shift Pins at Rest position 040T01_02V01B
+    _14 : BOOL ;	//A/I 14 Update Input Clamps at Work position 040T01_02V02A
+    _15 : BOOL ;	//A/I 15 Update Input Clamps at Rest position 040T01_02V02B
+    _16 : BOOL ;	//A/I 16 Update Input Clamps at Work position 040T01_02V03A
+    _17 : BOOL ;	//A/I 17 Update Input Clamps at Work position 040T01_02V03B
+    _18 : BOOL ;	//A/I 18 Update Input Shift Pins at Work position 040T01_02V04A
+    _19 : BOOL ;	//A/I 19 Update Input Shift Pins at Work position 040T01_02V04B
+    _20 : BOOL ;	//RESERVE
+    _21 : BOOL ;	//RESERVE
+    _22 : BOOL ;	//RESERVE
+    _23 : BOOL ;	//RESERVE
+    _24 : BOOL ;	//RESERVE
+    _25 : BOOL ;	//RESERVE
+    _26 : BOOL ;	//RESERVE
+    _27 : BOOL ;	//RESERVE
+    _28 : BOOL ;	//RESERVE
+    _29 : BOOL ;	//RESERVE
+    _30 : BOOL ;	//RESERVE
+    _31 : BOOL ;	//RESERVE
+    _32 : BOOL ;	//RESERVE
+    _33 : BOOL ;	//RESERVE
+    _34 : BOOL ;	//RESERVE
+    _35 : BOOL ;	//RESERVE
+    _36 : BOOL ;	//RESERVE
+    _37 : BOOL ;	//RESERVE
+    _38 : BOOL ;	//RESERVE
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RESERVE
+    _42 : BOOL ;	//RESERVE
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//RESERVE
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//RESERVE
+    _47 : BOOL ;	//RESERVE
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//RESERVE
+    _51 : BOOL ;	//RESERVE
+    _52 : BOOL ;	//RESERVE
+    _53 : BOOL ;	//RESERVE
+    _54 : BOOL ;	//RESERVE
+    _55 : BOOL ;	//RESERVE
+    _56 : BOOL ;	//RESERVE
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//RESERVE
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//RESERVE
+    _61 : BOOL ;	//RESERVE
+    _62 : BOOL ;	//RESERVE
+    _63 : BOOL ;	//RESERVE
+    _64 : BOOL ;	//RESERVE
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//RESERVE
+    _67 : BOOL ;	//RESERVE
+    _68 : BOOL ;	//RESERVE
+    _69 : BOOL ;	//RESERVE
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//RESERVE
+    _72 : BOOL ;	//RESERVE
+    _73 : BOOL ;	//RESERVE
+    _74 : BOOL ;	//RESERVE
+    _75 : BOOL ;	//RESERVE
+    _76 : BOOL ;	//RESERVE
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//RESERVE
+    _81 : BOOL ;	//RESERVE
+    _82 : BOOL ;	//RESERVE
+    _83 : BOOL ;	//RESERVE
+    _84 : BOOL ;	//RESERVE
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//RESERVE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//RESERVE
+    _94 : BOOL ;	//RESERVE
+    _95 : BOOL ;	//RESERVE
+   END_STRUCT ;	
+   RQM : STRUCT 	//#RQM
+    _00 : BOOL ;	//RQM 00 [ST040T01] Reset end of work
+    _01 : BOOL ;	//RQM 01 [ST040T01] Selection Emptying Line 
+    _02 : BOOL ;	//RQM 02 [ST040T01] All memory reset
+    _03 : BOOL ;	//RESERVE
+    _04 : BOOL ;	//RQM 04 [ST040T01] Wait condition for start new cycle
+    _05 : BOOL ;	//RESERVE
+    _06 : BOOL ;	//RQM 06 [ST040T01] Wait part present ok for drop 1 ( 035R01 )
+    _07 : BOOL ;	//RQM 07 [ST040T01] Wait part present ok for drop 2 ( 040R03 )
+    _08 : BOOL ;	//RQM 08 [ST040T01] Wait IFL OK
+    _09 : BOOL ;	//RQM 09 [ST040T01] Wait part present off for pick part ( 045R01 )
+    _10 : BOOL ;	//RESERVE
+    _11 : BOOL ;	//RESERVE
+    _12 : BOOL ;	//RESERVE
+    _13 : BOOL ;	//RESERVE
+    _14 : BOOL ;	//RESERVE
+    _15 : BOOL ;	//RESERVE
+    _16 : BOOL ;	//RESERVE
+    _17 : BOOL ;	//RESERVE
+    _18 : BOOL ;	//RESERVE
+    _19 : BOOL ;	//RESERVE
+    _20 : BOOL ;	//RESERVE
+    _21 : BOOL ;	//RESERVE
+    _22 : BOOL ;	//RQM 22 [ST040T01] Wait inside of station 035R01
+    _23 : BOOL ;	//RQM 23 [ST040T01] Wait tool Request ON 035R01 (TOOLING X)
+    _24 : BOOL ;	//RQM 24 [ST040T01] Wait robot 035R01 drop part done
+    _25 : BOOL ;	//RQM 25 [ST040T01] Wait Out of interference 035R01
+    _26 : BOOL ;	//RQM 26 [ST040T01] Wait tool Request OFF 035R01 (TOOLING X)
+    _27 : BOOL ;	//RQM 27 [ST040T01] Wait inside of station 040R03
+    _28 : BOOL ;	//RQM 28 [ST040T01] RES 040R03
+    _29 : BOOL ;	//RQM 29 [ST040T01] Wait robot 040R03 drop part done
+    _30 : BOOL ;	//RQM 30 [ST040T01] Wait Out of interference 040R03
+    _31 : BOOL ;	//RQM 31 [ST040T01] RES 040R03
+    _32 : BOOL ;	//RQM 32 [ST040T01] Wait inside of station 045R01
+    _33 : BOOL ;	//RQM 33 [ST040T01] Wait tool Request ON 045R01 (TOOLING 1)
+    _34 : BOOL ;	//RQM 34 [ST040T01] Wait robot 045R01 Pick part done
+    _35 : BOOL ;	//RQM 35 [ST040T01] Wait Out of interference 045R01 
+    _36 : BOOL ;	//RQM 36 [ST040T01] Wait tool Request OFF 045R01 (TOOLING 1)
+    _37 : BOOL ;	//RESERVE
+    _38 : BOOL ;	//RESERVE
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RQM 41 [ST040T01] Wait inside of JOB4 040R03
+    _42 : BOOL ;	//RQM 42 [ST040T01] Wait robot 040R03 Clamps Opened Done
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//RESERVE
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//RESERVE
+    _47 : BOOL ;	//RESERVE
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//RESERVE
+    _51 : BOOL ;	//RESERVE
+    _52 : BOOL ;	//RESERVE
+    _53 : BOOL ;	//RESERVE
+    _54 : BOOL ;	//RESERVE
+    _55 : BOOL ;	//RQM 55 [ST040T01] Wait Set End of Work
+    _56 : BOOL ;	//RESERVE
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//RESERVE
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//RESERVE
+    _61 : BOOL ;	//RESERVE
+    _62 : BOOL ;	//RESERVE
+    _63 : BOOL ;	//RESERVE
+    _64 : BOOL ;	//RESERVE
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//RESERVE
+    _67 : BOOL ;	//RESERVE
+    _68 : BOOL ;	//RESERVE
+    _69 : BOOL ;	//RESERVE
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//RESERVE
+    _72 : BOOL ;	//RESERVE
+    _73 : BOOL ;	//RESERVE
+    _74 : BOOL ;	//RESERVE
+    _75 : BOOL ;	//RESERVE
+    _76 : BOOL ;	//RESERVE
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//RESERVE
+    _81 : BOOL ;	//RESERVE
+    _82 : BOOL ;	//RESERVE
+    _83 : BOOL ;	//RESERVE
+    _84 : BOOL ;	//RESERVE
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//RESERVE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//RESERVE
+    _94 : BOOL ;	//RESERVE
+    _95 : BOOL ;	//RESERVE
+   END_STRUCT ;	
+   RQT : STRUCT 	//#RQT
+    _00 : BOOL ;	//RQT 00 [ST040T01] Wait Part Present On 210SQ01
+    _01 : BOOL ;	//RQT 01 [ST040T01] Wait Part Present On 220SQ02
+    _02 : BOOL ;	//RQT 02 [ST040T01] Wait Part Present On 250SQ03
+    _03 : BOOL ;	//RQT 02 [ST040T01] Wait Part Present On 250SQ04
+    _04 : BOOL ;	//RQT 02 [ST040T01] Wait Part Present On 410SQ05
+    _05 : BOOL ;	//RQT 02 [ST040T01] Wait Part Present On 440SQ06
+    _06 : BOOL ;	//RQT 02 [ST040T01] Wait Part Present On res
+    _07 : BOOL ;	//RQT 07 [ST040T01] Wait Part Present On res
+    _08 : BOOL ;	//RQT 08 [ST040T01  Wait Part Present On res
+    _09 : BOOL ;	//RQT 09 [ST040T01] Wait Part Present On res
+    _10 : BOOL ;	//RQT 10 [ST040T01] Wait Part Present Off 210SQ01
+    _11 : BOOL ;	//RQT 11 [ST040T01] Wait Part Present Off 220SQ02
+    _12 : BOOL ;	//RQT 12 [ST040T01] Wait Part Present Off 250SQ03
+    _13 : BOOL ;	//RQT 13 [ST040T01] Wait Part Present Off 250SQ04
+    _14 : BOOL ;	//RQT 14 [ST040T01] Wait Part Present Off 410SQ05
+    _15 : BOOL ;	//RQT 15 [ST040T01] Wait Part Present Off 440SQ06
+    _16 : BOOL ;	//RQT 16 [ST040T01] Wait Part Present Off res
+    _17 : BOOL ;	//RQT 17 [ST040T01] Wait Part Present Off res
+    _18 : BOOL ;	//RQT 18 [ST040T01] Wait Part Present Off res
+    _19 : BOOL ;	//RQT 19 [ST040T01] Wait Part Present Off res
+    _20 : BOOL ;	//RQT 20 [ST040T01] Wait Part Present Off res
+    _21 : BOOL ;	//RESERVE
+    _22 : BOOL ;	//RQT 22 [ST040T01] Wait robot 040R01 START
+    _23 : BOOL ;	//RQT 23 [ST040T01] Wait robot 040R02 START
+    _24 : BOOL ;	//RQT 24 [ST040T01] Wait inside of station 040R01 
+    _25 : BOOL ;	//RQT 25 [ST040T01] Wait robot 040R01 end of welding
+    _26 : BOOL ;	//RQT 26 [ST040T01] Wait Out of interference 040R01 
+    _27 : BOOL ;	//RQT 27 [ST040T01] Wait inside of station 040R02 
+    _28 : BOOL ;	//RQT 28 [ST040T01] Wait robot 040R02 end of welding
+    _29 : BOOL ;	//RQT 29 [ST040T01] Wait Out of interference 040R02
+    _30 : BOOL ;	//RESERVE
+    _31 : BOOL ;	//RESERVE
+    _32 : BOOL ;	//RESERVE
+    _33 : BOOL ;	//RESERVE
+    _34 : BOOL ;	//RESERVE
+    _35 : BOOL ;	//RESERVE
+    _36 : BOOL ;	//RESERVE
+    _37 : BOOL ;	//RESERVE
+    _38 : BOOL ;	//RESERVE
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RESERVE
+    _42 : BOOL ;	//RESERVE
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//RQT 44 [ST040T01] Wait 40R03 Docking sesnsors SQ05 SQ06
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//RESERVE
+    _47 : BOOL ;	//RESERVE
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//RESERVE
+    _51 : BOOL ;	//RQT 51 [ST040T01] Wait Clamp 050C01-060C01 at work 01V01A
+    _52 : BOOL ;	//RQT 52 [ST040T01] Wait Clamp 110C01-120C01 at work 01V02A
+    _53 : BOOL ;	//RQT 53 [ST040T01] Wait Pin   030C01-300C01 at work 01V03A
+    _54 : BOOL ;	//RQT 54 [ST040T01] Wait Clamp 130C01-140C01 at work 01V04A
+    _55 : BOOL ;	//RQT 55 [ST040T01] Wait Clamp 070C01-080C01 at work 01V05A
+    _56 : BOOL ;	//RQT 56 [ST040T01] Wait Clamp 390C01-400C01-410C01-440C01 at work 01V06A
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//RESERVE
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//RESERVE
+    _61 : BOOL ;	//RQT 61 [ST040T01] Wait Pin   370C01-380C01 at work 02V01A
+    _62 : BOOL ;	//RQT 62 [ST040T01] Wait Clamp 330C01-340C01 at work 02V02A
+    _63 : BOOL ;	//RQT 63 [ST040T01] Wait Clamp 310C01-320C01 at work 02V03A
+    _64 : BOOL ;	//RQT 64 [ST040T01] Wait Pin   350C01-360C01 at work 02V04A
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//RESERVE
+    _67 : BOOL ;	//RESERVE
+    _68 : BOOL ;	//RESERVE
+    _69 : BOOL ;	//RESERVE
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//RQT 71 [ST040T01] Wait Clamp 050C01-060C01 at rest 01V01B
+    _72 : BOOL ;	//RQT 72 [ST040T01] Wait Clamp 110C01-120C01 at rest 01V02B
+    _73 : BOOL ;	//RQT 73 [ST040T01] Wait Pin   030C01-300C01 at rest 01V03B
+    _74 : BOOL ;	//RQT 74 [ST040T01] Wait Clamp 130C01-140C01 at rest 01V04B
+    _75 : BOOL ;	//RQT 75 [ST040T01] Wait Clamp 070C01-080C01 at rest 01V05B
+    _76 : BOOL ;	//RQT 76 [ST040T01] Wait Clamp 390C01-400C01-410C01-440C01 at rest 01V06B
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//RESERVE
+    _81 : BOOL ;	//RQT 81 [ST040T01] Wait Pin   370C01-380C01 at rest 02V01B
+    _82 : BOOL ;	//RQT 82 [ST040T01] Wait Clamp 330C01-340C01 at rest 02V02B
+    _83 : BOOL ;	//RQT 83 [ST040T01] Wait Clamp 310C01-320C01 at rest 02V03B
+    _84 : BOOL ;	//RQT 84 [ST040T01] Wait Pin   350C01-360C01 at rest 02V03B
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//RESERVE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//RESERVE
+    _94 : BOOL ;	//RESERVE
+    _95 : BOOL ;	//RQT 90 [ST040T01] Set End of Work
+   END_STRUCT ;	
+   Ma_EP : ARRAY  [0 .. 128 ] OF //not used
+   BOOL ;	
+   Aux_Cycle : STRUCT 	//#Auxiliary Cycle
+    _01 : BOOL ;	//Robots out of interference
+    _02 : BOOL ;	//No fault robot 040R01
+    _03 : BOOL ;	//No fault robot 040R02
+    _04 : BOOL ;	//No Robot Collision
+    _05 : BOOL ;	//RESERVE
+    _06 : BOOL ;	//Clamps ready to drop 35R01
+    _07 : BOOL ;	//Clamps ready to drop 40R03
+    _08 : BOOL ;	//Clamps closed 
+    _09 : BOOL ;	//Clamps ready to Exit 40R03
+    _10 : BOOL ;	//Clamps opened
+    _11 : BOOL ;	//Clamps ready to pick part 045R01
+    _12 : BOOL ;	//Aux 040T01 Pilot Valve Error 01V00 (BM01)
+    _13 : BOOL ;	//Aux 040T01 Pilot Valve Error 01V00 (BM02)
+    _14 : BOOL ;	//RESERVE
+    _15 : BOOL ;	//AUX. CONSENSUS INCREM. CON. TAT. STEP ST.
+    _16 : BOOL ;	//Presence element in ST040 for dry cycle
+    _17 : BOOL ;	//Aux 17 Interlock Fwd Clamps YV01 C050-C060
+    _18 : BOOL ;	//Aux 18 Interlock Bwd Clamps YV01 C050-C060
+    _19 : BOOL ;	//Aux 19 Interlock Fwd Clamps YV02 C110-C120
+    _20 : BOOL ;	//Aux 20 Interlock Bwd Clamps YV02 C110-C120
+    _21 : BOOL ;	//Aux 21 Interlock Fwd Shift Pins YV03 C030-C300
+    _22 : BOOL ;	//Aux 22 Interlock Bwd Shift Pins YV03 C030-C300
+    _23 : BOOL ;	//Aux 23 Interlock Fwd Clamp Pins YV04 C130-C140
+    _24 : BOOL ;	//Aux 24 Interlock Bwd Clamp Pins YV04 C130-C140
+    _25 : BOOL ;	//Aux 25 Interlock Fwd Clamps YV05 C070-C080
+    _26 : BOOL ;	//Aux 26 Interlock Bwd Clamps YV05 C070-C180
+    _27 : BOOL ;	//Aux 27 Interlock Fwd Clamps YV06 C390-C400-C410-C440
+    _28 : BOOL ;	//Aux 28 Interlock Bwd Clamps YV06 C390-C400-C410-C440
+    _29 : BOOL ;	//Aux 29 Interlock Fwd Shift Pins 2YV01 C370-C380
+    _30 : BOOL ;	//Aux 30 Interlock Bwd Shift Pins 2YV01 C370-C380
+    _31 : BOOL ;	//Aux 31 Interlock Fwd Clamp 2YV02 C330-C340
+    _32 : BOOL ;	//Aux 32 Interlock Bwd Clamp  2YV02 C330-C340
+    _33 : BOOL ;	//Aux 33 Interlock Fwd Clamp 2YV03 C310-C320
+    _34 : BOOL ;	//Aux 34 Interlock Bwd Clamp 2YV03 C310-C320
+    _35 : BOOL ;	//Aux 35 Interlock Fwd Shift Pins 2YV04 C350-C360
+    _36 : BOOL ;	//Aux 36 Interlock Bwd Shift Pins 2YV04 C350-C360
+    _37 : BOOL ;	//RESERVE
+    _38 : BOOL ;	//RESERVE
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RESERVE
+    _42 : BOOL ;	//Clamps ready to tooling 35R01
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//Clamps ready to tooling 45R01
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//Aux. Robot 040R01 out of interference from 040T01
+    _47 : BOOL ;	//Aux. Robot 040R02 out of interference from 040T01
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//Presence Element Drop 1 035R01
+    _51 : BOOL ;	//Presence Element Drop 2 040R03
+    _52 : BOOL ;	//Aux. All Robots out of station
+    _53 : BOOL ;	//Aux. Robot 035R01 out of interference from 040T01
+    _54 : BOOL ;	//Aux. Robot 040R03 out of interference from 040T01
+    _55 : BOOL ;	//Aux. Robot 045R01 out of interference from 040T01
+    _56 : BOOL ;	//RESERVE
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//Aux. Robot 035R01 tooling request X
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//Aux. Robot 045R01 tooling request 1
+    _61 : BOOL ;	//Aux. Consent To Weld 040R01-040R02
+    _62 : BOOL ;	//Aux. Consent Exit 040R01-040R02
+    _63 : BOOL ;	//RESERVE
+    _64 : BOOL ;	//Aux. Consent To Drop 035R01
+    _65 : BOOL ;	//Aux. Tooling Release X 035R01
+    _66 : BOOL ;	//Aux. Consent To Exit 035R01
+    _67 : BOOL ;	//Aux. Consent To Drop 040R03
+    _68 : BOOL ;	//Aux. Consent To Open Clamps 040R03
+    _69 : BOOL ;	//Aux. Consent To Exit 040R03
+    _70 : BOOL ;	//Aux. Consent To Pick 045R01
+    _71 : BOOL ;	//Aux. Tooling Release 01 045R01
+    _72 : BOOL ;	//Aux. Consent To Exit 045R01
+    _73 : BOOL ;	//RESERVE
+    _74 : BOOL ;	//RESERVE
+    _75 : BOOL ;	//RESERVE
+    _76 : BOOL ;	//RESERVE
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//CSS OK
+    _81 : BOOL ;	//RESERVE
+    _82 : BOOL ;	//RESERVE
+    _83 : BOOL ;	//RESERVE
+    _84 : BOOL ;	//RESERVE
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//RESERVE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//IFL OK
+    _94 : BOOL ;	//IFL OK OP55
+    _95 : BOOL ;	//No fault clamps
+   END_STRUCT ;	
+   Mem_Cycle : STRUCT 	//#Memory Cycle
+    _01 : BOOL ;	//RESERVE
+    _02 : BOOL ;	//RESERVE
+    _03 : BOOL ;	//RESERVE
+    _04 : BOOL ;	//RESERVE
+    _05 : BOOL ;	//RESERVE
+    _06 : BOOL ;	//RESERVE
+    _07 : BOOL ;	//RESERVE
+    _08 : BOOL ;	//RESERVE
+    _09 : BOOL ;	//RESERVE
+    _10 : BOOL ;	//RESERVE
+    _11 : BOOL ;	//RESERVE
+    _12 : BOOL ;	//RESERVE
+    _13 : BOOL ;	//RESERVE
+    _14 : BOOL ;	//RESERVE
+    _15 : BOOL ;	//RESERVE
+    _16 : BOOL ;	//RESERVE
+    _17 : BOOL ;	//MEMORY END JOB 1  ROBOT 40R01 End of welding 040T01
+    _18 : BOOL ;	//RESERVE
+    _19 : BOOL ;	//RESERVE
+    _20 : BOOL ;	//RESERVE
+    _21 : BOOL ;	//MEMORY CHANGE TIPS OK 040R01
+    _22 : BOOL ;	//RESERVE
+    _23 : BOOL ;	//RESERVE
+    _24 : BOOL ;	//RESERVE
+    _25 : BOOL ;	//MEMORY END JOB 1  ROBOT 40R02 End of welding 040T01
+    _26 : BOOL ;	//RESERVE
+    _27 : BOOL ;	//RESERVE
+    _28 : BOOL ;	//RESERVE
+    _29 : BOOL ;	//MEMORY CHANGE TIPS OK 040R02
+    _30 : BOOL ;	//RESERVE
+    _31 : BOOL ;	//RESERVE
+    _32 : BOOL ;	//MEMORY END JOB 035R01 Part dropped on 040T01
+    _33 : BOOL ;	//MEMORY END JOB 040R03 Part dropped on 040T01
+    _34 : BOOL ;	//MEMORY END JOB 040R03 Gripper clamps opened on 040T01
+    _35 : BOOL ;	//MEMORY END JOB 45R01 Part picked from 040T01
+    _36 : BOOL ;	//RESERVE
+    _37 : BOOL ;	//RESERVE
+    _38 : BOOL ;	//RESERVE
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RESERVE
+    _42 : BOOL ;	//RESERVE
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//RESERVE
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//RESERVE
+    _47 : BOOL ;	//RESERVE
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//RESERVE
+    _51 : BOOL ;	//RESERVE
+    _52 : BOOL ;	//RESERVE
+    _53 : BOOL ;	//RESERVE
+    _54 : BOOL ;	//RESERVE
+    _55 : BOOL ;	//RESERVE
+    _56 : BOOL ;	//RESERVE
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//RESERVE
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//RESERVE
+    _61 : BOOL ;	//RESERVE
+    _62 : BOOL ;	//RESERVE
+    _63 : BOOL ;	//RESERVE
+    _64 : BOOL ;	//RESERVE
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//RESERVE
+    _67 : BOOL ;	//RESERVE
+    _68 : BOOL ;	//RESERVE
+    _69 : BOOL ;	//RESERVE
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//RESERVE
+    _72 : BOOL ;	//RESERVE
+    _73 : BOOL ;	//RESERVE
+    _74 : BOOL ;	//RESERVE
+    _75 : BOOL ;	//RESERVE
+    _76 : BOOL ;	//RESERVE
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//RESERVE
+    _81 : BOOL ;	//RESERVE
+    _82 : BOOL ;	//RESERVE
+    _83 : BOOL ;	//RESERVE
+    _84 : BOOL ;	//RESERVE
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//RESERVE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//RESERVE
+    _94 : BOOL ;	//RESERVE
+    _95 : BOOL ;	//RESERVE
+   END_STRUCT ;	
+   PICS : STRUCT 	
+    Pag_list_step1 : BOOL ;	//Page list step 1
+    Pag_list_step2 : BOOL ;	//Page list step 2
+    Pag_list_step3 : BOOL ;	//Page list step 3
+    Pag_list_step4 : BOOL ;	//Page list step 4
+    Pag_list_step5 : BOOL ;	//Page list step 5
+    Pag_list_step6 : BOOL ;	//Page list step 6
+    Pag_list_step7 : BOOL ;	//Page list step 7
+    Pag_list_step8 : BOOL ;	//Page list step 8
+    Pag_cmd_man_09 : BOOL ;	//Page Manual Command 09
+    Pag_cmd_man_10 : BOOL ;	//Page Manual Command 10
+    Pag_cmd_man_11 : BOOL ;	//Page Manual Command 11
+    Pag_cmd_man_12 : BOOL ;	//Page Manual Command 12
+    Pag_cmd_man_13 : BOOL ;	//Page Manual Command 13
+    Pag_cmd_man_14 : BOOL ;	//Page Manual Command 14
+    Pag_cmd_man_15 : BOOL ;	//Page Manual Command 15
+    Pag_cmd_man_16 : BOOL ;	//Page Manual Command 16
+    Pag_cmd_man_01 : BOOL ;	//Page Manual Command 01
+    Pag_cmd_man_02 : BOOL ;	//Page Manual Command 02
+    Pag_cmd_man_03 : BOOL ;	//Page Manual Command 03
+    Pag_cmd_man_04 : BOOL ;	//Page Manual Command 04
+    Pag_cmd_man_05 : BOOL ;	//Page Manual Command 05
+    Pag_cmd_man_06 : BOOL ;	//Page Manual Command 06
+    Pag_cmd_man_07 : BOOL ;	//Page Manual Command 07
+    Pag_cmd_man_08 : BOOL ;	//Page Manual Command 08
+    Pag_cmd_trp_01 : BOOL ;	//Page Transport Command 01
+    Pag_cmd_trp_02 : BOOL ;	//Page Transport Command 02
+    Pag_cmd_trp_03 : BOOL ;	//Page Transport Command 03
+    Pag_cmd_trp_04 : BOOL ;	//Page Transport Command 04
+    Pag_cmd_trp_05 : BOOL ;	//Page Transport Command 05
+    Pag_cmd_trp_06 : BOOL ;	//Page Transport Command 06
+    Pag_robot_view_1 : BOOL ;	//Page Overview Robot 01 
+    Pag_robot_view_11 : BOOL ;	//Page Overview Robot 01 
+   END_STRUCT ;	
+   MG : STRUCT 	
+    _00 : BOOL ;	//M/G 00 [ST040T01] Wait Cycle start up
+    _01 : BOOL ;	//M/G 01 [ST040T01] Wait Station at rest
+    _02 : BOOL ;	//M/G 02 [ST040T01] Remove Part for cycle without part 
+    _03 : BOOL ;	//RESERVE
+    _04 : BOOL ;	//M/G 04 [ST040T01] Wait consent from level 1.5
+    _05 : BOOL ;	//RESERVE
+    _06 : BOOL ;	//M/G 06 [ST040T01] Wait Part Present Drop 1 OK
+    _07 : BOOL ;	//M/G 07 [ST040T01] Wait Part Present OK
+    _08 : BOOL ;	//RESERVE
+    _09 : BOOL ;	//RESERVE
+    _10 : BOOL ;	//M/G 10 [ST040T01] Wait Robot 040R01 in station for drop
+    _11 : BOOL ;	//M/G 11 [ST040T01] Wait Robot 040R01 out of station after drop
+    _12 : BOOL ;	//M/G 12 [ST040T01] Wait Robot 040R04 in station for drop
+    _13 : BOOL ;	//M/G 13 [ST040T01] Wait Robot 040R04 out of station after drop
+    _14 : BOOL ;	//M/G 14 [ST040T01] Wait Robot 070R02 in station for pick
+    _15 : BOOL ;	//M/G 15 [ST040T01] Wait Robot 070R02 out of station after pick
+    _16 : BOOL ;	//RESERVE
+    _17 : BOOL ;	//RESERVE
+    _18 : BOOL ;	//RESERVE
+    _19 : BOOL ;	//RESERVE
+    _20 : BOOL ;	//M/G 20 [ST040T01] IFL Part NOT_OK or Missing Part in ST040T01
+    _21 : BOOL ;	//M/G 21 [ST040T01] Wait part presence 040T01 - 03SQ01
+    _22 : BOOL ;	//M/G 22 [ST040T01] Wait part presence 040T01 - 21SQ01
+    _23 : BOOL ;	//M/G 23 [ST040T01] Wait part presence 040T01 - 21SQ02
+    _24 : BOOL ;	//M/G 24 [ST040T01] Wait part presence 040T01 - 22SQ01
+    _25 : BOOL ;	//RESERVE
+    _26 : BOOL ;	//RESERVE
+    _27 : BOOL ;	//RESERVE
+    _28 : BOOL ;	//RESERVE
+    _29 : BOOL ;	//RESERVE
+    _30 : BOOL ;	//RESERVE
+    _31 : BOOL ;	//RESERVE
+    _32 : BOOL ;	//RESERVE
+    _33 : BOOL ;	//RESERVE
+    _34 : BOOL ;	//RESERVE
+    _35 : BOOL ;	//M/G 35 [ST040T01] Verify All Sensors Off
+    _36 : BOOL ;	//RESERVE
+    _37 : BOOL ;	//RESERVE
+    _38 : BOOL ;	//RESERVE
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//RESERVE
+    _41 : BOOL ;	//RESERVE
+    _42 : BOOL ;	//RESERVE
+    _43 : BOOL ;	//RESERVE
+    _44 : BOOL ;	//RESERVE
+    _45 : BOOL ;	//RESERVE
+    _46 : BOOL ;	//RESERVE
+    _47 : BOOL ;	//RESERVE
+    _48 : BOOL ;	//RESERVE
+    _49 : BOOL ;	//RESERVE
+    _50 : BOOL ;	//RESERVE
+    _51 : BOOL ;	//RESERVE
+    _52 : BOOL ;	//RESERVE
+    _53 : BOOL ;	//RESERVE
+    _54 : BOOL ;	//RESERVE
+    _55 : BOOL ;	//RESERVE
+    _56 : BOOL ;	//RESERVE
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//RESERVE
+    _59 : BOOL ;	//RESERVE
+    _60 : BOOL ;	//RESERVE
+    _61 : BOOL ;	//RESERVE
+    _62 : BOOL ;	//RESERVE
+    _63 : BOOL ;	//RESERVE
+    _64 : BOOL ;	//RESERVE
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//RESERVE
+    _67 : BOOL ;	//RESERVE
+    _68 : BOOL ;	//RESERVE
+    _69 : BOOL ;	//RESERVE
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//RESERVE
+    _72 : BOOL ;	//RESERVE
+    _73 : BOOL ;	//RESERVE
+    _74 : BOOL ;	//RESERVE
+    _75 : BOOL ;	//RESERVE
+    _76 : BOOL ;	//RESERVE
+    _77 : BOOL ;	//RESERVE
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//RESERVE
+    _80 : BOOL ;	//RESERVE
+    _81 : BOOL ;	//RESERVE
+    _82 : BOOL ;	//RESERVE
+    _83 : BOOL ;	//RESERVE
+    _84 : BOOL ;	//RESERVE
+    _85 : BOOL ;	//RESERVE
+    _86 : BOOL ;	//RESERVE
+    _87 : BOOL ;	//RESERVE
+    _88 : BOOL ;	//RESERVE
+    _89 : BOOL ;	//RESERVE
+    _90 : BOOL ;	//RESERVE
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//RESERVE
+    _93 : BOOL ;	//RESERVE
+    _94 : BOOL ;	//RESERVE
+    _95 : BOOL ;	//RESERVE
+   END_STRUCT ;	
+   TIO_D : STRUCT 	
+    RESERVED : ARRAY  [0 .. 15 ] OF BOOL  := FALSE;	
+    _00 : BOOL ;	//M/A ST40T01 IFL FAULT
+    _01 : BOOL ;	//RESERVE
+    _02 : BOOL ;	//RESERVE
+    _03 : BOOL ;	//RESERVE
+    _04 : BOOL ;	//RESERVE
+    _05 : BOOL ;	//RESERVE
+    _06 : BOOL ;	//RESERVE
+    _07 : BOOL ;	//RESERVE
+    _08 : BOOL ;	//RESERVE
+    _09 : BOOL ;	//RESERVE
+    _10 : BOOL ;	//RESERVE
+    _11 : BOOL ;	//M/A  [ST040] ROBOT FAULT 040R01
+    _12 : BOOL ;	//M/A  [ST040] ROBOT FAULT 040R02
+    _13 : BOOL ;	//RESERVE
+    _14 : BOOL ;	//RESERVE
+    _15 : BOOL ;	//RESERVE
+    _16 : BOOL ;	//RESERVE
+    _17 : BOOL ;	//RESERVE
+    _18 : BOOL ;	//RESERVE
+    _19 : BOOL ;	//RESERVE
+    _20 : BOOL ;	//RESERVE
+    _21 : BOOL ;	//RESERVE
+    _22 : BOOL ;	//RESERVE
+    _23 : BOOL ;	//RESERVE
+    _24 : BOOL ;	//RESERVE
+    _25 : BOOL ;	//M/A ST.040T01 PILOT VALVE ALARM 01V00 (BM01)
+    _26 : BOOL ;	//M/A 040T01-BM01 Profinet Node (62) [129.100.2.62] Not Connected
+    _27 : BOOL ;	//M/A 040T01-BM01 Profinet Node (62) [129.100.2.62] Fault
+    _28 : BOOL ;	//RESERVE
+    _29 : BOOL ;	//RESERVE
+    _30 : BOOL ;	//RESERVE
+    _31 : BOOL ;	//RESERVE
+    _32 : BOOL ;	//M/A ST40_T01_01V01 Group message
+    _33 : BOOL ;	//M/A ST40_T01_01V01 Interlock error for Fwd.
+    _34 : BOOL ;	//M/A ST40_T01_01V01 Interlock error for Bwd.
+    _35 : BOOL ;	//M/A ST40_T01_01V01_050C01 Limit pos. Fwd. has been left (without control)
+    _36 : BOOL ;	//M/A ST40_T01_01V01_050C01 Limit pos. Bwd. has been left (without control)
+    _37 : BOOL ;	//M/A ST40_T01_01V01_050C01 Limit pos. fwd. has not been left (control act.)
+    _38 : BOOL ;	//M/A ST40_T01_01V01_050C01 Limit pos. bwd. has not been left (control act.)
+    _39 : BOOL ;	//RESERVE
+    _40 : BOOL ;	//M/A ST40_T01_01V01_060C01 Limit pos. Fwd. has been left (without control)
+    _41 : BOOL ;	//M/A ST40_T01_01V01_060C01 Limit pos. Bwd. has been left (without control)
+    _42 : BOOL ;	//M/A ST40_T01_01V01_060C01 Limit pos. fwd. has not been left (control act.)
+    _43 : BOOL ;	//M/A ST40_T01_01V01_060C01 Limit pos. bwd. has not been left (control act.)
+    _44 : BOOL ;	//RESERVE
+    _45 : BOOL ;	//M/A ST40_T01_01V02 Group message
+    _46 : BOOL ;	//M/A ST40_T01_01V02 Interlock error for Fwd.
+    _47 : BOOL ;	//M/A ST40_T01_01V02 Interlock error for Bwd.
+    _48 : BOOL ;	//M/A ST40_T01_01V02_110C01 Limit pos. Fwd. has been left (without control)
+    _49 : BOOL ;	//M/A ST40_T01_01V02_110C01 Limit pos. Bwd. has been left (without control)
+    _50 : BOOL ;	//M/A ST40_T01_01V02_110C01 Limit pos. Fwd. has not been left (control act.)
+    _51 : BOOL ;	//M/A ST40_T01_01V02_110C01 Limit pos. Fwd. has not been left (control act.)
+    _52 : BOOL ;	//RESERVE
+    _53 : BOOL ;	//M/A ST40_T01_01V02_120C01 Limit pos. Fwd. has been left (without control)
+    _54 : BOOL ;	//M/A ST40_T01_01V02_120C01 Limit pos. Bwd. has been left (without control)
+    _55 : BOOL ;	//M/A ST40_T01_01V02_120C01 Limit pos. Fwd. has not been left (control act.)
+    _56 : BOOL ;	//M/A ST40_T01_01V02_120C01 Limit pos. Bwd. has not been left (control act.)
+    _57 : BOOL ;	//RESERVE
+    _58 : BOOL ;	//M/A ST40_T01_01V03 Group message
+    _59 : BOOL ;	//M/A ST40_T01_01V03 Interlock error for Fwd.
+    _60 : BOOL ;	//M/A ST40_T01_01V03 Interlock error for Bwd.
+    _61 : BOOL ;	//M/A ST40_T01_01V03_030C01 Limit pos. Fwd. has been left (without control)
+    _62 : BOOL ;	//M/A ST40_T01_01V03_030C01 Limit pos. Bwd. has been left (without control)
+    _63 : BOOL ;	//M/A ST40_T01_01V03_030C01 Limit pos. Fwd. has not been left (control act.)
+    _64 : BOOL ;	//M/A ST40_T01_01V03_030C01 Limit pos. Bwd. has not been left (control act.)
+    _65 : BOOL ;	//RESERVE
+    _66 : BOOL ;	//M/A ST40_T01_01V03_300C01 Limit pos. Fwd. has been left (without control)
+    _67 : BOOL ;	//M/A ST40_T01_01V03_300C01 Limit pos. Bwd. has been left (without control)
+    _68 : BOOL ;	//M/A ST40_T01_01V03_300C01 Limit pos. Fwd. has not been left (control act.)
+    _69 : BOOL ;	//M/A ST40_T01_01V03_300C01 Limit pos. Bwd. has not been left (control act.)
+    _70 : BOOL ;	//RESERVE
+    _71 : BOOL ;	//M/A ST40_T01_01V04 Group message
+    _72 : BOOL ;	//M/A ST40_T01_01V04 Interlock error for Fwd.
+    _73 : BOOL ;	//M/A ST40_T01_01V04 Interlock error for Bwd.
+    _74 : BOOL ;	//M/A ST40_T01_01V04_130C01 Limit pos. Fwd. has been left (without control)
+    _75 : BOOL ;	//M/A ST40_T01_01V04_130C01 Limit pos. Bwd. has been left (without control)
+    _76 : BOOL ;	//M/A ST40_T01_01V04_130C01 Limit pos. Fwd. has not been left (control act.)
+    _77 : BOOL ;	//M/A ST40_T01_01V04_130C01 Limit pos. Bwd. has not been left (control act.)
+    _78 : BOOL ;	//RESERVE
+    _79 : BOOL ;	//M/A ST40_T01_01V04_140C01 Limit pos. Fwd. has been left (without control)
+    _80 : BOOL ;	//M/A ST40_T01_01V04_140C01 Limit pos. Bwd. has been left (without control)
+    _81 : BOOL ;	//M/A ST40_T01_01V04_140C01 Limit pos. Fwd. has not been left (control act.)
+    _82 : BOOL ;	//M/A ST40_T01_01V04_140C01 Limit pos. Bwd. has not been left (control act.)
+    _83 : BOOL ;	//RESERVE
+    _84 : BOOL ;	//M/A ST40_T01_01V05 Group message
+    _85 : BOOL ;	//M/A ST40_T01_01V05 Interlock error for Fwd.
+    _86 : BOOL ;	//M/A ST40_T01_01V05 Interlock error for Bwd.
+    _87 : BOOL ;	//M/A ST40_T01_01V05_070C01 Limit pos. Fwd. has been left (without control)
+    _88 : BOOL ;	//M/A ST40_T01_01V05_070C01 Limit pos. Bwd. has been left (without control)
+    _89 : BOOL ;	//M/A ST40_T01_01V05_070C01 Limit pos. Fwd. has not been left (control act.)
+    _90 : BOOL ;	//M/A ST40_T01_01V05_070C01 Limit pos. Bwd. has not been left (control act.)
+    _91 : BOOL ;	//RESERVE
+    _92 : BOOL ;	//M/A ST40_T01_01V05_080C01 Limit pos. Fwd. has been left (without control)
+    _93 : BOOL ;	//M/A ST40_T01_01V05_080C01 Limit pos. Bwd. has been left (without control)
+    _94 : BOOL ;	//M/A ST40_T01_01V05_080C01 Limit pos. Fwd. has not been left (control act.)
+    _95 : BOOL ;	//M/A ST40_T01_01V05_080C01 Limit pos. Bwd. has not been left (control act.)
+    _96 : BOOL ;	//RESERVE
+    _97 : BOOL ;	//M/A ST40_T01_01V06 Group message
+    _98 : BOOL ;	//M/A ST40_T01_01V06 Interlock error for Fwd.
+    _99 : BOOL ;	//M/A ST40_T01_01V06 Interlock error for Bwd.
+    _100 : BOOL ;	//M/A ST40_T01_01V06_390C01 Limit pos. Fwd. has been left (without control)
+    _101 : BOOL ;	//M/A ST40_T01_01V06_390C01 Limit pos. Bwd. has been left (without control)
+    _102 : BOOL ;	//M/A ST40_T01_01V06_390C01 Limit pos. Fwd. has not been left (control act.)
+    _103 : BOOL ;	//M/A ST40_T01_01V06_390C01 Limit pos. Bwd. has not been left (control act.)
+    _104 : BOOL ;	//RESERVE
+    _105 : BOOL ;	//M/A ST40_T01_01V06_400C01 Limit pos. Fwd. has been left (without control)
+    _106 : BOOL ;	//M/A ST40_T01_01V06_400C01 Limit pos. Bwd. has been left (without control)
+    _107 : BOOL ;	//M/A ST40_T01_01V06_400C01 Limit pos. Fwd. has not been left (control act.)
+    _108 : BOOL ;	//M/A ST40_T01_01V06_400C01 Limit pos. Bwd. has not been left (control act.)
+    _109 : BOOL ;	//RESERVE
+    _110 : BOOL ;	//M/A ST40_T01_01V06_410C01 Limit pos. Fwd. has been left (without control)
+    _111 : BOOL ;	//M/A ST40_T01_01V06_410C01 Limit pos. Bwd. has been left (without control)
+    _112 : BOOL ;	//M/A ST40_T01_01V06_410C01 Limit pos. Fwd. has not been left (control act.)
+    _113 : BOOL ;	//M/A ST40_T01_01V06_410C01 Limit pos. Bwd. has not been left (control act.)
+    _114 : BOOL ;	//RESERVE
+    _115 : BOOL ;	//M/A ST40_T01_01V06_440C01 Limit pos. Fwd. has been left (without control)
+    _116 : BOOL ;	//M/A ST40_T01_01V06_440C01 Limit pos. Bwd. has been left (without control)
+    _117 : BOOL ;	//M/A ST40_T01_01V06_440C01 Limit pos. Fwd. has not been left (control act.)
+    _118 : BOOL ;	//M/A ST40_T01_01V06_440C01 Limit pos. Bwd. has not been left (control act.)
+    _119 : BOOL ;	//RESERVE
+    _120 : BOOL ;	//RESERVE
+    _121 : BOOL ;	//RESERVE
+    _122 : BOOL ;	//RESERVE
+    _123 : BOOL ;	//RESERVE
+    _124 : BOOL ;	//RESERVE
+    _125 : BOOL ;	//RESERVE
+    _126 : BOOL ;	//RESERVE
+    _127 : BOOL ;	//RESERVE
+    _128 : BOOL ;	//RESERVE
+    _129 : BOOL ;	//RESERVE
+    _130 : BOOL ;	//M/A ST40_T01_02V01 Group message
+    _131 : BOOL ;	//M/A ST40_T01_02V01 Interlock error for Fwd.
+    _132 : BOOL ;	//M/A ST40_T01_02V01 Interlock error for Bwd.
+    _133 : BOOL ;	//M/A ST40_T01_02V01_370C01 Limit pos. Fwd. has been left (without control)
+    _134 : BOOL ;	//M/A ST40_T01_02V01_370C01 Limit pos. Bwd. has been left (without control)
+    _135 : BOOL ;	//M/A ST40_T01_02V01_370C01 Limit pos. Fwd. has not been left (control act.)
+    _136 : BOOL ;	//M/A ST40_T01_02V01_370C01 Limit pos. Bwd. has not been left (control act.)
+    _137 : BOOL ;	//RESERVE
+    _138 : BOOL ;	//M/A ST40_T01_02V01_380C01 Limit pos. Fwd. has been left (without control)
+    _139 : BOOL ;	//M/A ST40_T01_02V01_380C01 Limit pos. Bwd. has been left (without control)
+    _140 : BOOL ;	//M/A ST40_T01_02V01_380C01 Limit pos. Fwd. has not been left (control act.)
+    _141 : BOOL ;	//M/A ST40_T01_02V01_380C01 Limit pos. Bwd. has not been left (control act.)
+    _142 : BOOL ;	//RESERVE
+    _143 : BOOL ;	//M/A ST40_T01_02V02 Group message
+    _144 : BOOL ;	//M/A ST40_T01_02V02 Interlock error for Fwd.
+    _145 : BOOL ;	//M/A ST40_T01_02V02 Interlock error for Bwd.
+    _146 : BOOL ;	//M/A ST40_T01_02V02_330C01 Limit pos. Fwd. has been left (without control)
+    _147 : BOOL ;	//M/A ST40_T01_02V02_330C01 Limit pos. Bwd. has been left (without control)
+    _148 : BOOL ;	//M/A ST40_T01_02V02_330C01 Limit pos. Fwd. has not been left (control act.)
+    _149 : BOOL ;	//M/A ST40_T01_02V02_330C01 Limit pos. Bwd. has not been left (control act.)
+    _150 : BOOL ;	//RESERVE
+    _151 : BOOL ;	//M/A ST40_T01_02V02_340C01 Limit pos. Fwd. has been left (without control)
+    _152 : BOOL ;	//M/A ST40_T01_02V02_340C01 Limit pos. Bwd. has been left (without control)
+    _153 : BOOL ;	//M/A ST40_T01_02V02_340C01 Limit pos. Fwd. has not been left (control act.)
+    _154 : BOOL ;	//M/A ST40_T01_02V02_340C01 Limit pos. Bwd. has not been left (control act.)
+    _155 : BOOL ;	//RESERVE
+    _156 : BOOL ;	//M/A ST40_T01_02V03 Group message
+    _157 : BOOL ;	//M/A ST40_T01_02V03 Interlock error for Fwd.
+    _158 : BOOL ;	//M/A ST40_T01_02V03 Interlock error for Bwd.
+    _159 : BOOL ;	//M/A ST40_T01_02V03_310C01 Limit pos. Fwd. has been left (without control)
+    _160 : BOOL ;	//M/A ST40_T01_02V03_310C01 Limit pos. Bwd. has been left (without control)
+    _161 : BOOL ;	//M/A ST40_T01_02V03_310C01 Limit pos. Fwd. has not been left (control act.)
+    _162 : BOOL ;	//M/A ST40_T01_02V03_310C01 Limit pos. Bwd. has not been left (control act.)
+    _163 : BOOL ;	//RESERVE
+    _164 : BOOL ;	//M/A ST40_T01_02V03_320C01 Limit pos. Fwd. has been left (without control)
+    _165 : BOOL ;	//M/A ST40_T01_02V03_320C01 Limit pos. Bwd. has been left (without control)
+    _166 : BOOL ;	//M/A ST40_T01_02V03_320C01 Limit pos. Fwd. has not been left (control act.)
+    _167 : BOOL ;	//M/A ST40_T01_02V03_320C01 Limit pos. Bwd. has not been left (control act.)
+    _168 : BOOL ;	//RESERVE
+    _169 : BOOL ;	//M/A ST40_T01_02V04 Group message
+    _170 : BOOL ;	//M/A ST40_T01_02V04 Interlock error for Fwd.
+    _171 : BOOL ;	//M/A ST40_T01_02V04 Interlock error for Bwd.
+    _172 : BOOL ;	//M/A ST40_T01_02V04_350C01 Limit pos. Fwd. has been left (without control)
+    _173 : BOOL ;	//M/A ST40_T01_02V04_350C01 Limit pos. Bwd. has been left (without control)
+    _174 : BOOL ;	//M/A ST40_T01_02V04_350C01 Limit pos. Fwd. has not been left (control act.)
+    _175 : BOOL ;	//M/A ST40_T01_02V04_350C01 Limit pos. Bwd. has not been left (control act.)
+    _176 : BOOL ;	//RESERVE
+    _177 : BOOL ;	//M/A ST40_T01_02V04_360C01 Limit pos. Fwd. has been left (without control)
+    _178 : BOOL ;	//M/A ST40_T01_02V04_360C01 Limit pos. Bwd. has been left (without control)
+    _179 : BOOL ;	//M/A ST40_T01_02V04_360C01 Limit pos. Fwd. has not been left (control act.)
+    _180 : BOOL ;	//M/A ST40_T01_02V04_360C01 Limit pos. Bwd. has not been left (control act.)
+    _181 : BOOL ;	//RESERVE
+    _182 : BOOL ;	//RESERVE
+    _183 : BOOL ;	//RESERVE
+    _184 : BOOL ;	//RESERVE
+    _185 : BOOL ;	//RESERVE
+    _186 : BOOL ;	//RESERVE
+    _187 : BOOL ;	//RESERVE
+    _188 : BOOL ;	//RESERVE
+    _189 : BOOL ;	//RESERVE
+    _190 : BOOL ;	//RESERVE
+    _191 : BOOL ;	//RESERVE
+    _192 : BOOL ;	//RESERVE
+    _193 : BOOL ;	//RESERVE
+    _194 : BOOL ;	//RESERVE
+    _195 : BOOL ;	//RESERVE
+    _196 : BOOL ;	//RESERVE
+    _197 : BOOL ;	//RESERVE
+    _198 : BOOL ;	//RESERVE
+    _199 : BOOL ;	//RESERVE
+    _200 : BOOL ;	//M/A Possible Collision  35R01<->40R01 Z1
+    _201 : BOOL ;	//M/A Possible Collision  40R01<->40R03 Z2
+    _202 : BOOL ;	//M/A Possible Collision  40R01<->45R01 Z3
+    _203 : BOOL ;	//M/A Possible Collision  40R01<->45R01 Z9
+    _204 : BOOL ;	//M/A Possible Collision  40R02<->35R01 Z2
+    _205 : BOOL ;	//M/A Possible Collision  40R02<->40R03 Z1
+    _206 : BOOL ;	//M/A Possible Collision  40R02<->40R03 Z3
+    _207 : BOOL ;	//M/A Possible Collision  40R02<->45R01 Z4
+    _208 : BOOL ;	//RESERVE
+    _209 : BOOL ;	//RESERVE
+    _210 : BOOL ;	//RESERVE
+    _211 : BOOL ;	//RESERVE
+    _212 : BOOL ;	//RESERVE
+    _213 : BOOL ;	//RESERVE
+    _214 : BOOL ;	//RESERVE
+    _215 : BOOL ;	//RESERVE
+    _216 : BOOL ;	//RESERVE
+    _217 : BOOL ;	//RESERVE
+    _218 : BOOL ;	//RESERVE
+    _219 : BOOL ;	//RESERVE
+    _220 : BOOL ;	//RESERVE
+    _221 : BOOL ;	//RESERVE
+    _222 : BOOL ;	//RESERVE
+    _223 : BOOL ;	//RESERVE
+    _224 : BOOL ;	//RESERVE
+    _225 : BOOL ;	//RESERVE
+    _226 : BOOL ;	//RESERVE
+    _227 : BOOL ;	//RESERVE
+    _228 : BOOL ;	//RESERVE
+    _229 : BOOL ;	//RESERVE
+    _230 : BOOL ;	//RESERVE
+    _231 : BOOL ;	//RESERVE
+    _232 : BOOL ;	//RESERVE
+    _233 : BOOL ;	//RESERVE
+    _234 : BOOL ;	//RESERVE
+    _235 : BOOL ;	//RESERVE
+    _236 : BOOL ;	//RESERVE
+    _237 : BOOL ;	//RESERVE
+    _238 : BOOL ;	//RESERVE
+    _239 : BOOL ;	//RESERVE
+    _240 : BOOL ;	//RESERVE
+    _241 : BOOL ;	//RESERVE
+    _242 : BOOL ;	//RESERVE
+    _243 : BOOL ;	//RESERVE
+    _244 : BOOL ;	//RESERVE
+    _245 : BOOL ;	//RESERVE
+    _246 : BOOL ;	//RESERVE
+    _247 : BOOL ;	//RESERVE
+    _248 : BOOL ;	//RESERVE
+    _249 : BOOL ;	//RESERVE
+    _250 : BOOL ;	//RESERVE
+    _251 : BOOL ;	//RESERVE
+    _252 : BOOL ;	//RESERVE
+    _253 : BOOL ;	//RESERVE
+    _254 : BOOL ;	//RESERVE
+    _255 : BOOL ;	//RESERVE
+    _256 : BOOL ;	//RESERVE
+    _257 : BOOL ;	//RESERVE
+    _258 : BOOL ;	//RESERVE
+    _259 : BOOL ;	//RESERVE
+    _260 : BOOL ;	//RESERVE
+    _261 : BOOL ;	//RESERVE
+    _262 : BOOL ;	//RESERVE
+    _263 : BOOL ;	//RESERVE
+    _264 : BOOL ;	//RESERVE
+    _265 : BOOL ;	//RESERVE
+    _266 : BOOL ;	//RESERVE
+    _267 : BOOL ;	//RESERVE
+    _268 : BOOL ;	//RESERVE
+    _269 : BOOL ;	//RESERVE
+    _270 : BOOL ;	//RESERVE
+    _271 : BOOL ;	//RESERVE
+    _272 : BOOL ;	//RESERVE
+    _273 : BOOL ;	//RESERVE
+    _274 : BOOL ;	//RESERVE
+    _275 : BOOL ;	//RESERVE
+    _276 : BOOL ;	//RESERVE
+    _277 : BOOL ;	//RESERVE
+    _278 : BOOL ;	//RESERVE
+    _279 : BOOL ;	//RESERVE
+    _280 : BOOL ;	//RESERVE
+    _281 : BOOL ;	//RESERVE
+    _282 : BOOL ;	//RESERVE
+    _283 : BOOL ;	//RESERVE
+    _284 : BOOL ;	//RESERVE
+    _285 : BOOL ;	//RESERVE
+    _286 : BOOL ;	//RESERVE
+    _287 : BOOL ;	//RESERVE
+    _288 : BOOL ;	//RESERVE
+    _289 : BOOL ;	//RESERVE
+    _290 : BOOL ;	//RESERVE
+    _291 : BOOL ;	//RESERVE
+    _292 : BOOL ;	//RESERVE
+    _293 : BOOL ;	//RESERVE
+    _294 : BOOL ;	//RESERVE
+    _295 : BOOL ;	//RESERVE
+    _296 : BOOL ;	//RESERVE
+    _297 : BOOL ;	//RESERVE
+    _298 : BOOL ;	//RESERVE
+    _299 : BOOL ;	//RESERVE
+    _300 : BOOL ;	//RESERVE
+    _301 : BOOL ;	//RESERVE
+    _302 : BOOL ;	//RESERVE
+    _303 : BOOL ;	//RESERVE
+    _304 : BOOL ;	//RESERVE
+    _305 : BOOL ;	//RESERVE
+    _306 : BOOL ;	//RESERVE
+    _307 : BOOL ;	//RESERVE
+    _308 : BOOL ;	//RESERVE
+    _309 : BOOL ;	//RESERVE
+    _310 : BOOL ;	//RESERVE
+    _311 : BOOL ;	//RESERVE
+    _312 : BOOL ;	//RESERVE
+    _313 : BOOL ;	//RESERVE
+    _314 : BOOL ;	//RESERVE
+    _315 : BOOL ;	//RESERVE
+    _316 : BOOL ;	//RESERVE
+    _317 : BOOL ;	//RESERVE
+    _318 : BOOL ;	//RESERVE
+    _319 : BOOL ;	//RESERVE
+    _320 : BOOL ;	//RESERVE
+    _321 : BOOL ;	//RESERVE
+    _322 : BOOL ;	//RESERVE
+    _323 : BOOL ;	//RESERVE
+    _324 : BOOL ;	//RESERVE
+    _325 : BOOL ;	//RESERVE
+    _326 : BOOL ;	//RESERVE
+    _327 : BOOL ;	//RESERVE
+    _328 : BOOL ;	//RESERVE
+    _329 : BOOL ;	//RESERVE
+    _330 : BOOL ;	//RESERVE
+    _331 : BOOL ;	//RESERVE
+    _332 : BOOL ;	//RESERVE
+    _333 : BOOL ;	//RESERVE
+    _334 : BOOL ;	//RESERVE
+    _335 : BOOL ;	//RESERVE
+    _336 : BOOL ;	//RESERVE
+    _337 : BOOL ;	//RESERVE
+    _338 : BOOL ;	//RESERVE
+    _339 : BOOL ;	//RESERVE
+    _340 : BOOL ;	//RESERVE
+    _341 : BOOL ;	//RESERVE
+    _342 : BOOL ;	//RESERVE
+    _343 : BOOL ;	//RESERVE
+    _344 : BOOL ;	//RESERVE
+    _345 : BOOL ;	//RESERVE
+    _346 : BOOL ;	//RESERVE
+    _347 : BOOL ;	//RESERVE
+    _348 : BOOL ;	//RESERVE
+    _349 : BOOL ;	//RESERVE
+    _350 : BOOL ;	//RESERVE
+    _351 : BOOL ;	//RESERVE
+    _352 : BOOL ;	//RESERVE
+    _353 : BOOL ;	//RESERVE
+    _354 : BOOL ;	//RESERVE
+    _355 : BOOL ;	//RESERVE
+    _356 : BOOL ;	//RESERVE
+    _357 : BOOL ;	//RESERVE
+    _358 : BOOL ;	//RESERVE
+    _359 : BOOL ;	//RESERVE
+    _360 : BOOL ;	//RESERVE
+    _361 : BOOL ;	//RESERVE
+    _362 : BOOL ;	//RESERVE
+    _363 : BOOL ;	//RESERVE
+    _364 : BOOL ;	//RESERVE
+    _365 : BOOL ;	//RESERVE
+    _366 : BOOL ;	//RESERVE
+    _367 : BOOL ;	//RESERVE
+    _368 : BOOL ;	//RESERVE
+    _369 : BOOL ;	//RESERVE
+    _370 : BOOL ;	//RESERVE
+    _371 : BOOL ;	//RESERVE
+    _372 : BOOL ;	//RESERVE
+    _373 : BOOL ;	//RESERVE
+    _374 : BOOL ;	//RESERVE
+    _375 : BOOL ;	//RESERVE
+    _376 : BOOL ;	//RESERVE
+    _377 : BOOL ;	//RESERVE
+    _378 : BOOL ;	//RESERVE
+    _379 : BOOL ;	//RESERVE
+    _380 : BOOL ;	//RESERVE
+    _381 : BOOL ;	//RESERVE
+    _382 : BOOL ;	//RESERVE
+    _383 : BOOL ;	//RESERVE
+    SPARE_01 : INT ;	
+    SPARE_02 : INT ;	
+    SPARE_03 : INT ;	
+    SPARE_04 : INT ;	
+    SPARE_05 : INT ;	
+    SPARE_06 : INT ;	
+    SPARE_07 : INT ;	
+    SPARE_08 : INT ;	
+    SPARE_09 : INT ;	
+    SPARE_10 : INT ;	
+    SPARE_11 : INT ;	
+    SPARE_12 : INT ;	
+    SPARE_13 : INT ;	
+    SPARE_14 : INT ;	
+    SPARE_15 : INT ;	
+    SPARE_16 : INT ;	
+    SPARE_17 : INT ;	
+    SPARE_18 : INT ;	
+    SPARE_19 : INT ;	
+    SPARE_20 : INT ;	
+    SPARE_21 : INT ;	
+    SPARE_22 : INT ;	
+    SPARE_23 : INT ;	
+    SPARE_24 : INT ;	
+    SPARE_25 : INT ;	
+    ME : STRUCT 	
+     _00 : BOOL ;	//ME_00 Parity Error ST040T01
+     _01 : BOOL ;	
+     _02 : BOOL ;	
+     _03 : BOOL ;	
+     _04 : BOOL ;	
+     _05 : BOOL ;	
+     _06 : BOOL ;	
+     _07 : BOOL ;	
+    END_STRUCT ;	
+    MT : STRUCT 	
+     _00 : BOOL ;	//MT 00 [ST040T01] Wait Clamp 050C01-060C01 at work 01V01A
+     _01 : BOOL ;	//MT 01 [ST040T01] Wait Clamp 050C01-060C01 at rest 01V01B
+     _02 : BOOL ;	//MT 02 [ST040T01] Wait Clamp 110C01-120C01 at work 01V02A
+     _03 : BOOL ;	//MT 03 [ST040T01] Wait Clamp 110C01-120C01 at rest 01V02B
+     _04 : BOOL ;	//MT 04 [ST040T01] Wait Pin 030C01-300C01 at work 01V03A
+     _05 : BOOL ;	//MT 05 [ST040T01] Wait Pin 030C01-300C01 at rest 01V03B
+     _06 : BOOL ;	//MT 06 [ST040T01] Wait Clamp 130C01-140C01 at work 01V04A
+     _07 : BOOL ;	//MT 07 [ST040T01] Wait Clamp 130C01-140C01 at rest 01V04B
+     _08 : BOOL ;	//MT 08 [ST040T01] Wait Clamp 070C01-080C01 at work 01V05A
+     _09 : BOOL ;	//MT 09 [ST040T01] Wait Clamp 070C01-080C01 at rest 01V05B
+     _10 : BOOL ;	//MT 10 [ST040T01] Wait Clamp 390C01-400C01-410C01-440C01 at work 01V06A
+     _11 : BOOL ;	//MT 11 [ST040T01] Wait Clamp 390C01-400C01-410C01-440C01 at rest 01V06B
+     _12 : BOOL ;	//MT 12 [ST040T01] Wait Pin 370C01-380C01 at work 02V01A
+     _13 : BOOL ;	//MT 13 [ST040T01] Wait Pin 370C01-380C01 at rest 02V01B
+     _14 : BOOL ;	//MT 14 [ST040T01] Wait Clamp 330C01-340C01 at work 02V02A
+     _15 : BOOL ;	//MT 15 [ST040T01] Wait Clamp 330C01-340C01 at rest 02V02B
+     _16 : BOOL ;	//MT 16 [ST040T01] Wait Clamp 310C01-320C01 at work 02V03A
+     _17 : BOOL ;	//MT 17 [ST040T01] Wait Clamp 310C01-320C01 at rest 02V03B
+     _18 : BOOL ;	//MT 18 [ST040T01] Wait Pin 350C01-360C01 at work 02V04A
+     _19 : BOOL ;	//MT 19 [ST040T01] Wait Pin 350C01-360C01 at rest 02V04B
+     _20 : BOOL ;	//RESERVE
+     _21 : BOOL ;	//RESERVE
+     _22 : BOOL ;	//RESERVE
+     _23 : BOOL ;	//RESERVE
+     _24 : BOOL ;	//MT 24 [ST040T01] Wait robot 040R01 end of welding
+     _25 : BOOL ;	//MT 25 [ST040T01] Wait robot 040R02 end of welding
+     _26 : BOOL ;	//RESERVE
+     _27 : BOOL ;	//RESERVE
+     _28 : BOOL ;	//RESERVE
+     _29 : BOOL ;	//RESERVE
+     _30 : BOOL ;	//RESERVE
+     _31 : BOOL ;	//RESERVE
+     _32 : BOOL ;	//RESERVE
+     _33 : BOOL ;	//RESERVE
+     _34 : BOOL ;	//MT 34 [ST040T01] Wait Out of interference 040R01 after welding
+     _35 : BOOL ;	//MT 35 [ST040T01] Wait Out of interference 040R02 after welding
+     _36 : BOOL ;	//RESERVE
+     _37 : BOOL ;	//RESERVE
+     _38 : BOOL ;	//RESERVE
+     _39 : BOOL ;	//RESERVE
+     _40 : BOOL ;	//RESERVE
+     _41 : BOOL ;	//RESERVE
+     _42 : BOOL ;	//RESERVE
+     _43 : BOOL ;	//RESERVE
+     _44 : BOOL ;	//RESERVE
+     _45 : BOOL ;	//MT 45 [ST040T01] Wait Part Present On 210SQ01
+     _46 : BOOL ;	//MT 46 [ST040T01] Wait Part Present On 220SQ02
+     _47 : BOOL ;	//MT 47 [ST040T01] Wait Part Present On 250SQ03 L1
+     _48 : BOOL ;	//MT 48 [ST040T01] Wait Part Present On 250SQ04 L2
+     _49 : BOOL ;	//MT 49 [ST040T01] Wait Part Present On 410SQ05
+     _50 : BOOL ;	//MT 50 [ST040T01] Wait Part Present On 440SQ06
+     _51 : BOOL ;	//MT 51 [ST040T01] Wait Part Present Off 210SQ01
+     _52 : BOOL ;	//MT 52 [ST040T01] Wait Part Present Off 220SQ02
+     _53 : BOOL ;	//MT 53 [ST040T01] Wait Part Present Off 250SQ03 L1
+     _54 : BOOL ;	//MT 54 [ST040T01] Wait Part Present Off 250SQ04 L2
+     _55 : BOOL ;	//MT 55 [ST040T01] Wait Part Present Off 410SQ05
+     _56 : BOOL ;	//MT 56 [ST040T01] Wait Part Present Off 440SQ06
+     _57 : BOOL ;	//RESERVE
+     _58 : BOOL ;	//RESERVE
+     _59 : BOOL ;	//RESERVE
+     _60 : BOOL ;	//RESERVE
+     _61 : BOOL ;	//RESERVE
+     _62 : BOOL ;	//RESERVE
+     _63 : BOOL ;	//RESERVE
+     _64 : BOOL ;	//RESERVE
+     _65 : BOOL ;	//RESERVE
+     _66 : BOOL ;	//RESERVE
+     _67 : BOOL ;	//RESERVE
+     _68 : BOOL ;	//RESERVE
+     _69 : BOOL ;	//RESERVE
+     _70 : BOOL ;	//RESERVE
+     _71 : BOOL ;	//RESERVE
+     _72 : BOOL ;	//RESERVE
+     _73 : BOOL ;	//RESERVE
+     _74 : BOOL ;	//RESERVE
+     _75 : BOOL ;	//RESERVE
+     _76 : BOOL ;	//RESERVE
+     _77 : BOOL ;	//RESERVE
+     _78 : BOOL ;	//RESERVE
+     _79 : BOOL ;	//RESERVE
+     _80 : BOOL ;	//RESERVE
+     _81 : BOOL ;	//RESERVE
+     _82 : BOOL ;	//RESERVE
+     _83 : BOOL ;	//RESERVE
+     _84 : BOOL ;	//RESERVE
+     _85 : BOOL ;	//RESERVE
+     _86 : BOOL ;	//RESERVE
+     _87 : BOOL ;	//RESERVE
+     _88 : BOOL ;	//RESERVE
+     _89 : BOOL ;	//RESERVE
+     _90 : BOOL ;	//MT 90 [ST040T01] Set End of Work
+     _91 : BOOL ;	//RESERVE
+     _92 : BOOL ;	//RESERVE
+     _93 : BOOL ;	//RESERVE
+     _94 : BOOL ;	//RESERVE
+     _95 : BOOL ;	//RESERVE
+    END_STRUCT ;	
+    RESERVE : INT ;	
+    MP : STRUCT 	
+     _00 : BOOL ;	//RESERVE
+     _01 : BOOL ;	//RESERVE
+     _02 : BOOL ;	//RESERVE
+     _03 : BOOL ;	//RESERVE
+     _04 : BOOL ;	//RESERVE
+     _05 : BOOL ;	//RESERVE
+     _06 : BOOL ;	//RESERVE
+     _07 : BOOL ;	//RESERVE
+     _08 : BOOL ;	//RESERVE
+     _09 : BOOL ;	//RESERVE
+     _10 : BOOL ;	//RESERVE
+     _11 : BOOL ;	//RESERVE
+     _12 : BOOL ;	//RESERVE
+     _13 : BOOL ;	//RESERVE
+     _14 : BOOL ;	//RESERVE
+     _15 : BOOL ;	//RESERVE
+     _17 : BOOL ;	//RESERVE
+     _18 : BOOL ;	//RESERVE
+     _19 : BOOL ;	//RESERVE
+     _20 : BOOL ;	//RESERVE
+     _21 : BOOL ;	//RESERVE
+     _22 : BOOL ;	//RESERVE
+     _23 : BOOL ;	//RESERVE
+     _24 : BOOL ;	//RESERVE
+     _25 : BOOL ;	//RESERVE
+     _26 : BOOL ;	//RESERVE
+     _27 : BOOL ;	//RESERVE
+     _28 : BOOL ;	//RESERVE
+     _29 : BOOL ;	//RESERVE
+     _30 : BOOL ;	//RESERVE
+     _31 : BOOL ;	//RESERVE
+     _32 : BOOL ;	//RESERVE
+     _33 : BOOL ;	//RESERVE
+     _34 : BOOL ;	//RESERVE
+     _35 : BOOL ;	//RESERVE
+     _36 : BOOL ;	//RESERVE
+     _37 : BOOL ;	//RESERVE
+     _38 : BOOL ;	//RESERVE
+     _39 : BOOL ;	//RESERVE
+     _40 : BOOL ;	//RESERVE
+     _41 : BOOL ;	//RESERVE
+     _42 : BOOL ;	//RESERVE
+     _43 : BOOL ;	//RESERVE
+     _44 : BOOL ;	//RESERVE
+     _45 : BOOL ;	//RESERVE
+     _46 : BOOL ;	//RESERVE
+     _47 : BOOL ;	//RESERVE
+     _48 : BOOL ;	//RESERVE
+    END_STRUCT ;	
+    MG : STRUCT 	
+     _00 : BOOL ;	//RESERVE
+     _01 : BOOL ;	//RESERVE
+     _02 : BOOL ;	//RESERVE
+     _03 : BOOL ;	//RESERVE
+     _04 : BOOL ;	//RESERVE
+     _05 : BOOL ;	//RESERVE
+     _06 : BOOL ;	//RESERVE
+     _07 : BOOL ;	//RESERVE
+     _08 : BOOL ;	//RESERVE
+     _09 : BOOL ;	//RESERVE
+     _10 : BOOL ;	//RESERVE
+     _11 : BOOL ;	//RESERVE
+     _12 : BOOL ;	//RESERVE
+     _13 : BOOL ;	//RESERVE
+     _14 : BOOL ;	//RESERVE
+     _15 : BOOL ;	//RESERVE
+     _16 : BOOL ;	//RESERVE
+     _17 : BOOL ;	//RESERVE
+     _18 : BOOL ;	//RESERVE
+     _19 : BOOL ;	//RESERVE
+     _20 : BOOL ;	//RESERVE
+     _21 : BOOL ;	//RESERVE
+     _22 : BOOL ;	//RESERVE
+     _23 : BOOL ;	//RESERVE
+     _24 : BOOL ;	//RESERVE
+     _25 : BOOL ;	//RESERVE
+     _26 : BOOL ;	//RESERVE
+     _27 : BOOL ;	//RESERVE
+     _28 : BOOL ;	//RESERVE
+     _29 : BOOL ;	//RESERVE
+     _30 : BOOL ;	//RESERVE
+     _31 : BOOL ;	//RESERVE
+     _32 : BOOL ;	//RESERVE
+     _33 : BOOL ;	//RESERVE
+     _34 : BOOL ;	//RESERVE
+     _35 : BOOL ;	//RESERVE
+     _36 : BOOL ;	//RESERVE
+     _37 : BOOL ;	//RESERVE
+     _38 : BOOL ;	//RESERVE
+     _39 : BOOL ;	//RESERVE
+     _40 : BOOL ;	//RESERVE
+     _41 : BOOL ;	//RESERVE
+     _42 : BOOL ;	//RESERVE
+     _43 : BOOL ;	//RESERVE
+     _44 : BOOL ;	//RESERVE
+     _45 : BOOL ;	//RESERVE
+     _46 : BOOL ;	//RESERVE
+     _47 : BOOL ;	//RESERVE
+     _48 : BOOL ;	//RESERVE
+     _49 : BOOL ;	//RESERVE
+     _50 : BOOL ;	//RESERVE
+     _51 : BOOL ;	//RESERVE
+     _52 : BOOL ;	//RESERVE
+     _53 : BOOL ;	//RESERVE
+     _54 : BOOL ;	//RESERVE
+     _55 : BOOL ;	//RESERVE
+     _56 : BOOL ;	//RESERVE
+     _57 : BOOL ;	//RESERVE
+     _58 : BOOL ;	//RESERVE
+     _59 : BOOL ;	//RESERVE
+     _60 : BOOL ;	//RESERVE
+     _61 : BOOL ;	//RESERVE
+     _62 : BOOL ;	//RESERVE
+     _63 : BOOL ;	//RESERVE
+     _64 : BOOL ;	//RESERVE
+     _65 : BOOL ;	//RESERVE
+     _66 : BOOL ;	//RESERVE
+     _67 : BOOL ;	//RESERVE
+     _68 : BOOL ;	//RESERVE
+     _69 : BOOL ;	//RESERVE
+     _70 : BOOL ;	//RESERVE
+     _71 : BOOL ;	//RESERVE
+     _72 : BOOL ;	//RESERVE
+     _73 : BOOL ;	//RESERVE
+     _74 : BOOL ;	//RESERVE
+     _75 : BOOL ;	//RESERVE
+     _76 : BOOL ;	//RESERVE
+     _77 : BOOL ;	//RESERVE
+     _78 : BOOL ;	//RESERVE
+     _79 : BOOL ;	//RESERVE
+     _80 : BOOL ;	//RESERVE
+     _81 : BOOL ;	//RESERVE
+     _82 : BOOL ;	//RESERVE
+     _83 : BOOL ;	//RESERVE
+     _84 : BOOL ;	//RESERVE
+     _85 : BOOL ;	//RESERVE
+     _86 : BOOL ;	//RESERVE
+     _87 : BOOL ;	//RESERVE
+     _88 : BOOL ;	//RESERVE
+     _89 : BOOL ;	//RESERVE
+     _90 : BOOL ;	//RESERVE
+     _91 : BOOL ;	//RESERVE
+     _92 : BOOL ;	//RESERVE
+     _93 : BOOL ;	//RESERVE
+     _94 : BOOL ;	//RESERVE
+     _95 : BOOL ;	//RESERVE
+    END_STRUCT ;	
+    RESERVE1 : ARRAY  [0 .. 12 ] OF INT  := 0;	
+    LEVEL_1_2 : STRUCT 	
+     SPARE_00 : INT ;	
+     SPARE_01 : INT ;	
+     SPARE_02 : INT ;	
+     SPARE_03 : INT ;	
+     SPARE_04 : INT ;	
+     SPARE_05 : INT ;	
+     SPARE_06 : INT ;	
+     SPARE_07 : INT ;	
+     SPARE_08 : INT ;	
+     SPARE_09 : INT ;	
+     SPARE_10 : INT ;	
+     SPARE_11 : INT ;	
+     SPARE_12 : INT ;	
+     SPARE_13 : INT ;	
+     SPARE_14 : INT ;	
+     SPARE_15 : INT ;	
+     SPARE_16 : INT ;	
+     SPARE_17 : INT ;	
+     SPARE_18 : INT ;	
+     SPARE_19 : INT ;	
+    END_STRUCT ;	
+   END_STRUCT ;	
+   Type_Element_Code : STRUCT 	
+    Type_01 : BOOL ;	//Type Element 1 - L1 VP
+    Type_02 : BOOL ;	//Type Element 2 - L1 VU
+    Type_03 : BOOL ;	//Type Element 3 - L2 VU
+    Type_04 : BOOL ;	//Type Element 4 - L2 VU R2
+    Type_05 : BOOL ;	//Type Element 5 - 
+    Type_06 : BOOL ;	//Type Element 6 - 
+    Type_07 : BOOL ;	//Type Element 7 - 
+    Type_08 : BOOL ;	//Type Element 8 - 
+    Type_09 : BOOL ;	//Type Element 9 - 
+    Type_10 : BOOL ;	//Type Element 10 -
+    Type_11 : BOOL ;	//Type Element 11 - 
+    Type_12 : BOOL ;	//Type Element 12 - 
+    Type_13 : BOOL ;	//Type Element 13 - 
+    Type_14 : BOOL ;	//Type Element 14 - 
+    Type_15 : BOOL ;	//Type Element 15 - 
+    Type_16 : BOOL ;	//Type Element 16 - 
+    Type_17 : BOOL ;	//Type Element 17 - 
+    Type_18 : BOOL ;	//Type Element 18 - 
+    Type_19 : BOOL ;	//Type Element 19 - 
+    Type_20 : BOOL ;	//Type Element 20
+    Type_21 : BOOL ;	//Type Element 21
+    Type_22 : BOOL ;	//Type Element 22
+    Type_23 : BOOL ;	//Type Element 23
+    Type_24 : BOOL ;	//Type Element 24
+    Type_25 : BOOL ;	//Type Element 25
+    Type_26 : BOOL ;	//Type Element 26
+    Type_27 : BOOL ;	//Type Element 27
+    Type_28 : BOOL ;	//Type Element 28
+    Type_29 : BOOL ;	//Type Element 29
+    Type_30 : BOOL ;	//Type Element 30
+    Type_31 : BOOL ;	//Type Element 31
+    Type_32 : BOOL ;	//Type Element 32
+   END_STRUCT ;	
+  END_STRUCT ;	
+BEGIN
+   F_Gen.No_Ma := FALSE; 
+   F_Gen.No_Mp := FALSE; 
+   F_Gen.No_Fmp_sec := FALSE; 
+   F_Gen.No_ma_imm := FALSE; 
+   F_Gen.No_ma_weld := FALSE; 
+   F_Gen.No_mp_sec := FALSE; 
+   Cycle.Manual := FALSE; 
+   Cycle.Manual_rem := FALSE; 
+   Cycle.Auto_lin := TRUE; 
+   Cycle.Auto_loc := FALSE; 
+   Cycle.Auto_loc_noweld := FALSE; 
+   Cycle.Auto_loc_noelem := FALSE; 
+   Cycle.Auto_step_step := FALSE; 
+   Cycle.Auto_st_st_noweld := FALSE; 
+   Cycle.Auto_st_st_noelem := FALSE; 
+   Cycle.Change_tool := FALSE; 
+   Cycle.Home_Run := FALSE; 
+   Cycle.Except := FALSE; 
+   Cycle.Auto_lin_no_el := FALSE; 
+   F_Prim.No_anom := FALSE; 
+   F_Prim.AB_M := FALSE; 
+   F_Prim.OS_home_run := FALSE; 
+   F_Prim.Home_run := FALSE; 
+   F_Prim.Excl_sec := FALSE; 
+   F_Prim.P_E_OK := FALSE; 
+   F_Prim.C_rest := TRUE; 
+   F_Prim.C_Start_up := FALSE; 
+   F_Prim.C_in_Start_up := FALSE; 
+   F_Prim.C_in_run := FALSE; 
+   F_Prim.C_H_R_in_run := FALSE; 
+   F_Prim.C_AutoL_in_run := FALSE; 
+   F_Prim.End_Work := FALSE; 
+   F_Prim.Change_selec := FALSE; 
+   F_Prim.Open_Out_Cycle := FALSE; 
+   F_Prim.NO_MA := FALSE; 
+   F_Prim.NO_MG := FALSE; 
+   F_Prim.Time_Out := FALSE; 
+   F_Prim.NO_ME := FALSE; 
+   F_Prim.NO_MA_pr := FALSE; 
+   F_Prim.NO_RQM := FALSE; 
+   F_Prim.NO_RQT := TRUE; 
+   F_Prim.P_E_GEN := FALSE; 
+   F_Prim.NO_P_E := TRUE; 
+   F_Prim.Parity_Error := FALSE; 
+   F_Prim.NO_RQM_pr := FALSE; 
+   F_Prim.AB_C_run := FALSE; 
+   F_Prim.CMD_C_avv := FALSE; 
+   F_Prim.AB_inc_cnt := FALSE; 
+   F_Prim.AB_dec_cnt := FALSE; 
+   F_Prim.OS_CMD_C_run := FALSE; 
+   F_Prim.OS_Open_Out_Cycle := FALSE; 
+   F_Prim.AUX_Open_Out_Cycle := FALSE; 
+   F_Prim.RES_TO := FALSE; 
+   F_Prim.OS_RES_TO := FALSE; 
+   F_Prim.AUX_RES_End_Work := TRUE; 
+   F_Prim.Reset_step_counter := FALSE; 
+   F_Prim.Conf_Step := FALSE; 
+   F_Prim.OS_Conf_Step := FALSE; 
+   F_Prim.AUX_SET_End_Work := FALSE; 
+   Reset_anom1 := FALSE; 
+   Tip_el := 0; 
+   Step[0] := TRUE; 
+   Step[1] := FALSE; 
+   Step[2] := FALSE; 
+   Step[3] := FALSE; 
+   Step[4] := FALSE; 
+   Step[5] := FALSE; 
+   Step[6] := FALSE; 
+   Step[7] := FALSE; 
+   Step[8] := FALSE; 
+   Step[9] := FALSE; 
+   Step[10] := FALSE; 
+   Step[11] := FALSE; 
+   Step[12] := FALSE; 
+   Step[13] := FALSE; 
+   Step[14] := FALSE; 
+   Step[15] := FALSE; 
+   Step[16] := FALSE; 
+   Step[17] := FALSE; 
+   Step[18] := FALSE; 
+   Step[19] := FALSE; 
+   Step[20] := FALSE; 
+   Step[21] := FALSE; 
+   Step[22] := FALSE; 
+   Step[23] := FALSE; 
+   Step[24] := FALSE; 
+   Step[25] := FALSE; 
+   Step[26] := FALSE; 
+   Step[27] := FALSE; 
+   Step[28] := FALSE; 
+   Step[29] := FALSE; 
+   Step[30] := FALSE; 
+   Step[31] := FALSE; 
+   Step[32] := FALSE; 
+   Step[33] := FALSE; 
+   Step[34] := FALSE; 
+   Step[35] := FALSE; 
+   Step[36] := FALSE; 
+   Step[37] := FALSE; 
+   Step[38] := FALSE; 
+   Step[39] := FALSE; 
+   Step[40] := FALSE; 
+   Step[41] := FALSE; 
+   Step[42] := FALSE; 
+   Step[43] := FALSE; 
+   Step[44] := FALSE; 
+   Step[45] := FALSE; 
+   Step[46] := FALSE; 
+   Step[47] := FALSE; 
+   Step[48] := FALSE; 
+   Step[49] := FALSE; 
+   Step[50] := FALSE; 
+   Step[51] := FALSE; 
+   Step[52] := FALSE; 
+   Step[53] := FALSE; 
+   Step[54] := FALSE; 
+   Step[55] := FALSE; 
+   Step[56] := FALSE; 
+   Step[57] := FALSE; 
+   Step[58] := FALSE; 
+   Step[59] := FALSE; 
+   Step[60] := FALSE; 
+   Step[61] := FALSE; 
+   Step[62] := FALSE; 
+   Step[63] := FALSE; 
+   Step[64] := FALSE; 
+   Cnt1 := L#0; 
+   O_I._00 := FALSE; 
+   O_I._01 := FALSE; 
+   O_I._02 := FALSE; 
+   O_I._03 := TRUE; 
+   O_I._04 := FALSE; 
+   O_I._05 := TRUE; 
+   O_I._06 := FALSE; 
+   O_I._07 := TRUE; 
+   O_I._08 := FALSE; 
+   O_I._09 := FALSE; 
+   O_I._10 := FALSE; 
+   O_I._11 := FALSE; 
+   O_I._12 := FALSE; 
+   O_I._13 := FALSE; 
+   O_I._14 := FALSE; 
+   O_I._15 := FALSE; 
+   O_I._16 := FALSE; 
+   O_I._17 := TRUE; 
+   O_I._18 := FALSE; 
+   O_I._19 := FALSE; 
+   O_I._20 := FALSE; 
+   O_I._21 := FALSE; 
+   O_I._22 := FALSE; 
+   O_I._23 := FALSE; 
+   O_I._24 := FALSE; 
+   O_I._25 := FALSE; 
+   O_I._26 := FALSE; 
+   O_I._27 := FALSE; 
+   O_I._28 := FALSE; 
+   O_I._29 := FALSE; 
+   O_I._30 := FALSE; 
+   O_I._31 := FALSE; 
+   O_I._32 := FALSE; 
+   O_I._33 := FALSE; 
+   O_I._34 := FALSE; 
+   O_I._35 := FALSE; 
+   O_I._36 := FALSE; 
+   O_I._37 := FALSE; 
+   O_I._38 := FALSE; 
+   O_I._39 := FALSE; 
+   O_I._40 := FALSE; 
+   O_I._41 := FALSE; 
+   O_I._42 := FALSE; 
+   O_I._43 := FALSE; 
+   O_I._44 := FALSE; 
+   O_I._45 := FALSE; 
+   O_I._46 := FALSE; 
+   O_I._47 := FALSE; 
+   O_I._48 := FALSE; 
+   O_I._49 := FALSE; 
+   O_I._50 := FALSE; 
+   O_I._51 := FALSE; 
+   O_I._52 := FALSE; 
+   O_I._53 := FALSE; 
+   O_I._54 := FALSE; 
+   O_I._55 := FALSE; 
+   O_I._56 := FALSE; 
+   O_I._57 := FALSE; 
+   O_I._58 := FALSE; 
+   O_I._59 := FALSE; 
+   O_I._60 := FALSE; 
+   O_I._61 := FALSE; 
+   O_I._62 := FALSE; 
+   O_I._63 := FALSE; 
+   O_I._64 := FALSE; 
+   O_I._65 := FALSE; 
+   O_I._66 := FALSE; 
+   O_I._67 := FALSE; 
+   O_I._68 := FALSE; 
+   O_I._69 := FALSE; 
+   O_I._70 := FALSE; 
+   O_I._71 := FALSE; 
+   O_I._72 := FALSE; 
+   O_I._73 := FALSE; 
+   O_I._74 := FALSE; 
+   O_I._75 := FALSE; 
+   O_I._76 := FALSE; 
+   O_I._77 := FALSE; 
+   O_I._78 := FALSE; 
+   O_I._79 := FALSE; 
+   O_I._80 := FALSE; 
+   O_I._81 := FALSE; 
+   O_I._82 := FALSE; 
+   O_I._83 := FALSE; 
+   O_I._84 := FALSE; 
+   O_I._85 := FALSE; 
+   O_I._86 := FALSE; 
+   O_I._87 := FALSE; 
+   O_I._88 := FALSE; 
+   O_I._89 := FALSE; 
+   O_I._90 := FALSE; 
+   O_I._91 := FALSE; 
+   O_I._92 := FALSE; 
+   O_I._93 := FALSE; 
+   O_I._94 := FALSE; 
+   O_I._95 := FALSE; 
+   AB._00 := FALSE; 
+   AB._01 := FALSE; 
+   AB._02 := FALSE; 
+   AB._03 := FALSE; 
+   AB._04 := FALSE; 
+   AB._05 := FALSE; 
+   AB._06 := FALSE; 
+   AB._07 := FALSE; 
+   AB._08 := FALSE; 
+   AB._09 := FALSE; 
+   AB._10 := FALSE; 
+   AB._11 := FALSE; 
+   AB._12 := FALSE; 
+   AB._13 := FALSE; 
+   AB._14 := FALSE; 
+   AB._15 := FALSE; 
+   AB._16 := FALSE; 
+   AB._17 := FALSE; 
+   AB._18 := FALSE; 
+   AB._19 := FALSE; 
+   AB._20 := FALSE; 
+   AB._21 := FALSE; 
+   AB._22 := FALSE; 
+   AB._23 := FALSE; 
+   AB._24 := FALSE; 
+   AB._25 := FALSE; 
+   AB._26 := FALSE; 
+   AB._27 := FALSE; 
+   AB._28 := FALSE; 
+   AB._29 := FALSE; 
+   AB._30 := FALSE; 
+   AB._31 := FALSE; 
+   AB._32 := FALSE; 
+   AB._33 := FALSE; 
+   AB._34 := FALSE; 
+   AB._35 := FALSE; 
+   AB._36 := FALSE; 
+   AB._37 := FALSE; 
+   AB._38 := FALSE; 
+   AB._39 := FALSE; 
+   AB._40 := FALSE; 
+   AB._41 := FALSE; 
+   AB._42 := FALSE; 
+   AB._43 := FALSE; 
+   AB._44 := FALSE; 
+   AB._45 := FALSE; 
+   AB._46 := FALSE; 
+   AB._47 := FALSE; 
+   AB._48 := FALSE; 
+   AB._49 := FALSE; 
+   AB._50 := FALSE; 
+   AB._51 := FALSE; 
+   AB._52 := FALSE; 
+   AB._53 := FALSE; 
+   AB._54 := FALSE; 
+   AB._55 := FALSE; 
+   AB._56 := FALSE; 
+   AB._57 := FALSE; 
+   AB._58 := FALSE; 
+   AB._59 := FALSE; 
+   AB._60 := FALSE; 
+   AB._61 := FALSE; 
+   AB._62 := FALSE; 
+   AB._63 := FALSE; 
+   AB._64 := FALSE; 
+   AB._65 := FALSE; 
+   AB._66 := FALSE; 
+   AB._67 := FALSE; 
+   AB._68 := FALSE; 
+   AB._69 := FALSE; 
+   AB._70 := FALSE; 
+   AB._71 := FALSE; 
+   AB._72 := FALSE; 
+   AB._73 := FALSE; 
+   AB._74 := FALSE; 
+   AB._75 := FALSE; 
+   AB._76 := FALSE; 
+   AB._77 := FALSE; 
+   AB._78 := FALSE; 
+   AB._79 := FALSE; 
+   AB._80 := FALSE; 
+   AB._81 := FALSE; 
+   AB._82 := FALSE; 
+   AB._83 := FALSE; 
+   AB._84 := FALSE; 
+   AB._85 := FALSE; 
+   AB._86 := FALSE; 
+   AB._87 := FALSE; 
+   AB._88 := FALSE; 
+   AB._89 := FALSE; 
+   AB._90 := FALSE; 
+   AB._91 := FALSE; 
+   AB._92 := FALSE; 
+   AB._93 := FALSE; 
+   AB._94 := FALSE; 
+   AB._95 := FALSE; 
+   A_I._00 := FALSE; 
+   A_I._01 := FALSE; 
+   A_I._02 := FALSE; 
+   A_I._03 := FALSE; 
+   A_I._04 := FALSE; 
+   A_I._05 := FALSE; 
+   A_I._06 := FALSE; 
+   A_I._07 := FALSE; 
+   A_I._08 := FALSE; 
+   A_I._09 := FALSE; 
+   A_I._10 := FALSE; 
+   A_I._11 := FALSE; 
+   A_I._12 := FALSE; 
+   A_I._13 := FALSE; 
+   A_I._14 := FALSE; 
+   A_I._15 := FALSE; 
+   A_I._16 := FALSE; 
+   A_I._17 := FALSE; 
+   A_I._18 := FALSE; 
+   A_I._19 := FALSE; 
+   A_I._20 := FALSE; 
+   A_I._21 := FALSE; 
+   A_I._22 := FALSE; 
+   A_I._23 := FALSE; 
+   A_I._24 := FALSE; 
+   A_I._25 := FALSE; 
+   A_I._26 := FALSE; 
+   A_I._27 := FALSE; 
+   A_I._28 := FALSE; 
+   A_I._29 := FALSE; 
+   A_I._30 := FALSE; 
+   A_I._31 := FALSE; 
+   A_I._32 := FALSE; 
+   A_I._33 := FALSE; 
+   A_I._34 := FALSE; 
+   A_I._35 := FALSE; 
+   A_I._36 := FALSE; 
+   A_I._37 := FALSE; 
+   A_I._38 := FALSE; 
+   A_I._39 := FALSE; 
+   A_I._40 := FALSE; 
+   A_I._41 := FALSE; 
+   A_I._42 := FALSE; 
+   A_I._43 := FALSE; 
+   A_I._44 := FALSE; 
+   A_I._45 := FALSE; 
+   A_I._46 := FALSE; 
+   A_I._47 := FALSE; 
+   A_I._48 := FALSE; 
+   A_I._49 := FALSE; 
+   A_I._50 := FALSE; 
+   A_I._51 := FALSE; 
+   A_I._52 := FALSE; 
+   A_I._53 := FALSE; 
+   A_I._54 := FALSE; 
+   A_I._55 := FALSE; 
+   A_I._56 := FALSE; 
+   A_I._57 := FALSE; 
+   A_I._58 := FALSE; 
+   A_I._59 := FALSE; 
+   A_I._60 := FALSE; 
+   A_I._61 := FALSE; 
+   A_I._62 := FALSE; 
+   A_I._63 := FALSE; 
+   A_I._64 := FALSE; 
+   A_I._65 := FALSE; 
+   A_I._66 := FALSE; 
+   A_I._67 := FALSE; 
+   A_I._68 := FALSE; 
+   A_I._69 := FALSE; 
+   A_I._70 := FALSE; 
+   A_I._71 := FALSE; 
+   A_I._72 := FALSE; 
+   A_I._73 := FALSE; 
+   A_I._74 := FALSE; 
+   A_I._75 := FALSE; 
+   A_I._76 := FALSE; 
+   A_I._77 := FALSE; 
+   A_I._78 := FALSE; 
+   A_I._79 := FALSE; 
+   A_I._80 := FALSE; 
+   A_I._81 := FALSE; 
+   A_I._82 := FALSE; 
+   A_I._83 := FALSE; 
+   A_I._84 := FALSE; 
+   A_I._85 := FALSE; 
+   A_I._86 := FALSE; 
+   A_I._87 := FALSE; 
+   A_I._88 := FALSE; 
+   A_I._89 := FALSE; 
+   A_I._90 := FALSE; 
+   A_I._91 := FALSE; 
+   A_I._92 := FALSE; 
+   A_I._93 := FALSE; 
+   A_I._94 := FALSE; 
+   A_I._95 := FALSE; 
+   RQM._00 := FALSE; 
+   RQM._01 := FALSE; 
+   RQM._02 := FALSE; 
+   RQM._03 := FALSE; 
+   RQM._04 := FALSE; 
+   RQM._05 := FALSE; 
+   RQM._06 := FALSE; 
+   RQM._07 := FALSE; 
+   RQM._08 := FALSE; 
+   RQM._09 := FALSE; 
+   RQM._10 := FALSE; 
+   RQM._11 := FALSE; 
+   RQM._12 := FALSE; 
+   RQM._13 := FALSE; 
+   RQM._14 := FALSE; 
+   RQM._15 := FALSE; 
+   RQM._16 := FALSE; 
+   RQM._17 := FALSE; 
+   RQM._18 := FALSE; 
+   RQM._19 := FALSE; 
+   RQM._20 := FALSE; 
+   RQM._21 := FALSE; 
+   RQM._22 := FALSE; 
+   RQM._23 := FALSE; 
+   RQM._24 := FALSE; 
+   RQM._25 := FALSE; 
+   RQM._26 := FALSE; 
+   RQM._27 := FALSE; 
+   RQM._28 := FALSE; 
+   RQM._29 := FALSE; 
+   RQM._30 := FALSE; 
+   RQM._31 := FALSE; 
+   RQM._32 := FALSE; 
+   RQM._33 := FALSE; 
+   RQM._34 := FALSE; 
+   RQM._35 := FALSE; 
+   RQM._36 := FALSE; 
+   RQM._37 := FALSE; 
+   RQM._38 := FALSE; 
+   RQM._39 := FALSE; 
+   RQM._40 := FALSE; 
+   RQM._41 := FALSE; 
+   RQM._42 := FALSE; 
+   RQM._43 := FALSE; 
+   RQM._44 := FALSE; 
+   RQM._45 := FALSE; 
+   RQM._46 := FALSE; 
+   RQM._47 := FALSE; 
+   RQM._48 := FALSE; 
+   RQM._49 := FALSE; 
+   RQM._50 := FALSE; 
+   RQM._51 := FALSE; 
+   RQM._52 := FALSE; 
+   RQM._53 := FALSE; 
+   RQM._54 := FALSE; 
+   RQM._55 := FALSE; 
+   RQM._56 := FALSE; 
+   RQM._57 := FALSE; 
+   RQM._58 := FALSE; 
+   RQM._59 := FALSE; 
+   RQM._60 := FALSE; 
+   RQM._61 := FALSE; 
+   RQM._62 := FALSE; 
+   RQM._63 := FALSE; 
+   RQM._64 := FALSE; 
+   RQM._65 := FALSE; 
+   RQM._66 := FALSE; 
+   RQM._67 := FALSE; 
+   RQM._68 := FALSE; 
+   RQM._69 := FALSE; 
+   RQM._70 := FALSE; 
+   RQM._71 := FALSE; 
+   RQM._72 := FALSE; 
+   RQM._73 := FALSE; 
+   RQM._74 := FALSE; 
+   RQM._75 := FALSE; 
+   RQM._76 := FALSE; 
+   RQM._77 := FALSE; 
+   RQM._78 := FALSE; 
+   RQM._79 := FALSE; 
+   RQM._80 := FALSE; 
+   RQM._81 := FALSE; 
+   RQM._82 := FALSE; 
+   RQM._83 := FALSE; 
+   RQM._84 := FALSE; 
+   RQM._85 := FALSE; 
+   RQM._86 := FALSE; 
+   RQM._87 := FALSE; 
+   RQM._88 := FALSE; 
+   RQM._89 := FALSE; 
+   RQM._90 := FALSE; 
+   RQM._91 := FALSE; 
+   RQM._92 := FALSE; 
+   RQM._93 := FALSE; 
+   RQM._94 := FALSE; 
+   RQM._95 := FALSE; 
+   RQT._00 := FALSE; 
+   RQT._01 := FALSE; 
+   RQT._02 := FALSE; 
+   RQT._03 := FALSE; 
+   RQT._04 := FALSE; 
+   RQT._05 := FALSE; 
+   RQT._06 := FALSE; 
+   RQT._07 := FALSE; 
+   RQT._08 := FALSE; 
+   RQT._09 := FALSE; 
+   RQT._10 := FALSE; 
+   RQT._11 := FALSE; 
+   RQT._12 := FALSE; 
+   RQT._13 := FALSE; 
+   RQT._14 := FALSE; 
+   RQT._15 := FALSE; 
+   RQT._16 := FALSE; 
+   RQT._17 := FALSE; 
+   RQT._18 := FALSE; 
+   RQT._19 := FALSE; 
+   RQT._20 := FALSE; 
+   RQT._21 := FALSE; 
+   RQT._22 := FALSE; 
+   RQT._23 := FALSE; 
+   RQT._24 := FALSE; 
+   RQT._25 := FALSE; 
+   RQT._26 := FALSE; 
+   RQT._27 := FALSE; 
+   RQT._28 := FALSE; 
+   RQT._29 := FALSE; 
+   RQT._30 := FALSE; 
+   RQT._31 := FALSE; 
+   RQT._32 := FALSE; 
+   RQT._33 := FALSE; 
+   RQT._34 := FALSE; 
+   RQT._35 := FALSE; 
+   RQT._36 := FALSE; 
+   RQT._37 := FALSE; 
+   RQT._38 := FALSE; 
+   RQT._39 := FALSE; 
+   RQT._40 := FALSE; 
+   RQT._41 := FALSE; 
+   RQT._42 := FALSE; 
+   RQT._43 := FALSE; 
+   RQT._44 := FALSE; 
+   RQT._45 := FALSE; 
+   RQT._46 := FALSE; 
+   RQT._47 := FALSE; 
+   RQT._48 := FALSE; 
+   RQT._49 := FALSE; 
+   RQT._50 := FALSE; 
+   RQT._51 := FALSE; 
+   RQT._52 := FALSE; 
+   RQT._53 := FALSE; 
+   RQT._54 := FALSE; 
+   RQT._55 := FALSE; 
+   RQT._56 := FALSE; 
+   RQT._57 := FALSE; 
+   RQT._58 := FALSE; 
+   RQT._59 := FALSE; 
+   RQT._60 := FALSE; 
+   RQT._61 := FALSE; 
+   RQT._62 := FALSE; 
+   RQT._63 := FALSE; 
+   RQT._64 := FALSE; 
+   RQT._65 := FALSE; 
+   RQT._66 := FALSE; 
+   RQT._67 := FALSE; 
+   RQT._68 := FALSE; 
+   RQT._69 := FALSE; 
+   RQT._70 := FALSE; 
+   RQT._71 := FALSE; 
+   RQT._72 := FALSE; 
+   RQT._73 := FALSE; 
+   RQT._74 := FALSE; 
+   RQT._75 := FALSE; 
+   RQT._76 := FALSE; 
+   RQT._77 := FALSE; 
+   RQT._78 := FALSE; 
+   RQT._79 := FALSE; 
+   RQT._80 := FALSE; 
+   RQT._81 := FALSE; 
+   RQT._82 := FALSE; 
+   RQT._83 := FALSE; 
+   RQT._84 := FALSE; 
+   RQT._85 := FALSE; 
+   RQT._86 := FALSE; 
+   RQT._87 := FALSE; 
+   RQT._88 := FALSE; 
+   RQT._89 := FALSE; 
+   RQT._90 := FALSE; 
+   RQT._91 := FALSE; 
+   RQT._92 := FALSE; 
+   RQT._93 := FALSE; 
+   RQT._94 := FALSE; 
+   RQT._95 := FALSE; 
+   Ma_EP[0] := FALSE; 
+   Ma_EP[1] := FALSE; 
+   Ma_EP[2] := FALSE; 
+   Ma_EP[3] := FALSE; 
+   Ma_EP[4] := FALSE; 
+   Ma_EP[5] := FALSE; 
+   Ma_EP[6] := FALSE; 
+   Ma_EP[7] := FALSE; 
+   Ma_EP[8] := FALSE; 
+   Ma_EP[9] := FALSE; 
+   Ma_EP[10] := FALSE; 
+   Ma_EP[11] := FALSE; 
+   Ma_EP[12] := FALSE; 
+   Ma_EP[13] := FALSE; 
+   Ma_EP[14] := FALSE; 
+   Ma_EP[15] := FALSE; 
+   Ma_EP[16] := FALSE; 
+   Ma_EP[17] := FALSE; 
+   Ma_EP[18] := FALSE; 
+   Ma_EP[19] := FALSE; 
+   Ma_EP[20] := FALSE; 
+   Ma_EP[21] := FALSE; 
+   Ma_EP[22] := FALSE; 
+   Ma_EP[23] := FALSE; 
+   Ma_EP[24] := FALSE; 
+   Ma_EP[25] := FALSE; 
+   Ma_EP[26] := FALSE; 
+   Ma_EP[27] := FALSE; 
+   Ma_EP[28] := FALSE; 
+   Ma_EP[29] := FALSE; 
+   Ma_EP[30] := FALSE; 
+   Ma_EP[31] := FALSE; 
+   Ma_EP[32] := FALSE; 
+   Ma_EP[33] := FALSE; 
+   Ma_EP[34] := FALSE; 
+   Ma_EP[35] := FALSE; 
+   Ma_EP[36] := FALSE; 
+   Ma_EP[37] := FALSE; 
+   Ma_EP[38] := FALSE; 
+   Ma_EP[39] := FALSE; 
+   Ma_EP[40] := FALSE; 
+   Ma_EP[41] := FALSE; 
+   Ma_EP[42] := FALSE; 
+   Ma_EP[43] := FALSE; 
+   Ma_EP[44] := FALSE; 
+   Ma_EP[45] := FALSE; 
+   Ma_EP[46] := FALSE; 
+   Ma_EP[47] := FALSE; 
+   Ma_EP[48] := FALSE; 
+   Ma_EP[49] := FALSE; 
+   Ma_EP[50] := FALSE; 
+   Ma_EP[51] := FALSE; 
+   Ma_EP[52] := FALSE; 
+   Ma_EP[53] := FALSE; 
+   Ma_EP[54] := FALSE; 
+   Ma_EP[55] := FALSE; 
+   Ma_EP[56] := FALSE; 
+   Ma_EP[57] := FALSE; 
+   Ma_EP[58] := FALSE; 
+   Ma_EP[59] := FALSE; 
+   Ma_EP[60] := FALSE; 
+   Ma_EP[61] := FALSE; 
+   Ma_EP[62] := FALSE; 
+   Ma_EP[63] := FALSE; 
+   Ma_EP[64] := FALSE; 
+   Ma_EP[65] := FALSE; 
+   Ma_EP[66] := FALSE; 
+   Ma_EP[67] := FALSE; 
+   Ma_EP[68] := FALSE; 
+   Ma_EP[69] := FALSE; 
+   Ma_EP[70] := FALSE; 
+   Ma_EP[71] := FALSE; 
+   Ma_EP[72] := FALSE; 
+   Ma_EP[73] := FALSE; 
+   Ma_EP[74] := FALSE; 
+   Ma_EP[75] := FALSE; 
+   Ma_EP[76] := FALSE; 
+   Ma_EP[77] := FALSE; 
+   Ma_EP[78] := FALSE; 
+   Ma_EP[79] := FALSE; 
+   Ma_EP[80] := FALSE; 
+   Ma_EP[81] := FALSE; 
+   Ma_EP[82] := FALSE; 
+   Ma_EP[83] := FALSE; 
+   Ma_EP[84] := FALSE; 
+   Ma_EP[85] := FALSE; 
+   Ma_EP[86] := FALSE; 
+   Ma_EP[87] := FALSE; 
+   Ma_EP[88] := FALSE; 
+   Ma_EP[89] := FALSE; 
+   Ma_EP[90] := FALSE; 
+   Ma_EP[91] := FALSE; 
+   Ma_EP[92] := FALSE; 
+   Ma_EP[93] := FALSE; 
+   Ma_EP[94] := FALSE; 
+   Ma_EP[95] := FALSE; 
+   Ma_EP[96] := FALSE; 
+   Ma_EP[97] := FALSE; 
+   Ma_EP[98] := FALSE; 
+   Ma_EP[99] := FALSE; 
+   Ma_EP[100] := FALSE; 
+   Ma_EP[101] := FALSE; 
+   Ma_EP[102] := FALSE; 
+   Ma_EP[103] := FALSE; 
+   Ma_EP[104] := FALSE; 
+   Ma_EP[105] := FALSE; 
+   Ma_EP[106] := FALSE; 
+   Ma_EP[107] := FALSE; 
+   Ma_EP[108] := FALSE; 
+   Ma_EP[109] := FALSE; 
+   Ma_EP[110] := FALSE; 
+   Ma_EP[111] := FALSE; 
+   Ma_EP[112] := FALSE; 
+   Ma_EP[113] := FALSE; 
+   Ma_EP[114] := FALSE; 
+   Ma_EP[115] := FALSE; 
+   Ma_EP[116] := FALSE; 
+   Ma_EP[117] := FALSE; 
+   Ma_EP[118] := FALSE; 
+   Ma_EP[119] := FALSE; 
+   Ma_EP[120] := FALSE; 
+   Ma_EP[121] := FALSE; 
+   Ma_EP[122] := FALSE; 
+   Ma_EP[123] := FALSE; 
+   Ma_EP[124] := FALSE; 
+   Ma_EP[125] := FALSE; 
+   Ma_EP[126] := FALSE; 
+   Ma_EP[127] := FALSE; 
+   Ma_EP[128] := FALSE; 
+   Aux_Cycle._01 := FALSE; 
+   Aux_Cycle._02 := FALSE; 
+   Aux_Cycle._03 := FALSE; 
+   Aux_Cycle._04 := FALSE; 
+   Aux_Cycle._05 := FALSE; 
+   Aux_Cycle._06 := FALSE; 
+   Aux_Cycle._07 := FALSE; 
+   Aux_Cycle._08 := FALSE; 
+   Aux_Cycle._09 := FALSE; 
+   Aux_Cycle._10 := TRUE; 
+   Aux_Cycle._11 := FALSE; 
+   Aux_Cycle._12 := FALSE; 
+   Aux_Cycle._13 := FALSE; 
+   Aux_Cycle._14 := FALSE; 
+   Aux_Cycle._15 := FALSE; 
+   Aux_Cycle._16 := FALSE; 
+   Aux_Cycle._17 := FALSE; 
+   Aux_Cycle._18 := TRUE; 
+   Aux_Cycle._19 := FALSE; 
+   Aux_Cycle._20 := FALSE; 
+   Aux_Cycle._21 := FALSE; 
+   Aux_Cycle._22 := FALSE; 
+   Aux_Cycle._23 := FALSE; 
+   Aux_Cycle._24 := FALSE; 
+   Aux_Cycle._25 := FALSE; 
+   Aux_Cycle._26 := FALSE; 
+   Aux_Cycle._27 := FALSE; 
+   Aux_Cycle._28 := FALSE; 
+   Aux_Cycle._29 := FALSE; 
+   Aux_Cycle._30 := FALSE; 
+   Aux_Cycle._31 := FALSE; 
+   Aux_Cycle._32 := FALSE; 
+   Aux_Cycle._33 := FALSE; 
+   Aux_Cycle._34 := FALSE; 
+   Aux_Cycle._35 := FALSE; 
+   Aux_Cycle._36 := FALSE; 
+   Aux_Cycle._37 := FALSE; 
+   Aux_Cycle._38 := FALSE; 
+   Aux_Cycle._39 := FALSE; 
+   Aux_Cycle._40 := FALSE; 
+   Aux_Cycle._41 := FALSE; 
+   Aux_Cycle._42 := FALSE; 
+   Aux_Cycle._43 := FALSE; 
+   Aux_Cycle._44 := FALSE; 
+   Aux_Cycle._45 := FALSE; 
+   Aux_Cycle._46 := FALSE; 
+   Aux_Cycle._47 := FALSE; 
+   Aux_Cycle._48 := FALSE; 
+   Aux_Cycle._49 := FALSE; 
+   Aux_Cycle._50 := FALSE; 
+   Aux_Cycle._51 := FALSE; 
+   Aux_Cycle._52 := FALSE; 
+   Aux_Cycle._53 := FALSE; 
+   Aux_Cycle._54 := FALSE; 
+   Aux_Cycle._55 := FALSE; 
+   Aux_Cycle._56 := FALSE; 
+   Aux_Cycle._57 := FALSE; 
+   Aux_Cycle._58 := FALSE; 
+   Aux_Cycle._59 := FALSE; 
+   Aux_Cycle._60 := FALSE; 
+   Aux_Cycle._61 := FALSE; 
+   Aux_Cycle._62 := FALSE; 
+   Aux_Cycle._63 := FALSE; 
+   Aux_Cycle._64 := FALSE; 
+   Aux_Cycle._65 := FALSE; 
+   Aux_Cycle._66 := FALSE; 
+   Aux_Cycle._67 := FALSE; 
+   Aux_Cycle._68 := FALSE; 
+   Aux_Cycle._69 := FALSE; 
+   Aux_Cycle._70 := FALSE; 
+   Aux_Cycle._71 := FALSE; 
+   Aux_Cycle._72 := FALSE; 
+   Aux_Cycle._73 := FALSE; 
+   Aux_Cycle._74 := FALSE; 
+   Aux_Cycle._75 := FALSE; 
+   Aux_Cycle._76 := FALSE; 
+   Aux_Cycle._77 := FALSE; 
+   Aux_Cycle._78 := FALSE; 
+   Aux_Cycle._79 := FALSE; 
+   Aux_Cycle._80 := FALSE; 
+   Aux_Cycle._81 := FALSE; 
+   Aux_Cycle._82 := FALSE; 
+   Aux_Cycle._83 := FALSE; 
+   Aux_Cycle._84 := FALSE; 
+   Aux_Cycle._85 := FALSE; 
+   Aux_Cycle._86 := FALSE; 
+   Aux_Cycle._87 := FALSE; 
+   Aux_Cycle._88 := FALSE; 
+   Aux_Cycle._89 := FALSE; 
+   Aux_Cycle._90 := FALSE; 
+   Aux_Cycle._91 := FALSE; 
+   Aux_Cycle._92 := FALSE; 
+   Aux_Cycle._93 := FALSE; 
+   Aux_Cycle._94 := FALSE; 
+   Aux_Cycle._95 := TRUE; 
+   Mem_Cycle._01 := FALSE; 
+   Mem_Cycle._02 := FALSE; 
+   Mem_Cycle._03 := FALSE; 
+   Mem_Cycle._04 := FALSE; 
+   Mem_Cycle._05 := FALSE; 
+   Mem_Cycle._06 := FALSE; 
+   Mem_Cycle._07 := FALSE; 
+   Mem_Cycle._08 := FALSE; 
+   Mem_Cycle._09 := FALSE; 
+   Mem_Cycle._10 := FALSE; 
+   Mem_Cycle._11 := FALSE; 
+   Mem_Cycle._12 := FALSE; 
+   Mem_Cycle._13 := FALSE; 
+   Mem_Cycle._14 := FALSE; 
+   Mem_Cycle._15 := FALSE; 
+   Mem_Cycle._16 := FALSE; 
+   Mem_Cycle._17 := FALSE; 
+   Mem_Cycle._18 := FALSE; 
+   Mem_Cycle._19 := FALSE; 
+   Mem_Cycle._20 := FALSE; 
+   Mem_Cycle._21 := FALSE; 
+   Mem_Cycle._22 := FALSE; 
+   Mem_Cycle._23 := FALSE; 
+   Mem_Cycle._24 := FALSE; 
+   Mem_Cycle._25 := FALSE; 
+   Mem_Cycle._26 := FALSE; 
+   Mem_Cycle._27 := FALSE; 
+   Mem_Cycle._28 := FALSE; 
+   Mem_Cycle._29 := FALSE; 
+   Mem_Cycle._30 := FALSE; 
+   Mem_Cycle._31 := FALSE; 
+   Mem_Cycle._32 := FALSE; 
+   Mem_Cycle._33 := FALSE; 
+   Mem_Cycle._34 := FALSE; 
+   Mem_Cycle._35 := FALSE; 
+   Mem_Cycle._36 := FALSE; 
+   Mem_Cycle._37 := FALSE; 
+   Mem_Cycle._38 := FALSE; 
+   Mem_Cycle._39 := FALSE; 
+   Mem_Cycle._40 := FALSE; 
+   Mem_Cycle._41 := FALSE; 
+   Mem_Cycle._42 := FALSE; 
+   Mem_Cycle._43 := FALSE; 
+   Mem_Cycle._44 := FALSE; 
+   Mem_Cycle._45 := FALSE; 
+   Mem_Cycle._46 := FALSE; 
+   Mem_Cycle._47 := FALSE; 
+   Mem_Cycle._48 := FALSE; 
+   Mem_Cycle._49 := FALSE; 
+   Mem_Cycle._50 := FALSE; 
+   Mem_Cycle._51 := FALSE; 
+   Mem_Cycle._52 := FALSE; 
+   Mem_Cycle._53 := FALSE; 
+   Mem_Cycle._54 := FALSE; 
+   Mem_Cycle._55 := FALSE; 
+   Mem_Cycle._56 := FALSE; 
+   Mem_Cycle._57 := FALSE; 
+   Mem_Cycle._58 := FALSE; 
+   Mem_Cycle._59 := FALSE; 
+   Mem_Cycle._60 := FALSE; 
+   Mem_Cycle._61 := FALSE; 
+   Mem_Cycle._62 := FALSE; 
+   Mem_Cycle._63 := FALSE; 
+   Mem_Cycle._64 := FALSE; 
+   Mem_Cycle._65 := FALSE; 
+   Mem_Cycle._66 := FALSE; 
+   Mem_Cycle._67 := FALSE; 
+   Mem_Cycle._68 := FALSE; 
+   Mem_Cycle._69 := FALSE; 
+   Mem_Cycle._70 := FALSE; 
+   Mem_Cycle._71 := FALSE; 
+   Mem_Cycle._72 := FALSE; 
+   Mem_Cycle._73 := FALSE; 
+   Mem_Cycle._74 := FALSE; 
+   Mem_Cycle._75 := FALSE; 
+   Mem_Cycle._76 := FALSE; 
+   Mem_Cycle._77 := FALSE; 
+   Mem_Cycle._78 := FALSE; 
+   Mem_Cycle._79 := FALSE; 
+   Mem_Cycle._80 := FALSE; 
+   Mem_Cycle._81 := FALSE; 
+   Mem_Cycle._82 := FALSE; 
+   Mem_Cycle._83 := FALSE; 
+   Mem_Cycle._84 := FALSE; 
+   Mem_Cycle._85 := FALSE; 
+   Mem_Cycle._86 := FALSE; 
+   Mem_Cycle._87 := FALSE; 
+   Mem_Cycle._88 := FALSE; 
+   Mem_Cycle._89 := FALSE; 
+   Mem_Cycle._90 := FALSE; 
+   Mem_Cycle._91 := FALSE; 
+   Mem_Cycle._92 := FALSE; 
+   Mem_Cycle._93 := FALSE; 
+   Mem_Cycle._94 := FALSE; 
+   Mem_Cycle._95 := FALSE; 
+   PICS.Pag_list_step1 := FALSE; 
+   PICS.Pag_list_step2 := FALSE; 
+   PICS.Pag_list_step3 := FALSE; 
+   PICS.Pag_list_step4 := FALSE; 
+   PICS.Pag_list_step5 := FALSE; 
+   PICS.Pag_list_step6 := FALSE; 
+   PICS.Pag_list_step7 := FALSE; 
+   PICS.Pag_list_step8 := FALSE; 
+   PICS.Pag_cmd_man_09 := FALSE; 
+   PICS.Pag_cmd_man_10 := FALSE; 
+   PICS.Pag_cmd_man_11 := FALSE; 
+   PICS.Pag_cmd_man_12 := FALSE; 
+   PICS.Pag_cmd_man_13 := FALSE; 
+   PICS.Pag_cmd_man_14 := FALSE; 
+   PICS.Pag_cmd_man_15 := FALSE; 
+   PICS.Pag_cmd_man_16 := FALSE; 
+   PICS.Pag_cmd_man_01 := FALSE; 
+   PICS.Pag_cmd_man_02 := FALSE; 
+   PICS.Pag_cmd_man_03 := FALSE; 
+   PICS.Pag_cmd_man_04 := FALSE; 
+   PICS.Pag_cmd_man_05 := FALSE; 
+   PICS.Pag_cmd_man_06 := FALSE; 
+   PICS.Pag_cmd_man_07 := FALSE; 
+   PICS.Pag_cmd_man_08 := FALSE; 
+   PICS.Pag_cmd_trp_01 := FALSE; 
+   PICS.Pag_cmd_trp_02 := FALSE; 
+   PICS.Pag_cmd_trp_03 := FALSE; 
+   PICS.Pag_cmd_trp_04 := FALSE; 
+   PICS.Pag_cmd_trp_05 := FALSE; 
+   PICS.Pag_cmd_trp_06 := FALSE; 
+   PICS.Pag_robot_view_1 := FALSE; 
+   PICS.Pag_robot_view_11 := FALSE; 
+   MG._00 := TRUE; 
+   MG._01 := FALSE; 
+   MG._02 := FALSE; 
+   MG._03 := FALSE; 
+   MG._04 := FALSE; 
+   MG._05 := FALSE; 
+   MG._06 := FALSE; 
+   MG._07 := FALSE; 
+   MG._08 := FALSE; 
+   MG._09 := FALSE; 
+   MG._10 := FALSE; 
+   MG._11 := FALSE; 
+   MG._12 := FALSE; 
+   MG._13 := FALSE; 
+   MG._14 := FALSE; 
+   MG._15 := FALSE; 
+   MG._16 := FALSE; 
+   MG._17 := FALSE; 
+   MG._18 := FALSE; 
+   MG._19 := FALSE; 
+   MG._20 := FALSE; 
+   MG._21 := FALSE; 
+   MG._22 := FALSE; 
+   MG._23 := FALSE; 
+   MG._24 := FALSE; 
+   MG._25 := FALSE; 
+   MG._26 := FALSE; 
+   MG._27 := FALSE; 
+   MG._28 := FALSE; 
+   MG._29 := FALSE; 
+   MG._30 := FALSE; 
+   MG._31 := FALSE; 
+   MG._32 := FALSE; 
+   MG._33 := FALSE; 
+   MG._34 := FALSE; 
+   MG._35 := FALSE; 
+   MG._36 := FALSE; 
+   MG._37 := FALSE; 
+   MG._38 := FALSE; 
+   MG._39 := FALSE; 
+   MG._40 := FALSE; 
+   MG._41 := FALSE; 
+   MG._42 := FALSE; 
+   MG._43 := FALSE; 
+   MG._44 := FALSE; 
+   MG._45 := FALSE; 
+   MG._46 := FALSE; 
+   MG._47 := FALSE; 
+   MG._48 := FALSE; 
+   MG._49 := FALSE; 
+   MG._50 := FALSE; 
+   MG._51 := FALSE; 
+   MG._52 := FALSE; 
+   MG._53 := FALSE; 
+   MG._54 := FALSE; 
+   MG._55 := FALSE; 
+   MG._56 := FALSE; 
+   MG._57 := FALSE; 
+   MG._58 := FALSE; 
+   MG._59 := FALSE; 
+   MG._60 := FALSE; 
+   MG._61 := FALSE; 
+   MG._62 := FALSE; 
+   MG._63 := FALSE; 
+   MG._64 := FALSE; 
+   MG._65 := FALSE; 
+   MG._66 := FALSE; 
+   MG._67 := FALSE; 
+   MG._68 := FALSE; 
+   MG._69 := FALSE; 
+   MG._70 := FALSE; 
+   MG._71 := FALSE; 
+   MG._72 := FALSE; 
+   MG._73 := FALSE; 
+   MG._74 := FALSE; 
+   MG._75 := FALSE; 
+   MG._76 := FALSE; 
+   MG._77 := FALSE; 
+   MG._78 := FALSE; 
+   MG._79 := FALSE; 
+   MG._80 := FALSE; 
+   MG._81 := FALSE; 
+   MG._82 := FALSE; 
+   MG._83 := FALSE; 
+   MG._84 := FALSE; 
+   MG._85 := FALSE; 
+   MG._86 := FALSE; 
+   MG._87 := FALSE; 
+   MG._88 := FALSE; 
+   MG._89 := FALSE; 
+   MG._90 := FALSE; 
+   MG._91 := FALSE; 
+   MG._92 := FALSE; 
+   MG._93 := FALSE; 
+   MG._94 := FALSE; 
+   MG._95 := FALSE; 
+   TIO_D.RESERVED[0] := FALSE; 
+   TIO_D.RESERVED[1] := FALSE; 
+   TIO_D.RESERVED[2] := FALSE; 
+   TIO_D.RESERVED[3] := FALSE; 
+   TIO_D.RESERVED[4] := FALSE; 
+   TIO_D.RESERVED[5] := FALSE; 
+   TIO_D.RESERVED[6] := FALSE; 
+   TIO_D.RESERVED[7] := FALSE; 
+   TIO_D.RESERVED[8] := FALSE; 
+   TIO_D.RESERVED[9] := FALSE; 
+   TIO_D.RESERVED[10] := FALSE; 
+   TIO_D.RESERVED[11] := FALSE; 
+   TIO_D.RESERVED[12] := FALSE; 
+   TIO_D.RESERVED[13] := FALSE; 
+   TIO_D.RESERVED[14] := FALSE; 
+   TIO_D.RESERVED[15] := FALSE; 
+   TIO_D._00 := FALSE; 
+   TIO_D._01 := FALSE; 
+   TIO_D._02 := FALSE; 
+   TIO_D._03 := FALSE; 
+   TIO_D._04 := FALSE; 
+   TIO_D._05 := FALSE; 
+   TIO_D._06 := FALSE; 
+   TIO_D._07 := FALSE; 
+   TIO_D._08 := FALSE; 
+   TIO_D._09 := FALSE; 
+   TIO_D._10 := FALSE; 
+   TIO_D._11 := FALSE; 
+   TIO_D._12 := FALSE; 
+   TIO_D._13 := FALSE; 
+   TIO_D._14 := FALSE; 
+   TIO_D._15 := FALSE; 
+   TIO_D._16 := FALSE; 
+   TIO_D._17 := FALSE; 
+   TIO_D._18 := FALSE; 
+   TIO_D._19 := FALSE; 
+   TIO_D._20 := FALSE; 
+   TIO_D._21 := FALSE; 
+   TIO_D._22 := FALSE; 
+   TIO_D._23 := FALSE; 
+   TIO_D._24 := FALSE; 
+   TIO_D._25 := FALSE; 
+   TIO_D._26 := FALSE; 
+   TIO_D._27 := FALSE; 
+   TIO_D._28 := FALSE; 
+   TIO_D._29 := FALSE; 
+   TIO_D._30 := FALSE; 
+   TIO_D._31 := FALSE; 
+   TIO_D._32 := FALSE; 
+   TIO_D._33 := FALSE; 
+   TIO_D._34 := FALSE; 
+   TIO_D._35 := FALSE; 
+   TIO_D._36 := FALSE; 
+   TIO_D._37 := FALSE; 
+   TIO_D._38 := FALSE; 
+   TIO_D._39 := FALSE; 
+   TIO_D._40 := FALSE; 
+   TIO_D._41 := FALSE; 
+   TIO_D._42 := FALSE; 
+   TIO_D._43 := FALSE; 
+   TIO_D._44 := FALSE; 
+   TIO_D._45 := FALSE; 
+   TIO_D._46 := FALSE; 
+   TIO_D._47 := FALSE; 
+   TIO_D._48 := FALSE; 
+   TIO_D._49 := FALSE; 
+   TIO_D._50 := FALSE; 
+   TIO_D._51 := FALSE; 
+   TIO_D._52 := FALSE; 
+   TIO_D._53 := FALSE; 
+   TIO_D._54 := FALSE; 
+   TIO_D._55 := FALSE; 
+   TIO_D._56 := FALSE; 
+   TIO_D._57 := FALSE; 
+   TIO_D._58 := FALSE; 
+   TIO_D._59 := FALSE; 
+   TIO_D._60 := FALSE; 
+   TIO_D._61 := FALSE; 
+   TIO_D._62 := FALSE; 
+   TIO_D._63 := FALSE; 
+   TIO_D._64 := FALSE; 
+   TIO_D._65 := FALSE; 
+   TIO_D._66 := FALSE; 
+   TIO_D._67 := FALSE; 
+   TIO_D._68 := FALSE; 
+   TIO_D._69 := FALSE; 
+   TIO_D._70 := FALSE; 
+   TIO_D._71 := FALSE; 
+   TIO_D._72 := FALSE; 
+   TIO_D._73 := FALSE; 
+   TIO_D._74 := FALSE; 
+   TIO_D._75 := FALSE; 
+   TIO_D._76 := FALSE; 
+   TIO_D._77 := FALSE; 
+   TIO_D._78 := FALSE; 
+   TIO_D._79 := FALSE; 
+   TIO_D._80 := FALSE; 
+   TIO_D._81 := FALSE; 
+   TIO_D._82 := FALSE; 
+   TIO_D._83 := FALSE; 
+   TIO_D._84 := FALSE; 
+   TIO_D._85 := FALSE; 
+   TIO_D._86 := FALSE; 
+   TIO_D._87 := FALSE; 
+   TIO_D._88 := FALSE; 
+   TIO_D._89 := FALSE; 
+   TIO_D._90 := FALSE; 
+   TIO_D._91 := FALSE; 
+   TIO_D._92 := FALSE; 
+   TIO_D._93 := FALSE; 
+   TIO_D._94 := FALSE; 
+   TIO_D._95 := FALSE; 
+   TIO_D._96 := FALSE; 
+   TIO_D._97 := FALSE; 
+   TIO_D._98 := FALSE; 
+   TIO_D._99 := FALSE; 
+   TIO_D._100 := FALSE; 
+   TIO_D._101 := FALSE; 
+   TIO_D._102 := FALSE; 
+   TIO_D._103 := FALSE; 
+   TIO_D._104 := FALSE; 
+   TIO_D._105 := FALSE; 
+   TIO_D._106 := FALSE; 
+   TIO_D._107 := FALSE; 
+   TIO_D._108 := FALSE; 
+   TIO_D._109 := FALSE; 
+   TIO_D._110 := FALSE; 
+   TIO_D._111 := FALSE; 
+   TIO_D._112 := FALSE; 
+   TIO_D._113 := FALSE; 
+   TIO_D._114 := FALSE; 
+   TIO_D._115 := FALSE; 
+   TIO_D._116 := FALSE; 
+   TIO_D._117 := FALSE; 
+   TIO_D._118 := FALSE; 
+   TIO_D._119 := FALSE; 
+   TIO_D._120 := FALSE; 
+   TIO_D._121 := FALSE; 
+   TIO_D._122 := FALSE; 
+   TIO_D._123 := FALSE; 
+   TIO_D._124 := FALSE; 
+   TIO_D._125 := FALSE; 
+   TIO_D._126 := FALSE; 
+   TIO_D._127 := FALSE; 
+   TIO_D._128 := FALSE; 
+   TIO_D._129 := FALSE; 
+   TIO_D._130 := FALSE; 
+   TIO_D._131 := FALSE; 
+   TIO_D._132 := FALSE; 
+   TIO_D._133 := FALSE; 
+   TIO_D._134 := FALSE; 
+   TIO_D._135 := FALSE; 
+   TIO_D._136 := FALSE; 
+   TIO_D._137 := FALSE; 
+   TIO_D._138 := FALSE; 
+   TIO_D._139 := FALSE; 
+   TIO_D._140 := FALSE; 
+   TIO_D._141 := FALSE; 
+   TIO_D._142 := FALSE; 
+   TIO_D._143 := FALSE; 
+   TIO_D._144 := FALSE; 
+   TIO_D._145 := FALSE; 
+   TIO_D._146 := FALSE; 
+   TIO_D._147 := FALSE; 
+   TIO_D._148 := FALSE; 
+   TIO_D._149 := FALSE; 
+   TIO_D._150 := FALSE; 
+   TIO_D._151 := FALSE; 
+   TIO_D._152 := FALSE; 
+   TIO_D._153 := FALSE; 
+   TIO_D._154 := FALSE; 
+   TIO_D._155 := FALSE; 
+   TIO_D._156 := FALSE; 
+   TIO_D._157 := FALSE; 
+   TIO_D._158 := FALSE; 
+   TIO_D._159 := FALSE; 
+   TIO_D._160 := FALSE; 
+   TIO_D._161 := FALSE; 
+   TIO_D._162 := FALSE; 
+   TIO_D._163 := FALSE; 
+   TIO_D._164 := FALSE; 
+   TIO_D._165 := FALSE; 
+   TIO_D._166 := FALSE; 
+   TIO_D._167 := FALSE; 
+   TIO_D._168 := FALSE; 
+   TIO_D._169 := FALSE; 
+   TIO_D._170 := FALSE; 
+   TIO_D._171 := FALSE; 
+   TIO_D._172 := FALSE; 
+   TIO_D._173 := FALSE; 
+   TIO_D._174 := FALSE; 
+   TIO_D._175 := FALSE; 
+   TIO_D._176 := FALSE; 
+   TIO_D._177 := FALSE; 
+   TIO_D._178 := FALSE; 
+   TIO_D._179 := FALSE; 
+   TIO_D._180 := FALSE; 
+   TIO_D._181 := FALSE; 
+   TIO_D._182 := FALSE; 
+   TIO_D._183 := FALSE; 
+   TIO_D._184 := FALSE; 
+   TIO_D._185 := FALSE; 
+   TIO_D._186 := FALSE; 
+   TIO_D._187 := FALSE; 
+   TIO_D._188 := FALSE; 
+   TIO_D._189 := FALSE; 
+   TIO_D._190 := FALSE; 
+   TIO_D._191 := FALSE; 
+   TIO_D._192 := FALSE; 
+   TIO_D._193 := FALSE; 
+   TIO_D._194 := FALSE; 
+   TIO_D._195 := FALSE; 
+   TIO_D._196 := FALSE; 
+   TIO_D._197 := FALSE; 
+   TIO_D._198 := FALSE; 
+   TIO_D._199 := FALSE; 
+   TIO_D._200 := FALSE; 
+   TIO_D._201 := FALSE; 
+   TIO_D._202 := FALSE; 
+   TIO_D._203 := FALSE; 
+   TIO_D._204 := FALSE; 
+   TIO_D._205 := FALSE; 
+   TIO_D._206 := FALSE; 
+   TIO_D._207 := FALSE; 
+   TIO_D._208 := FALSE; 
+   TIO_D._209 := FALSE; 
+   TIO_D._210 := FALSE; 
+   TIO_D._211 := FALSE; 
+   TIO_D._212 := FALSE; 
+   TIO_D._213 := FALSE; 
+   TIO_D._214 := FALSE; 
+   TIO_D._215 := FALSE; 
+   TIO_D._216 := FALSE; 
+   TIO_D._217 := FALSE; 
+   TIO_D._218 := FALSE; 
+   TIO_D._219 := FALSE; 
+   TIO_D._220 := FALSE; 
+   TIO_D._221 := FALSE; 
+   TIO_D._222 := FALSE; 
+   TIO_D._223 := FALSE; 
+   TIO_D._224 := FALSE; 
+   TIO_D._225 := FALSE; 
+   TIO_D._226 := FALSE; 
+   TIO_D._227 := FALSE; 
+   TIO_D._228 := FALSE; 
+   TIO_D._229 := FALSE; 
+   TIO_D._230 := FALSE; 
+   TIO_D._231 := FALSE; 
+   TIO_D._232 := FALSE; 
+   TIO_D._233 := FALSE; 
+   TIO_D._234 := FALSE; 
+   TIO_D._235 := FALSE; 
+   TIO_D._236 := FALSE; 
+   TIO_D._237 := FALSE; 
+   TIO_D._238 := FALSE; 
+   TIO_D._239 := FALSE; 
+   TIO_D._240 := FALSE; 
+   TIO_D._241 := FALSE; 
+   TIO_D._242 := FALSE; 
+   TIO_D._243 := FALSE; 
+   TIO_D._244 := FALSE; 
+   TIO_D._245 := FALSE; 
+   TIO_D._246 := FALSE; 
+   TIO_D._247 := FALSE; 
+   TIO_D._248 := FALSE; 
+   TIO_D._249 := FALSE; 
+   TIO_D._250 := FALSE; 
+   TIO_D._251 := FALSE; 
+   TIO_D._252 := FALSE; 
+   TIO_D._253 := FALSE; 
+   TIO_D._254 := FALSE; 
+   TIO_D._255 := FALSE; 
+   TIO_D._256 := FALSE; 
+   TIO_D._257 := FALSE; 
+   TIO_D._258 := FALSE; 
+   TIO_D._259 := FALSE; 
+   TIO_D._260 := FALSE; 
+   TIO_D._261 := FALSE; 
+   TIO_D._262 := FALSE; 
+   TIO_D._263 := FALSE; 
+   TIO_D._264 := FALSE; 
+   TIO_D._265 := FALSE; 
+   TIO_D._266 := FALSE; 
+   TIO_D._267 := FALSE; 
+   TIO_D._268 := FALSE; 
+   TIO_D._269 := FALSE; 
+   TIO_D._270 := FALSE; 
+   TIO_D._271 := FALSE; 
+   TIO_D._272 := FALSE; 
+   TIO_D._273 := FALSE; 
+   TIO_D._274 := FALSE; 
+   TIO_D._275 := FALSE; 
+   TIO_D._276 := FALSE; 
+   TIO_D._277 := FALSE; 
+   TIO_D._278 := FALSE; 
+   TIO_D._279 := FALSE; 
+   TIO_D._280 := FALSE; 
+   TIO_D._281 := FALSE; 
+   TIO_D._282 := FALSE; 
+   TIO_D._283 := FALSE; 
+   TIO_D._284 := FALSE; 
+   TIO_D._285 := FALSE; 
+   TIO_D._286 := FALSE; 
+   TIO_D._287 := FALSE; 
+   TIO_D._288 := FALSE; 
+   TIO_D._289 := FALSE; 
+   TIO_D._290 := FALSE; 
+   TIO_D._291 := FALSE; 
+   TIO_D._292 := FALSE; 
+   TIO_D._293 := FALSE; 
+   TIO_D._294 := FALSE; 
+   TIO_D._295 := FALSE; 
+   TIO_D._296 := FALSE; 
+   TIO_D._297 := FALSE; 
+   TIO_D._298 := FALSE; 
+   TIO_D._299 := FALSE; 
+   TIO_D._300 := FALSE; 
+   TIO_D._301 := FALSE; 
+   TIO_D._302 := FALSE; 
+   TIO_D._303 := FALSE; 
+   TIO_D._304 := FALSE; 
+   TIO_D._305 := FALSE; 
+   TIO_D._306 := FALSE; 
+   TIO_D._307 := FALSE; 
+   TIO_D._308 := FALSE; 
+   TIO_D._309 := FALSE; 
+   TIO_D._310 := FALSE; 
+   TIO_D._311 := FALSE; 
+   TIO_D._312 := FALSE; 
+   TIO_D._313 := FALSE; 
+   TIO_D._314 := FALSE; 
+   TIO_D._315 := FALSE; 
+   TIO_D._316 := FALSE; 
+   TIO_D._317 := FALSE; 
+   TIO_D._318 := FALSE; 
+   TIO_D._319 := FALSE; 
+   TIO_D._320 := FALSE; 
+   TIO_D._321 := FALSE; 
+   TIO_D._322 := FALSE; 
+   TIO_D._323 := FALSE; 
+   TIO_D._324 := FALSE; 
+   TIO_D._325 := FALSE; 
+   TIO_D._326 := FALSE; 
+   TIO_D._327 := FALSE; 
+   TIO_D._328 := FALSE; 
+   TIO_D._329 := FALSE; 
+   TIO_D._330 := FALSE; 
+   TIO_D._331 := FALSE; 
+   TIO_D._332 := FALSE; 
+   TIO_D._333 := FALSE; 
+   TIO_D._334 := FALSE; 
+   TIO_D._335 := FALSE; 
+   TIO_D._336 := FALSE; 
+   TIO_D._337 := FALSE; 
+   TIO_D._338 := FALSE; 
+   TIO_D._339 := FALSE; 
+   TIO_D._340 := FALSE; 
+   TIO_D._341 := FALSE; 
+   TIO_D._342 := FALSE; 
+   TIO_D._343 := FALSE; 
+   TIO_D._344 := FALSE; 
+   TIO_D._345 := FALSE; 
+   TIO_D._346 := FALSE; 
+   TIO_D._347 := FALSE; 
+   TIO_D._348 := FALSE; 
+   TIO_D._349 := FALSE; 
+   TIO_D._350 := FALSE; 
+   TIO_D._351 := FALSE; 
+   TIO_D._352 := FALSE; 
+   TIO_D._353 := FALSE; 
+   TIO_D._354 := FALSE; 
+   TIO_D._355 := FALSE; 
+   TIO_D._356 := FALSE; 
+   TIO_D._357 := FALSE; 
+   TIO_D._358 := FALSE; 
+   TIO_D._359 := FALSE; 
+   TIO_D._360 := FALSE; 
+   TIO_D._361 := FALSE; 
+   TIO_D._362 := FALSE; 
+   TIO_D._363 := FALSE; 
+   TIO_D._364 := FALSE; 
+   TIO_D._365 := FALSE; 
+   TIO_D._366 := FALSE; 
+   TIO_D._367 := FALSE; 
+   TIO_D._368 := FALSE; 
+   TIO_D._369 := FALSE; 
+   TIO_D._370 := FALSE; 
+   TIO_D._371 := FALSE; 
+   TIO_D._372 := FALSE; 
+   TIO_D._373 := FALSE; 
+   TIO_D._374 := FALSE; 
+   TIO_D._375 := FALSE; 
+   TIO_D._376 := FALSE; 
+   TIO_D._377 := FALSE; 
+   TIO_D._378 := FALSE; 
+   TIO_D._379 := FALSE; 
+   TIO_D._380 := FALSE; 
+   TIO_D._381 := FALSE; 
+   TIO_D._382 := FALSE; 
+   TIO_D._383 := FALSE; 
+   TIO_D.SPARE_01 := 0; 
+   TIO_D.SPARE_02 := 0; 
+   TIO_D.SPARE_03 := 0; 
+   TIO_D.SPARE_04 := 0; 
+   TIO_D.SPARE_05 := 0; 
+   TIO_D.SPARE_06 := 0; 
+   TIO_D.SPARE_07 := 0; 
+   TIO_D.SPARE_08 := 0; 
+   TIO_D.SPARE_09 := 0; 
+   TIO_D.SPARE_10 := 0; 
+   TIO_D.SPARE_11 := 0; 
+   TIO_D.SPARE_12 := 0; 
+   TIO_D.SPARE_13 := 0; 
+   TIO_D.SPARE_14 := 0; 
+   TIO_D.SPARE_15 := 0; 
+   TIO_D.SPARE_16 := 0; 
+   TIO_D.SPARE_17 := 0; 
+   TIO_D.SPARE_18 := 0; 
+   TIO_D.SPARE_19 := 0; 
+   TIO_D.SPARE_20 := 0; 
+   TIO_D.SPARE_21 := 0; 
+   TIO_D.SPARE_22 := 0; 
+   TIO_D.SPARE_23 := 0; 
+   TIO_D.SPARE_24 := 0; 
+   TIO_D.SPARE_25 := 0; 
+   TIO_D.ME._00 := FALSE; 
+   TIO_D.ME._01 := FALSE; 
+   TIO_D.ME._02 := FALSE; 
+   TIO_D.ME._03 := FALSE; 
+   TIO_D.ME._04 := FALSE; 
+   TIO_D.ME._05 := FALSE; 
+   TIO_D.ME._06 := FALSE; 
+   TIO_D.ME._07 := FALSE; 
+   TIO_D.MT._00 := FALSE; 
+   TIO_D.MT._01 := FALSE; 
+   TIO_D.MT._02 := FALSE; 
+   TIO_D.MT._03 := FALSE; 
+   TIO_D.MT._04 := FALSE; 
+   TIO_D.MT._05 := FALSE; 
+   TIO_D.MT._06 := FALSE; 
+   TIO_D.MT._07 := FALSE; 
+   TIO_D.MT._08 := FALSE; 
+   TIO_D.MT._09 := FALSE; 
+   TIO_D.MT._10 := FALSE; 
+   TIO_D.MT._11 := FALSE; 
+   TIO_D.MT._12 := FALSE; 
+   TIO_D.MT._13 := FALSE; 
+   TIO_D.MT._14 := FALSE; 
+   TIO_D.MT._15 := FALSE; 
+   TIO_D.MT._16 := FALSE; 
+   TIO_D.MT._17 := FALSE; 
+   TIO_D.MT._18 := FALSE; 
+   TIO_D.MT._19 := FALSE; 
+   TIO_D.MT._20 := FALSE; 
+   TIO_D.MT._21 := FALSE; 
+   TIO_D.MT._22 := FALSE; 
+   TIO_D.MT._23 := FALSE; 
+   TIO_D.MT._24 := FALSE; 
+   TIO_D.MT._25 := FALSE; 
+   TIO_D.MT._26 := FALSE; 
+   TIO_D.MT._27 := FALSE; 
+   TIO_D.MT._28 := FALSE; 
+   TIO_D.MT._29 := FALSE; 
+   TIO_D.MT._30 := FALSE; 
+   TIO_D.MT._31 := FALSE; 
+   TIO_D.MT._32 := FALSE; 
+   TIO_D.MT._33 := FALSE; 
+   TIO_D.MT._34 := FALSE; 
+   TIO_D.MT._35 := FALSE; 
+   TIO_D.MT._36 := FALSE; 
+   TIO_D.MT._37 := FALSE; 
+   TIO_D.MT._38 := FALSE; 
+   TIO_D.MT._39 := FALSE; 
+   TIO_D.MT._40 := FALSE; 
+   TIO_D.MT._41 := FALSE; 
+   TIO_D.MT._42 := FALSE; 
+   TIO_D.MT._43 := FALSE; 
+   TIO_D.MT._44 := FALSE; 
+   TIO_D.MT._45 := FALSE; 
+   TIO_D.MT._46 := FALSE; 
+   TIO_D.MT._47 := FALSE; 
+   TIO_D.MT._48 := FALSE; 
+   TIO_D.MT._49 := FALSE; 
+   TIO_D.MT._50 := FALSE; 
+   TIO_D.MT._51 := FALSE; 
+   TIO_D.MT._52 := FALSE; 
+   TIO_D.MT._53 := FALSE; 
+   TIO_D.MT._54 := FALSE; 
+   TIO_D.MT._55 := FALSE; 
+   TIO_D.MT._56 := FALSE; 
+   TIO_D.MT._57 := FALSE; 
+   TIO_D.MT._58 := FALSE; 
+   TIO_D.MT._59 := FALSE; 
+   TIO_D.MT._60 := FALSE; 
+   TIO_D.MT._61 := FALSE; 
+   TIO_D.MT._62 := FALSE; 
+   TIO_D.MT._63 := FALSE; 
+   TIO_D.MT._64 := FALSE; 
+   TIO_D.MT._65 := FALSE; 
+   TIO_D.MT._66 := FALSE; 
+   TIO_D.MT._67 := FALSE; 
+   TIO_D.MT._68 := FALSE; 
+   TIO_D.MT._69 := FALSE; 
+   TIO_D.MT._70 := FALSE; 
+   TIO_D.MT._71 := FALSE; 
+   TIO_D.MT._72 := FALSE; 
+   TIO_D.MT._73 := FALSE; 
+   TIO_D.MT._74 := FALSE; 
+   TIO_D.MT._75 := FALSE; 
+   TIO_D.MT._76 := FALSE; 
+   TIO_D.MT._77 := FALSE; 
+   TIO_D.MT._78 := FALSE; 
+   TIO_D.MT._79 := FALSE; 
+   TIO_D.MT._80 := FALSE; 
+   TIO_D.MT._81 := FALSE; 
+   TIO_D.MT._82 := FALSE; 
+   TIO_D.MT._83 := FALSE; 
+   TIO_D.MT._84 := FALSE; 
+   TIO_D.MT._85 := FALSE; 
+   TIO_D.MT._86 := FALSE; 
+   TIO_D.MT._87 := FALSE; 
+   TIO_D.MT._88 := FALSE; 
+   TIO_D.MT._89 := FALSE; 
+   TIO_D.MT._90 := FALSE; 
+   TIO_D.MT._91 := FALSE; 
+   TIO_D.MT._92 := FALSE; 
+   TIO_D.MT._93 := FALSE; 
+   TIO_D.MT._94 := FALSE; 
+   TIO_D.MT._95 := FALSE; 
+   TIO_D.RESERVE := 0; 
+   TIO_D.MP._00 := FALSE; 
+   TIO_D.MP._01 := FALSE; 
+   TIO_D.MP._02 := FALSE; 
+   TIO_D.MP._03 := FALSE; 
+   TIO_D.MP._04 := FALSE; 
+   TIO_D.MP._05 := FALSE; 
+   TIO_D.MP._06 := FALSE; 
+   TIO_D.MP._07 := FALSE; 
+   TIO_D.MP._08 := FALSE; 
+   TIO_D.MP._09 := FALSE; 
+   TIO_D.MP._10 := FALSE; 
+   TIO_D.MP._11 := FALSE; 
+   TIO_D.MP._12 := FALSE; 
+   TIO_D.MP._13 := FALSE; 
+   TIO_D.MP._14 := FALSE; 
+   TIO_D.MP._15 := FALSE; 
+   TIO_D.MP._17 := FALSE; 
+   TIO_D.MP._18 := FALSE; 
+   TIO_D.MP._19 := FALSE; 
+   TIO_D.MP._20 := FALSE; 
+   TIO_D.MP._21 := FALSE; 
+   TIO_D.MP._22 := FALSE; 
+   TIO_D.MP._23 := FALSE; 
+   TIO_D.MP._24 := FALSE; 
+   TIO_D.MP._25 := FALSE; 
+   TIO_D.MP._26 := FALSE; 
+   TIO_D.MP._27 := FALSE; 
+   TIO_D.MP._28 := FALSE; 
+   TIO_D.MP._29 := FALSE; 
+   TIO_D.MP._30 := FALSE; 
+   TIO_D.MP._31 := FALSE; 
+   TIO_D.MP._32 := FALSE; 
+   TIO_D.MP._33 := FALSE; 
+   TIO_D.MP._34 := FALSE; 
+   TIO_D.MP._35 := FALSE; 
+   TIO_D.MP._36 := FALSE; 
+   TIO_D.MP._37 := FALSE; 
+   TIO_D.MP._38 := FALSE; 
+   TIO_D.MP._39 := FALSE; 
+   TIO_D.MP._40 := FALSE; 
+   TIO_D.MP._41 := FALSE; 
+   TIO_D.MP._42 := FALSE; 
+   TIO_D.MP._43 := FALSE; 
+   TIO_D.MP._44 := FALSE; 
+   TIO_D.MP._45 := FALSE; 
+   TIO_D.MP._46 := FALSE; 
+   TIO_D.MP._47 := FALSE; 
+   TIO_D.MP._48 := FALSE; 
+   TIO_D.MG._00 := FALSE; 
+   TIO_D.MG._01 := FALSE; 
+   TIO_D.MG._02 := FALSE; 
+   TIO_D.MG._03 := FALSE; 
+   TIO_D.MG._04 := FALSE; 
+   TIO_D.MG._05 := FALSE; 
+   TIO_D.MG._06 := FALSE; 
+   TIO_D.MG._07 := FALSE; 
+   TIO_D.MG._08 := FALSE; 
+   TIO_D.MG._09 := FALSE; 
+   TIO_D.MG._10 := FALSE; 
+   TIO_D.MG._11 := FALSE; 
+   TIO_D.MG._12 := FALSE; 
+   TIO_D.MG._13 := FALSE; 
+   TIO_D.MG._14 := FALSE; 
+   TIO_D.MG._15 := FALSE; 
+   TIO_D.MG._16 := FALSE; 
+   TIO_D.MG._17 := FALSE; 
+   TIO_D.MG._18 := FALSE; 
+   TIO_D.MG._19 := FALSE; 
+   TIO_D.MG._20 := FALSE; 
+   TIO_D.MG._21 := FALSE; 
+   TIO_D.MG._22 := FALSE; 
+   TIO_D.MG._23 := FALSE; 
+   TIO_D.MG._24 := FALSE; 
+   TIO_D.MG._25 := FALSE; 
+   TIO_D.MG._26 := FALSE; 
+   TIO_D.MG._27 := FALSE; 
+   TIO_D.MG._28 := FALSE; 
+   TIO_D.MG._29 := FALSE; 
+   TIO_D.MG._30 := FALSE; 
+   TIO_D.MG._31 := FALSE; 
+   TIO_D.MG._32 := FALSE; 
+   TIO_D.MG._33 := FALSE; 
+   TIO_D.MG._34 := FALSE; 
+   TIO_D.MG._35 := FALSE; 
+   TIO_D.MG._36 := FALSE; 
+   TIO_D.MG._37 := FALSE; 
+   TIO_D.MG._38 := FALSE; 
+   TIO_D.MG._39 := FALSE; 
+   TIO_D.MG._40 := FALSE; 
+   TIO_D.MG._41 := FALSE; 
+   TIO_D.MG._42 := FALSE; 
+   TIO_D.MG._43 := FALSE; 
+   TIO_D.MG._44 := FALSE; 
+   TIO_D.MG._45 := FALSE; 
+   TIO_D.MG._46 := FALSE; 
+   TIO_D.MG._47 := FALSE; 
+   TIO_D.MG._48 := FALSE; 
+   TIO_D.MG._49 := FALSE; 
+   TIO_D.MG._50 := FALSE; 
+   TIO_D.MG._51 := FALSE; 
+   TIO_D.MG._52 := FALSE; 
+   TIO_D.MG._53 := FALSE; 
+   TIO_D.MG._54 := FALSE; 
+   TIO_D.MG._55 := FALSE; 
+   TIO_D.MG._56 := FALSE; 
+   TIO_D.MG._57 := FALSE; 
+   TIO_D.MG._58 := FALSE; 
+   TIO_D.MG._59 := FALSE; 
+   TIO_D.MG._60 := FALSE; 
+   TIO_D.MG._61 := FALSE; 
+   TIO_D.MG._62 := FALSE; 
+   TIO_D.MG._63 := FALSE; 
+   TIO_D.MG._64 := FALSE; 
+   TIO_D.MG._65 := FALSE; 
+   TIO_D.MG._66 := FALSE; 
+   TIO_D.MG._67 := FALSE; 
+   TIO_D.MG._68 := FALSE; 
+   TIO_D.MG._69 := FALSE; 
+   TIO_D.MG._70 := FALSE; 
+   TIO_D.MG._71 := FALSE; 
+   TIO_D.MG._72 := FALSE; 
+   TIO_D.MG._73 := FALSE; 
+   TIO_D.MG._74 := FALSE; 
+   TIO_D.MG._75 := FALSE; 
+   TIO_D.MG._76 := FALSE; 
+   TIO_D.MG._77 := FALSE; 
+   TIO_D.MG._78 := FALSE; 
+   TIO_D.MG._79 := FALSE; 
+   TIO_D.MG._80 := FALSE; 
+   TIO_D.MG._81 := FALSE; 
+   TIO_D.MG._82 := FALSE; 
+   TIO_D.MG._83 := FALSE; 
+   TIO_D.MG._84 := FALSE; 
+   TIO_D.MG._85 := FALSE; 
+   TIO_D.MG._86 := FALSE; 
+   TIO_D.MG._87 := FALSE; 
+   TIO_D.MG._88 := FALSE; 
+   TIO_D.MG._89 := FALSE; 
+   TIO_D.MG._90 := FALSE; 
+   TIO_D.MG._91 := FALSE; 
+   TIO_D.MG._92 := FALSE; 
+   TIO_D.MG._93 := FALSE; 
+   TIO_D.MG._94 := FALSE; 
+   TIO_D.MG._95 := FALSE; 
+   TIO_D.RESERVE1[0] := 0; 
+   TIO_D.RESERVE1[1] := 0; 
+   TIO_D.RESERVE1[2] := 0; 
+   TIO_D.RESERVE1[3] := 0; 
+   TIO_D.RESERVE1[4] := 0; 
+   TIO_D.RESERVE1[5] := 0; 
+   TIO_D.RESERVE1[6] := 0; 
+   TIO_D.RESERVE1[7] := 0; 
+   TIO_D.RESERVE1[8] := 0; 
+   TIO_D.RESERVE1[9] := 0; 
+   TIO_D.RESERVE1[10] := 0; 
+   TIO_D.RESERVE1[11] := 0; 
+   TIO_D.RESERVE1[12] := 0; 
+   TIO_D.LEVEL_1_2.SPARE_00 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_01 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_02 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_03 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_04 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_05 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_06 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_07 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_08 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_09 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_10 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_11 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_12 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_13 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_14 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_15 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_16 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_17 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_18 := 0; 
+   TIO_D.LEVEL_1_2.SPARE_19 := 0; 
+   Type_Element_Code.Type_01 := FALSE; 
+   Type_Element_Code.Type_02 := FALSE; 
+   Type_Element_Code.Type_03 := FALSE; 
+   Type_Element_Code.Type_04 := FALSE; 
+   Type_Element_Code.Type_05 := FALSE; 
+   Type_Element_Code.Type_06 := FALSE; 
+   Type_Element_Code.Type_07 := FALSE; 
+   Type_Element_Code.Type_08 := FALSE; 
+   Type_Element_Code.Type_09 := FALSE; 
+   Type_Element_Code.Type_10 := FALSE; 
+   Type_Element_Code.Type_11 := FALSE; 
+   Type_Element_Code.Type_12 := FALSE; 
+   Type_Element_Code.Type_13 := FALSE; 
+   Type_Element_Code.Type_14 := FALSE; 
+   Type_Element_Code.Type_15 := FALSE; 
+   Type_Element_Code.Type_16 := FALSE; 
+   Type_Element_Code.Type_17 := FALSE; 
+   Type_Element_Code.Type_18 := FALSE; 
+   Type_Element_Code.Type_19 := FALSE; 
+   Type_Element_Code.Type_20 := FALSE; 
+   Type_Element_Code.Type_21 := FALSE; 
+   Type_Element_Code.Type_22 := FALSE; 
+   Type_Element_Code.Type_23 := FALSE; 
+   Type_Element_Code.Type_24 := FALSE; 
+   Type_Element_Code.Type_25 := FALSE; 
+   Type_Element_Code.Type_26 := FALSE; 
+   Type_Element_Code.Type_27 := FALSE; 
+   Type_Element_Code.Type_28 := FALSE; 
+   Type_Element_Code.Type_29 := FALSE; 
+   Type_Element_Code.Type_30 := FALSE; 
+   Type_Element_Code.Type_31 := FALSE; 
+   Type_Element_Code.Type_32 := FALSE; 
+END_DATA_BLOCK
+
