@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "GUI Preview Server (gui_preview.html)",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5500", "--directory", "."],
+      "port": 5500
+    },
+    {
+      "name": "AWL Generator App (app.py – desktop)",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["app.py"],
+      "port": 0
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(py --version)",
+      "Bash(py -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(cmd.exe /c \"where python 2>&1\")",
+      "Bash(cmd.exe /c \"where python\")",
+      "Bash(cmd.exe /c \"python --version & py --version & py -3 --version\")",
+      "Bash(cmd.exe /c \"dir C:\\\\Python* /b 2>&1 & dir C:\\\\Users\\\\HP\\\\AppData\\\\Local\\\\Programs\\\\Python /b 2>&1\")",
+      "Bash(cmd.exe /c \"dir /s /b C:\\\\Users\\\\HP\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python*\\\\python.exe 2>&1 & dir /s /b C:\\\\Python*\\\\python.exe 2>&1\")",
+      "Bash(cmd.exe /c \"dir /s /b C:\\\\*python*.exe 2>nul | head -5\")",
+      "Bash(cmd.exe /c \"where /r C:\\\\ python.exe 2>&1\")",
+      "Bash(powershell.exe -Command \"Get-Command python,py,python3 -ErrorAction SilentlyContinue | Select-Object Name,Source\")",
+      "Bash(powershell.exe -Command \"New-Item -ItemType Directory -Force -Path ''C:\\\\Users\\\\HP\\\\Desktop\\\\Claude Workspace\\\\Station DB AWL Generation\\\\Source\\\\.claude'' | Out-Null; Write-Output ''ok''\")",
+      "mcp__Claude_Preview__preview_start",
+      "Read(//c/Users/HP/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/fbe66431-c5b0-4beb-a65c-ffc92277ba6a/3af51c66-8e44-487d-ba98-bab040085bc5/skills/xlsx/**)",
+      "Bash(python -c \":*)",
+      "Bash(pip install:*)",
+      "Bash(powershell.exe -Command \"pip install pandas openpyxl 2>&1 | Select-Object -Last 5\")",
+      "Bash(powershell.exe -Command \"python -m pip install pandas openpyxl 2>&1 | Select-Object -Last 5\")",
+      "Bash(powershell.exe -Command \"python -c ''import pandas as pd; xls = pd.ExcelFile\\(r\"\"C:\\\\Users\\\\HP\\\\Desktop\\\\Claude Workspace\\\\Station DB AWL Generation\\\\Exported_Excel.xlsx\"\"\\); print\\(xls.sheet_names\\)''\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\); print\\(''Syntax OK''\\)\")",
+      "Bash(powershell.exe -Command \"python -c ''import ast; ast.parse\\(open\\(r\"\"C:\\\\Users\\\\HP\\\\Desktop\\\\Claude Workspace\\\\Station DB AWL Generation\\\\Source\\\\app.py\"\", encoding=\"\"utf-8\"\"\\).read\\(\\)\\); print\\(\"\"Syntax OK\"\"\\)''\")",
+      "Bash(powershell.exe -Command \"python ''C:\\\\Users\\\\HP\\\\Desktop\\\\Claude Workspace\\\\Station DB AWL Generation\\\\Source\\\\check_syntax.py''\")",
+      "Bash(powershell.exe -Command \"cd ''C:\\\\Users\\\\HP\\\\Desktop\\\\Claude Workspace\\\\Station DB AWL Generation\\\\Source''; python app.py 2>&1\")",
+      "Bash(python check_syntax.py)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''app.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(py -c \"import ast; ast.parse\\(open\\(''app.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\(''app.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(where python*)",
+      "Read(//c/Users/mini/AppData/Local/Programs/**)",
+      "Bash(ls /c/Python*)",
+      "Bash(/c/Users/mini/AppData/Local/Python/bin/python.exe -c \"import ast; ast.parse\\(open\\(''/c/Users/mini/Desktop/Claude Workspace/Station DB AWL Generation/Source/app.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(/c/Users/mini/AppData/Local/Python/bin/python.exe -c \"import ast; ast.parse\\(open\\(''C:/Users/mini/Desktop/Claude Workspace/Station DB AWL Generation/Source/app.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(ls \"C:\\\\Users\\\\mini\\\\.claude\\\\projects\"\" 2>/dev/null || echo \"NOT FOUND \")"
+    ]
+  }
+}
