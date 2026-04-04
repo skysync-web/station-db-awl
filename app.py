@@ -511,6 +511,7 @@ def default_project():
         "part2": "T",
         "part3": "",
         "hmi_loc": "1",
+        "st_hmi_index": "1",
         "operator_load": {"enabled": False, "count": "1"},
         "drop_part_robot": {"enabled": False, "count": "1", "robot_names": []},
         "pick_part_robot": {"enabled": False, "count": "1", "robot_names": []},
@@ -520,12 +521,14 @@ def default_project():
             {
                 "enabled": True,
                 "valve_count": 1,
+                "io_address": "",
                 "valves": [{"type": "Clamp", "units": ""}
                            for _ in range(MAX_VALVES)],
             },
             {
                 "enabled": False,
                 "valve_count": 0,
+                "io_address": "",
                 "valves": [{"type": "Clamp", "units": ""}
                            for _ in range(MAX_VALVES)],
             },
@@ -670,6 +673,13 @@ class AWLGeneratorApp:
         self.hmi_loc_combo = ttk.Combobox(hmi_frame, textvariable=self.hmi_loc_var,
                                            values=[str(i) for i in range(1, 9)], width=3, state="readonly")
         self.hmi_loc_combo.pack(side=tk.LEFT, padx=2)
+
+        # ST HMI Index
+        ttk.Label(hmi_frame, text="   ST HMI Index:").pack(side=tk.LEFT)
+        self.st_hmi_index_var = tk.StringVar(value=self.project.get("st_hmi_index", "1"))
+        self.st_hmi_index_combo = ttk.Combobox(hmi_frame, textvariable=self.st_hmi_index_var,
+                                                values=[str(i) for i in range(1, 10)], width=3, state="readonly")
+        self.st_hmi_index_combo.pack(side=tk.LEFT, padx=2)
 
         # DB name display
         db_frame = ttk.Frame(frame)
@@ -818,6 +828,8 @@ class AWLGeneratorApp:
         self.island_frames = []
         self.island_enabled_vars = []
         self.island_valve_count_vars = []
+        self.island_io_address_vars = []
+        self.island_io_address_labels = []
         self.valve_type_vars = []
         self.valve_unit_vars = []
         self.valve_widgets = []
@@ -844,6 +856,16 @@ class AWLGeneratorApp:
             self.island_valve_count_vars.append(vc_var)
             vc_var.trace_add("write", lambda *a, i=isl: self._rebuild_valve_rows(i))
 
+            ttk.Label(top_row, text="I/O Address:").pack(side=tk.LEFT, padx=(10, 2))
+            io_var = tk.StringVar(value=str(self.project["islands"][isl].get("io_address", "")))
+            io_entry = ttk.Entry(top_row, textvariable=io_var, width=6)
+            io_entry.pack(side=tk.LEFT, padx=2)
+            self.island_io_address_vars.append(io_var)
+            io_valid_label = ttk.Label(top_row, text="", foreground="red", font=("TkDefaultFont", 10))
+            io_valid_label.pack(side=tk.LEFT, padx=2)
+            self.island_io_address_labels.append(io_valid_label)
+            io_var.trace_add("write", lambda *a, i=isl: self._validate_io_addresses())
+
             valves_frame = ttk.Frame(isl_frame)
             valves_frame.pack(fill=tk.X, pady=2)
 
@@ -858,6 +880,7 @@ class AWLGeneratorApp:
         enabled = self.island_enabled_vars[isl_idx].get()
         self.project["islands"][isl_idx]["enabled"] = enabled
         self._rebuild_valve_rows(isl_idx)
+        self._validate_io_addresses()
 
     def _rebuild_valve_rows(self, isl_idx):
         frame = self.island_frames[isl_idx]
@@ -910,6 +933,39 @@ class AWLGeneratorApp:
         if v_idx < len(self.valve_unit_vars[isl_idx]):
             self.project["islands"][isl_idx]["valves"][v_idx]["units"] = \
                 self.valve_unit_vars[isl_idx][v_idx].get()
+
+    def _validate_io_addresses(self, *args):
+        """Check that all enabled island I/O addresses are valid (0-10000) and unique."""
+        addresses = {}  # value -> list of island indices
+        for isl_idx in range(len(self.island_io_address_vars)):
+            if isl_idx >= len(self.island_enabled_vars):
+                continue
+            if not self.island_enabled_vars[isl_idx].get():
+                self.island_io_address_labels[isl_idx].configure(text="", foreground="red")
+                continue
+            val = self.island_io_address_vars[isl_idx].get().strip()
+            if not val:
+                self.island_io_address_labels[isl_idx].configure(text="", foreground="red")
+                continue
+            try:
+                num = int(val)
+            except ValueError:
+                self.island_io_address_labels[isl_idx].configure(text="Invalid", foreground="red")
+                continue
+            if num < 0 or num > 10000:
+                self.island_io_address_labels[isl_idx].configure(text="0-10000", foreground="red")
+                continue
+            if num not in addresses:
+                addresses[num] = []
+            addresses[num].append(isl_idx)
+
+        # Mark duplicates
+        for num, indices in addresses.items():
+            if len(indices) > 1:
+                for idx in indices:
+                    self.island_io_address_labels[idx].configure(text="Duplicate!", foreground="red")
+            else:
+                self.island_io_address_labels[indices[0]].configure(text="OK", foreground="green")
 
     def _build_additional_config(self, parent):
         frame = ttk.LabelFrame(parent, text="Additional Configuration", padding=8)
@@ -1388,6 +1444,7 @@ class AWLGeneratorApp:
         self.project["part2"] = self.part2_var.get().strip()
         self.project["part3"] = self.part3_var.get().strip()
         self.project["hmi_loc"] = self.hmi_loc_var.get()
+        self.project["st_hmi_index"] = self.st_hmi_index_var.get()
         self.project["operator_load"] = {
             "enabled": self.op_load_var.get(),
             "count": self.op_load_count_var.get(),
@@ -1408,6 +1465,7 @@ class AWLGeneratorApp:
         # Save island config
         for isl_idx in range(MAX_ISLANDS):
             self.project["islands"][isl_idx]["enabled"] = self.island_enabled_vars[isl_idx].get()
+            self.project["islands"][isl_idx]["io_address"] = self.island_io_address_vars[isl_idx].get().strip()
             try:
                 self.project["islands"][isl_idx]["valve_count"] = \
                     int(self.island_valve_count_vars[isl_idx].get())
@@ -1458,6 +1516,7 @@ class AWLGeneratorApp:
         self.project.setdefault("part2", "T")
         self.project.setdefault("part3", "")
         self.project.setdefault("hmi_loc", "1")
+        self.project.setdefault("st_hmi_index", "1")
         self.project.setdefault("operator_load", {"enabled": False, "count": "1"})
         self.project.setdefault("drop_part_robot", {"enabled": False, "count": "1", "robot_names": []})
         self.project.setdefault("pick_part_robot", {"enabled": False, "count": "1", "robot_names": []})
@@ -1471,8 +1530,9 @@ class AWLGeneratorApp:
         ])
         self.project.setdefault("db_pages", {str(db): default_db_page() for db in DB_RANGE})
 
-        # Ensure islands have enough valves
+        # Ensure islands have enough valves and io_address
         for isl in self.project["islands"]:
+            isl.setdefault("io_address", "")
             while len(isl.get("valves", [])) < MAX_VALVES:
                 isl["valves"].append({"type": "Clamp", "units": ""})
 
@@ -1488,6 +1548,7 @@ class AWLGeneratorApp:
         self.part2_var.set(self.project.get("part2", "T"))
         self.part3_var.set(self.project.get("part3", ""))
         self.hmi_loc_var.set(self.project.get("hmi_loc", "1"))
+        self.st_hmi_index_var.set(self.project.get("st_hmi_index", "1"))
 
         # Additional config
         self.op_load_var.set(self.project.get("operator_load", {}).get("enabled", False))
@@ -1514,6 +1575,7 @@ class AWLGeneratorApp:
             isl = self.project["islands"][isl_idx]
             self.island_enabled_vars[isl_idx].set(isl.get("enabled", False))
             self.island_valve_count_vars[isl_idx].set(str(isl.get("valve_count", 1)))
+            self.island_io_address_vars[isl_idx].set(str(isl.get("io_address", "")))
             self._rebuild_valve_rows(isl_idx)
             for v in range(len(self.valve_type_vars[isl_idx])):
                 if v < len(isl.get("valves", [])):
