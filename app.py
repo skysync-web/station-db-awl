@@ -252,11 +252,11 @@ def make_reserve_dict(start, end):
     return {i: "RESERVE" for i in range(start, end + 1)}
 
 
-def auto_gen_rqm(station, op_load=None):
+def auto_gen_rqm(station, op_load=None, drop_robot=None, pick_robot=None):
     """
     Generate RQM section comments.
     Fields _00 to _95, all default RESERVE first.
-    Operator loading entries at _06-_09.
+    Operator loading at _06-_09, drop robot at _22+.
     """
     comments = make_reserve_dict(0, 95)
 
@@ -271,6 +271,23 @@ def auto_gen_rqm(station, op_load=None):
         if load_count >= 2:
             comments[8] = f"RQM 08 [{station}] Wait operator enter loading area 2"
             comments[9] = f"RQM 09 [{station}] Wait operator exit loading area 2"
+
+    # Drop robot entries: 6 slots per robot (5 entries + 1 RESERVE) starting at _22
+    if drop_robot and drop_robot.get("enabled"):
+        drop_names = drop_robot.get("robot_names", [])
+        drop_toolings = drop_robot.get("toolings", [])
+        slot = 22
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            tooling = drop_toolings[i] if i < len(drop_toolings) else "1"
+            comments[slot] = f"RQM {slot:02d} [ST{station}] Wait inside of station {dname}"
+            comments[slot + 1] = f"RQM {slot+1:02d} [ST{station}] Wait tool Request ON {dname} (TOOLING {tooling})"
+            comments[slot + 2] = f"RQM {slot+2:02d} [ST{station}] Wait tool Request OFF {dname} (TOOLING {tooling})"
+            comments[slot + 3] = f"RQM {slot+3:02d} [ST{station}] Wait robot {dname} drop part done"
+            comments[slot + 4] = f"RQM {slot+4:02d} [ST{station}] Wait Out of interference {dname}"
+            # next slot is RESERVE (already set)
+            slot += 6
 
     return comments
 
@@ -313,13 +330,43 @@ def auto_gen_ai(station, islands_config):
     return comments
 
 
-def auto_gen_ab(station, islands_config, robot_names, op_load=None):
+def _short_name(robot_name):
+    """Get short robot name: drop leading zero if 6 chars (e.g. '035R01' -> '35R01')."""
+    if len(robot_name) == 6 and robot_name[0] == '0':
+        return robot_name[1:]
+    return robot_name
+
+
+def auto_gen_ab(station, islands_config, robot_names, op_load=None, drop_robot=None, pick_robot=None):
     """
     Generate AB section comments.
     All fields _00 to _95 default RESERVE first.
-    Operator load at _06-_15, robot entries at _24+, valve fwd at _51/_61, valve bwd at _71/_81.
+    Drop robot at _04+, operator load at _06-_15, robot entries at _24+,
+    valve fwd at _51/_61, valve bwd at _71/_81.
     """
     comments = make_reserve_dict(0, 95)
+
+    # Drop robot entries starting at _16, 10 slots per robot
+    if drop_robot and drop_robot.get("enabled"):
+        drop_names = drop_robot.get("robot_names", [])
+        drop_toolings = drop_robot.get("toolings", [])
+        drop_jobs = drop_robot.get("jobs", [])
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            base = 16 + i * 10
+            short = _short_name(dname)
+            tooling = drop_toolings[i] if i < len(drop_toolings) else "1"
+            job = drop_jobs[i] if i < len(drop_jobs) else "1"
+            load_n = i + 1
+            comments[base] = f"CHECK STATION AND MODEL BEFORE CONSENT TO {short}"
+            comments[base + 1] = f"CONSENT TO DROP PART {dname} (JOB{job})"
+            comments[base + 2] = f"CHECK PART PRESENTS ON (LOAD {load_n} {short})"
+            comments[base + 3] = f"WAITING TOOL REQUEST {tooling} FROM {short}"
+            comments[base + 4] = f"CONSENT TOOL RELEASE {tooling} {short}"
+            comments[base + 5] = f"WAITING END OF DROP {short} (JOB{job})"
+            comments[base + 6] = f"CONSENT TO EXIT {short} (ACK JOB{job})"
+            # _07, _08, _09 stay RESERVE (already set)
 
     # Operator loading entries
     if op_load and op_load.get("enabled"):
@@ -429,7 +476,7 @@ def auto_gen_rqt(station, islands_config, robot_names, op_load=None):
     return comments
 
 
-def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None):
+def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None, drop_robot=None, pick_robot=None):
     """
     Generate Aux_Cycle section comments.
     Fields _01 to _95, all default RESERVE first.
@@ -471,7 +518,6 @@ def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None):
             act_type = valve["type"]
             aux_type = ACTUATOR_AUX.get(act_type, act_type)
             units = valve.get("units", [])
-            # Extract 3-digit codes from unit names (e.g., "050C01" -> "C050")
             c_codes = []
             for u in units:
                 m = re.match(r'(\d{3})C\d+', u)
@@ -484,17 +530,59 @@ def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None):
             comments[slot + 1] = f"Aux {slot+1} Interlock Bwd {aux_type} {yv} {c_str}"
             slot += 2
 
+    # Drop robot entries
+    if drop_robot and drop_robot.get("enabled"):
+        drop_names = drop_robot.get("robot_names", [])
+        drop_toolings = drop_robot.get("toolings", [])
+
+        # Clamps ready to tooling starting at _42
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            short = _short_name(dname)
+            comments[42 + i] = f"Clamps ready to tooling {short}"
+
+        # Presence Element Drop starting at _50
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            comments[50 + i] = f"Presence Element Drop {i+1} {dname}"
+
+        # Robot out of interference (drop) starting at _53
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            comments[53 + i] = f"Aux. Robot {dname} out of interference from {station}"
+
+        # Robot tooling request starting at _58
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            tooling = drop_toolings[i] if i < len(drop_toolings) else "1"
+            comments[58 + i] = f"Aux. Robot {dname} tooling request {tooling}"
+
+        # Consent To Drop / Tooling Release / Consent To Exit starting at _64
+        slot_drop = 64
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            tooling = drop_toolings[i] if i < len(drop_toolings) else "1"
+            comments[slot_drop] = f"Aux. Consent To Drop {dname}"
+            comments[slot_drop + 1] = f"Aux. Tooling Release {tooling} {dname}"
+            comments[slot_drop + 2] = f"Aux. Consent To Exit {dname}"
+            slot_drop += 3
+
     return comments
 
 
-def auto_gen_mem_cycle(station, robot_names):
+def auto_gen_mem_cycle(station, robot_names, drop_robot=None, pick_robot=None):
     """
     Generate Mem_Cycle section comments.
     Fields _01 to _95, all default RESERVE first.
     For each robot i (0-indexed), base = 17 + i*8:
       base: MEMORY END JOB 1  ROBOT {short_name} End of welding {station}
       base+4: MEMORY CHANGE TIPS OK {robot_name}
-    short_name = last 5 chars of robot name (e.g., '40R01' from '040R01')
+    Drop robot entries at _32+.
     """
     comments = make_reserve_dict(1, 95)
 
@@ -503,6 +591,15 @@ def auto_gen_mem_cycle(station, robot_names):
         short_name = rname[1:] if len(rname) == 6 else rname[-5:]
         comments[base] = f"MEMORY END JOB 1  ROBOT {short_name} End of welding {station}"
         comments[base + 4] = f"MEMORY CHANGE TIPS OK {rname}"
+
+    # Drop robot entries starting at _32
+    if drop_robot and drop_robot.get("enabled"):
+        drop_names = drop_robot.get("robot_names", [])
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            job = drop_jobs[i] if i < len(drop_jobs) else "1"
+            comments[32 + i] = f"MEMORY END JOB {dname} JOB{job} Part dropped on {station}"
 
     return comments
 
@@ -1658,6 +1755,20 @@ class AWLGeneratorApp:
             "enabled": self.op_load_var.get(),
             "count": self.op_load_count_var.get(),
         }
+        drop_robot = {
+            "enabled": self.drop_robot_var.get(),
+            "count": self.drop_robot_count_var.get(),
+            "robot_names": [v.get().strip() for v in self.drop_robot_name_vars],
+            "toolings": [v.get() for v in self.drop_robot_tooling_vars],
+            "jobs": [v.get() for v in self.drop_robot_job_vars],
+        }
+        pick_robot = {
+            "enabled": self.pick_robot_var.get(),
+            "count": self.pick_robot_count_var.get(),
+            "robot_names": [v.get().strip() for v in self.pick_robot_name_vars],
+            "toolings": [v.get() for v in self.pick_robot_tooling_vars],
+            "jobs": [v.get() for v in self.pick_robot_job_vars],
+        }
 
         idx = self.db_notebook.index("current")
         db_num = DB_FIRST + idx
@@ -1680,11 +1791,11 @@ class AWLGeneratorApp:
         gen_funcs = {
             "O_I": lambda: auto_gen_oi(station, islands_config),
             "A_I": lambda: auto_gen_ai(station, islands_config),
-            "AB": lambda: auto_gen_ab(station, islands_config, robot_names, op_load),
-            "RQM": lambda: auto_gen_rqm(station, op_load),
+            "AB": lambda: auto_gen_ab(station, islands_config, robot_names, op_load, drop_robot, pick_robot),
+            "RQM": lambda: auto_gen_rqm(station, op_load, drop_robot, pick_robot),
             "RQT": lambda: auto_gen_rqt(station, islands_config, robot_names, op_load),
-            "Aux_Cycle": lambda: auto_gen_aux_cycle(station, islands_config, robot_names, op_load),
-            "Mem_Cycle": lambda: auto_gen_mem_cycle(station, robot_names),
+            "Aux_Cycle": lambda: auto_gen_aux_cycle(station, islands_config, robot_names, op_load, drop_robot, pick_robot),
+            "Mem_Cycle": lambda: auto_gen_mem_cycle(station, robot_names, drop_robot, pick_robot),
             "TIO_D": lambda: auto_gen_tio_d(station, islands_config, robot_names),
         }
 
