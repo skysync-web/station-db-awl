@@ -575,8 +575,8 @@ def default_project():
         "hmi_loc": "1",
         "st_hmi_index": "1",
         "operator_load": {"enabled": False, "count": "1"},
-        "drop_part_robot": {"enabled": False, "count": "1", "robot_names": []},
-        "pick_part_robot": {"enabled": False, "count": "1", "robot_names": []},
+        "drop_part_robot": {"enabled": False, "count": "1", "robot_names": [], "toolings": [], "jobs": []},
+        "pick_part_robot": {"enabled": False, "count": "1", "robot_names": [], "toolings": [], "jobs": []},
         "robot_count": 0,
         "robot_names": [],
         "islands": [
@@ -1101,6 +1101,8 @@ class AWLGeneratorApp:
             w.destroy()
         self.drop_robot_name_vars = []
         self.drop_robot_valid_labels = []
+        self.drop_robot_tooling_vars = []
+        self.drop_robot_job_vars = []
         if not self.drop_robot_var.get():
             return
         count_row = ttk.Frame(self.drop_robot_detail)
@@ -1115,6 +1117,8 @@ class AWLGeneratorApp:
         except ValueError:
             count = 1
         saved_names = self.project.get("drop_part_robot", {}).get("robot_names", [])
+        saved_toolings = self.project.get("drop_part_robot", {}).get("toolings", [])
+        saved_jobs = self.project.get("drop_part_robot", {}).get("jobs", [])
         for i in range(count):
             name_row = ttk.Frame(self.drop_robot_detail)
             name_row.pack(fill=tk.X, pady=1)
@@ -1129,6 +1133,20 @@ class AWLGeneratorApp:
                 self.drop_robot_name_vars, self.drop_robot_valid_labels, idx))
             self._validate_ext_robot(self.drop_robot_name_vars, self.drop_robot_valid_labels, i)
 
+            ttk.Label(name_row, text="Tooling:").pack(side=tk.LEFT, padx=(10, 2))
+            t_var = tk.StringVar(value=saved_toolings[i] if i < len(saved_toolings) else "1")
+            t_combo = ttk.Combobox(name_row, textvariable=t_var,
+                                    values=[str(x) for x in range(1, 17)], width=3, state="readonly")
+            t_combo.pack(side=tk.LEFT)
+            self.drop_robot_tooling_vars.append(t_var)
+
+            ttk.Label(name_row, text="JOB:").pack(side=tk.LEFT, padx=(10, 2))
+            j_var = tk.StringVar(value=saved_jobs[i] if i < len(saved_jobs) else "1")
+            j_combo = ttk.Combobox(name_row, textvariable=j_var,
+                                    values=[str(x) for x in range(1, 17)], width=3, state="readonly")
+            j_combo.pack(side=tk.LEFT)
+            self.drop_robot_job_vars.append(j_var)
+
     def _on_pick_robot_change(self):
         self.project.setdefault("pick_part_robot", {})["enabled"] = self.pick_robot_var.get()
         self._rebuild_pick_robot_detail()
@@ -1138,6 +1156,8 @@ class AWLGeneratorApp:
             w.destroy()
         self.pick_robot_name_vars = []
         self.pick_robot_valid_labels = []
+        self.pick_robot_tooling_vars = []
+        self.pick_robot_job_vars = []
         if not self.pick_robot_var.get():
             return
         count_row = ttk.Frame(self.pick_robot_detail)
@@ -1152,6 +1172,8 @@ class AWLGeneratorApp:
         except ValueError:
             count = 1
         saved_names = self.project.get("pick_part_robot", {}).get("robot_names", [])
+        saved_toolings = self.project.get("pick_part_robot", {}).get("toolings", [])
+        saved_jobs = self.project.get("pick_part_robot", {}).get("jobs", [])
         for i in range(count):
             name_row = ttk.Frame(self.pick_robot_detail)
             name_row.pack(fill=tk.X, pady=1)
@@ -1165,6 +1187,20 @@ class AWLGeneratorApp:
             var.trace_add("write", lambda *a, idx=i: self._validate_ext_robot(
                 self.pick_robot_name_vars, self.pick_robot_valid_labels, idx))
             self._validate_ext_robot(self.pick_robot_name_vars, self.pick_robot_valid_labels, i)
+
+            ttk.Label(name_row, text="Tooling:").pack(side=tk.LEFT, padx=(10, 2))
+            t_var = tk.StringVar(value=saved_toolings[i] if i < len(saved_toolings) else "1")
+            t_combo = ttk.Combobox(name_row, textvariable=t_var,
+                                    values=[str(x) for x in range(1, 17)], width=3, state="readonly")
+            t_combo.pack(side=tk.LEFT)
+            self.pick_robot_tooling_vars.append(t_var)
+
+            ttk.Label(name_row, text="JOB:").pack(side=tk.LEFT, padx=(10, 2))
+            j_var = tk.StringVar(value=saved_jobs[i] if i < len(saved_jobs) else "1")
+            j_combo = ttk.Combobox(name_row, textvariable=j_var,
+                                    values=[str(x) for x in range(1, 17)], width=3, state="readonly")
+            j_combo.pack(side=tk.LEFT)
+            self.pick_robot_job_vars.append(j_var)
 
     def _validate_ext_robot(self, name_vars, valid_labels, idx):
         if idx >= len(name_vars) or idx >= len(valid_labels):
@@ -1785,11 +1821,15 @@ class AWLGeneratorApp:
             "enabled": self.drop_robot_var.get(),
             "count": self.drop_robot_count_var.get(),
             "robot_names": [v.get().strip() for v in self.drop_robot_name_vars],
+            "toolings": [v.get() for v in self.drop_robot_tooling_vars],
+            "jobs": [v.get() for v in self.drop_robot_job_vars],
         }
         self.project["pick_part_robot"] = {
             "enabled": self.pick_robot_var.get(),
             "count": self.pick_robot_count_var.get(),
             "robot_names": [v.get().strip() for v in self.pick_robot_name_vars],
+            "toolings": [v.get() for v in self.pick_robot_tooling_vars],
+            "jobs": [v.get() for v in self.pick_robot_job_vars],
         }
         self.project["robot_count"] = int(self.robot_count_var.get())
         self.project["robot_names"] = [v.get().strip() for v in self.robot_name_vars]
@@ -1850,8 +1890,8 @@ class AWLGeneratorApp:
         self.project.setdefault("hmi_loc", "1")
         self.project.setdefault("st_hmi_index", "1")
         self.project.setdefault("operator_load", {"enabled": False, "count": "1"})
-        self.project.setdefault("drop_part_robot", {"enabled": False, "count": "1", "robot_names": []})
-        self.project.setdefault("pick_part_robot", {"enabled": False, "count": "1", "robot_names": []})
+        self.project.setdefault("drop_part_robot", {"enabled": False, "count": "1", "robot_names": [], "toolings": [], "jobs": []})
+        self.project.setdefault("pick_part_robot", {"enabled": False, "count": "1", "robot_names": [], "toolings": [], "jobs": []})
         self.project.setdefault("robot_count", 0)
         self.project.setdefault("robot_names", [])
         self.project.setdefault("islands", [
