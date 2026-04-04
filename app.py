@@ -252,6 +252,29 @@ def make_reserve_dict(start, end):
     return {i: "RESERVE" for i in range(start, end + 1)}
 
 
+def auto_gen_rqm(station, op_load=None):
+    """
+    Generate RQM section comments.
+    Fields _00 to _95, all default RESERVE first.
+    Operator loading entries at _06-_09.
+    """
+    comments = make_reserve_dict(0, 95)
+
+    if op_load and op_load.get("enabled"):
+        try:
+            load_count = int(op_load.get("count", "1"))
+        except ValueError:
+            load_count = 1
+        if load_count >= 1:
+            comments[6] = f"RQM 06 [{station}] Wait operator enter loading area 1"
+            comments[7] = f"RQM 07 [{station}] Wait operator exit loading area 1"
+        if load_count >= 2:
+            comments[8] = f"RQM 08 [{station}] Wait operator enter loading area 2"
+            comments[9] = f"RQM 09 [{station}] Wait operator exit loading area 2"
+
+    return comments
+
+
 def auto_gen_oi(station, islands_config):
     """
     Generate O_I section comments.
@@ -290,13 +313,28 @@ def auto_gen_ai(station, islands_config):
     return comments
 
 
-def auto_gen_ab(station, islands_config, robot_names):
+def auto_gen_ab(station, islands_config, robot_names, op_load=None):
     """
     Generate AB section comments.
     All fields _00 to _95 default RESERVE first.
-    Robot entries at _24+, valve fwd at _51/_61, valve bwd at _71/_81.
+    Operator load at _06-_15, robot entries at _24+, valve fwd at _51/_61, valve bwd at _71/_81.
     """
     comments = make_reserve_dict(0, 95)
+
+    # Operator loading entries
+    if op_load and op_load.get("enabled"):
+        try:
+            load_count = int(op_load.get("count", "1"))
+        except ValueError:
+            load_count = 1
+        if load_count >= 1:
+            comments[6] = "OPERATOR ENTER THE AREA FOR LOADING 1"
+            comments[7] = "CHECK PART PRESENTS ON LOADING 1"
+            comments[8] = "CONFIRM / RESET AREA LOADING 1"
+        if load_count >= 2:
+            comments[11] = "OPERATOR ENTER THE AREA FOR LOADING 2"
+            comments[12] = "CHECK PART PRESENTS ON LOADING 2"
+            comments[13] = "CONFIRM / RESET AREA LOADING 2"
 
     # Robot-related entries starting at _24
     n_robots = len(robot_names)
@@ -336,13 +374,24 @@ def auto_gen_ab(station, islands_config, robot_names):
     return comments
 
 
-def auto_gen_rqt(station, islands_config, robot_names):
+def auto_gen_rqt(station, islands_config, robot_names, op_load=None):
     """
     Generate RQT section comments.
     Fields _00 to _95, all default RESERVE first.
-    Robot entries at _22+, valve entries at _51/_61/_71/_81.
+    Operator load at _07/_08, robot entries at _22+, valve entries at _51/_61/_71/_81.
     """
     comments = make_reserve_dict(0, 95)
+
+    # Operator loading entries
+    if op_load and op_load.get("enabled"):
+        try:
+            load_count = int(op_load.get("count", "1"))
+        except ValueError:
+            load_count = 1
+        if load_count >= 1:
+            comments[7] = f"RQT 07 [{station}] Wait  loading 1 Part presents OK"
+        if load_count >= 2:
+            comments[8] = f"RQT 08 [{station}] Wait  loading 2 Part presents OK"
 
     n_robots = len(robot_names)
 
@@ -380,7 +429,7 @@ def auto_gen_rqt(station, islands_config, robot_names):
     return comments
 
 
-def auto_gen_aux_cycle(station, islands_config, robot_names):
+def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None):
     """
     Generate Aux_Cycle section comments.
     Fields _01 to _95, all default RESERVE first.
@@ -392,6 +441,17 @@ def auto_gen_aux_cycle(station, islands_config, robot_names):
     # No fault robot entries starting at _02
     for i, rname in enumerate(robot_names):
         comments[2 + i] = f"No fault robot {rname}"
+
+    # Operator loading entries at _12/_13
+    if op_load and op_load.get("enabled"):
+        try:
+            load_count = int(op_load.get("count", "1"))
+        except ValueError:
+            load_count = 1
+        if load_count >= 1:
+            comments[12] = "Aux.1st Operator Part Load OK"
+        if load_count >= 2:
+            comments[13] = "Aux.2nd Operator Part Load OK"
 
     # Robot out of interference starting at _46
     for i, rname in enumerate(robot_names):
@@ -1558,6 +1618,10 @@ class AWLGeneratorApp:
 
         islands_config = self._get_islands_config()
         robot_names = self._get_robot_names()
+        op_load = {
+            "enabled": self.op_load_var.get(),
+            "count": self.op_load_count_var.get(),
+        }
 
         idx = self.db_notebook.index("current")
         db_num = DB_FIRST + idx
@@ -1580,17 +1644,16 @@ class AWLGeneratorApp:
         gen_funcs = {
             "O_I": lambda: auto_gen_oi(station, islands_config),
             "A_I": lambda: auto_gen_ai(station, islands_config),
-            "AB": lambda: auto_gen_ab(station, islands_config, robot_names),
-            "RQT": lambda: auto_gen_rqt(station, islands_config, robot_names),
-            "Aux_Cycle": lambda: auto_gen_aux_cycle(station, islands_config, robot_names),
+            "AB": lambda: auto_gen_ab(station, islands_config, robot_names, op_load),
+            "RQM": lambda: auto_gen_rqm(station, op_load),
+            "RQT": lambda: auto_gen_rqt(station, islands_config, robot_names, op_load),
+            "Aux_Cycle": lambda: auto_gen_aux_cycle(station, islands_config, robot_names, op_load),
             "Mem_Cycle": lambda: auto_gen_mem_cycle(station, robot_names),
             "TIO_D": lambda: auto_gen_tio_d(station, islands_config, robot_names),
         }
 
-        # For sections that also need RESERVE default: RQM, MG
-        # These are auto-gen sections but we only set them to RESERVE (no specific logic beyond that)
+        # For sections that also need RESERVE default but no specific logic
         reserve_only_sections = {
-            "RQM": (0, 95),
             "MG": (0, 95),
         }
 
