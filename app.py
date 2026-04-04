@@ -500,6 +500,8 @@ def default_db_page():
     """Create default data for one DB page."""
     return {
         "sections": {},  # section_name -> {field_idx: comment}
+        "station_name": "",  # stored when auto-generated
+        "io_addresses": {},  # {isl_idx_str: address_str} stored when auto-generated
     }
 
 
@@ -1127,6 +1129,203 @@ class AWLGeneratorApp:
                    command=self.generate_current_db).pack(fill=tk.X, pady=2)
         ttk.Button(frame, text="Generate All DBs",
                    command=self.generate_all_dbs).pack(fill=tk.X, pady=2)
+        ttk.Button(frame, text="Create I/O",
+                   command=self.create_io_popup).pack(fill=tk.X, pady=2)
+
+    # ---- CREATE I/O --------------------------------------------------------
+
+    def _build_io_table(self, isl_idx, station):
+        """
+        Build output and input I/O entries for one valve island.
+        Outputs: Each valve = 2 bits (YVA=WORK, YVB=REST) with Q prefix.
+        Inputs:  Each actuator unit = 2 bits (SQB=REST, SQA=WORK) with I prefix.
+        Returns (outputs, inputs) - each is a list of dicts: {symbol, address, comment}
+        """
+        if isl_idx >= len(self.island_enabled_vars):
+            return [], []
+        if not self.island_enabled_vars[isl_idx].get():
+            return [], []
+
+        io_str = self.island_io_address_vars[isl_idx].get().strip()
+        if not io_str:
+            return [], []
+        try:
+            base_addr = int(io_str)
+        except ValueError:
+            return [], []
+
+        try:
+            valve_count = int(self.island_valve_count_vars[isl_idx].get())
+        except ValueError:
+            valve_count = 0
+
+        isl_num = isl_idx + 1
+        outputs = []
+        inputs = []
+        out_bit = 0  # output bit counter
+        in_bit = 0   # input bit counter
+
+        for v in range(valve_count):
+            vtype = "Clamp"
+            units_str = ""
+            if v < len(self.valve_type_vars[isl_idx]):
+                vtype = self.valve_type_vars[isl_idx][v].get()
+            if v < len(self.valve_unit_vars[isl_idx]):
+                units_str = self.valve_unit_vars[isl_idx][v].get().strip()
+
+            cmd_name = ACTUATOR_CMD.get(vtype, "CLAMP ").strip()
+            valve_label = f"{isl_num:02d}V{v+1:02d}"
+
+            # --- OUTPUTS: YVA (WORK) and YVB (REST) per valve ---
+            byte_a = base_addr + (out_bit // 8)
+            bit_a = out_bit % 8
+            sym_a = f"_{station}_{valve_label}YVA"
+            comment_a = f"COMMAND WORK {cmd_name} {units_str}".strip()
+            outputs.append({"symbol": sym_a, "address": f"Q{byte_a}.{bit_a}", "comment": comment_a})
+            out_bit += 1
+
+            byte_b = base_addr + (out_bit // 8)
+            bit_b = out_bit % 8
+            sym_b = f"_{station}_{valve_label}YVB"
+            comment_b = f"COMMAND REST {cmd_name} {units_str}".strip()
+            outputs.append({"symbol": sym_b, "address": f"Q{byte_b}.{bit_b}", "comment": comment_b})
+            out_bit += 1
+
+            # --- INPUTS: SQB (REST) and SQA (WORK) per actuator unit ---
+            # Parse units: dash-separated (e.g. "050C01-060C01")
+            units = [u.strip() for u in units_str.replace(",", "-").split("-") if u.strip()]
+            for unit_name in units:
+                # SQB - REST
+                byte_sqb = base_addr + (in_bit // 8)
+                bit_sqb = in_bit % 8
+                sym_sqb = f"_{station}_{unit_name}SQB"
+                comment_sqb = f"{cmd_name} {unit_name} REST/VALVE{v+1}"
+                inputs.append({"symbol": sym_sqb, "address": f"I{byte_sqb}.{bit_sqb}",
+                               "comment": comment_sqb})
+                in_bit += 1
+
+                # SQA - WORK
+                byte_sqa = base_addr + (in_bit // 8)
+                bit_sqa = in_bit % 8
+                sym_sqa = f"_{station}_{unit_name}SQA"
+                comment_sqa = f"{cmd_name} {unit_name} WORK/VALVE{v+1}"
+                inputs.append({"symbol": sym_sqa, "address": f"I{byte_sqa}.{bit_sqa}",
+                               "comment": comment_sqa})
+                in_bit += 1
+
+        return outputs, inputs
+
+    def create_io_popup(self):
+        """Show combined I/O address popup (outputs + inputs) for each enabled valve island."""
+        station = self._get_station_name()
+        if not station:
+            messagebox.showwarning("Warning", "Please configure station name first.")
+            return
+
+        found_any = False
+        for isl_idx in range(MAX_ISLANDS):
+            outputs, inputs = self._build_io_table(isl_idx, station)
+            if not outputs and not inputs:
+                continue
+            found_any = True
+
+            isl_num = isl_idx + 1
+            popup = tk.Toplevel(self.root)
+            popup.title(f"I/O Mapping - BM{isl_num:02d}")
+            popup.geometry("800x500")
+            popup.transient(self.root)
+
+            # Header
+            ttk.Label(popup, text=f"Valve Island BM{isl_num:02d} - I/O Mapping",
+                      font=("TkDefaultFont", 12, "bold")).pack(padx=10, pady=(10, 5))
+
+            # Table frame with scrollbar
+            table_frame = ttk.Frame(popup)
+            table_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+
+            canvas = tk.Canvas(table_frame)
+            scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=canvas.yview)
+            scroll_inner = ttk.Frame(canvas)
+
+            scroll_inner.bind("<Configure>", lambda e, c=canvas: c.configure(scrollregion=c.bbox("all")))
+            canvas.create_window((0, 0), window=scroll_inner, anchor="nw")
+            canvas.configure(yscrollcommand=scrollbar.set)
+
+            canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            # Mousewheel
+            canvas.bind("<Enter>", lambda e, c=canvas: c.bind_all("<MouseWheel>",
+                        lambda ev, cc=c: cc.yview_scroll(int(-1 * (ev.delta / 120)), "units")))
+            canvas.bind("<Leave>", lambda e, c=canvas: c.unbind_all("<MouseWheel>"))
+
+            row_idx = 0
+
+            # --- OUTPUTS SECTION ---
+            ttk.Label(scroll_inner, text="OUTPUTS", font=("TkDefaultFont", 11, "bold"),
+                      foreground="blue").grid(row=row_idx, column=0, columnspan=3, padx=5, pady=(5, 2), sticky="w")
+            row_idx += 1
+
+            # Column headers
+            ttk.Label(scroll_inner, text="Symbol", font=("TkDefaultFont", 10, "bold"),
+                      width=28, anchor="w").grid(row=row_idx, column=0, padx=5, pady=2, sticky="w")
+            ttk.Label(scroll_inner, text="Address", font=("TkDefaultFont", 10, "bold"),
+                      width=10, anchor="w").grid(row=row_idx, column=1, padx=5, pady=2, sticky="w")
+            ttk.Label(scroll_inner, text="Comment", font=("TkDefaultFont", 10, "bold"),
+                      width=50, anchor="w").grid(row=row_idx, column=2, padx=5, pady=2, sticky="w")
+            row_idx += 1
+
+            ttk.Separator(scroll_inner, orient="horizontal").grid(
+                row=row_idx, column=0, columnspan=3, sticky="ew", pady=2)
+            row_idx += 1
+
+            for entry in outputs:
+                ttk.Label(scroll_inner, text=entry["symbol"], width=28, anchor="w",
+                          font=("Consolas", 9)).grid(row=row_idx, column=0, padx=5, pady=1, sticky="w")
+                ttk.Label(scroll_inner, text=entry["address"], width=10, anchor="w",
+                          font=("Consolas", 9)).grid(row=row_idx, column=1, padx=5, pady=1, sticky="w")
+                ttk.Label(scroll_inner, text=entry["comment"], width=50, anchor="w",
+                          font=("Consolas", 9)).grid(row=row_idx, column=2, padx=5, pady=1, sticky="w")
+                row_idx += 1
+
+            # --- INPUTS SECTION ---
+            row_idx += 1  # spacing
+            ttk.Label(scroll_inner, text="INPUTS", font=("TkDefaultFont", 11, "bold"),
+                      foreground="green").grid(row=row_idx, column=0, columnspan=3, padx=5, pady=(10, 2), sticky="w")
+            row_idx += 1
+
+            ttk.Label(scroll_inner, text="Symbol", font=("TkDefaultFont", 10, "bold"),
+                      width=28, anchor="w").grid(row=row_idx, column=0, padx=5, pady=2, sticky="w")
+            ttk.Label(scroll_inner, text="Address", font=("TkDefaultFont", 10, "bold"),
+                      width=10, anchor="w").grid(row=row_idx, column=1, padx=5, pady=2, sticky="w")
+            ttk.Label(scroll_inner, text="Comment", font=("TkDefaultFont", 10, "bold"),
+                      width=50, anchor="w").grid(row=row_idx, column=2, padx=5, pady=2, sticky="w")
+            row_idx += 1
+
+            ttk.Separator(scroll_inner, orient="horizontal").grid(
+                row=row_idx, column=0, columnspan=3, sticky="ew", pady=2)
+            row_idx += 1
+
+            if inputs:
+                for entry in inputs:
+                    ttk.Label(scroll_inner, text=entry["symbol"], width=28, anchor="w",
+                              font=("Consolas", 9)).grid(row=row_idx, column=0, padx=5, pady=1, sticky="w")
+                    ttk.Label(scroll_inner, text=entry["address"], width=10, anchor="w",
+                              font=("Consolas", 9)).grid(row=row_idx, column=1, padx=5, pady=1, sticky="w")
+                    ttk.Label(scroll_inner, text=entry["comment"], width=50, anchor="w",
+                              font=("Consolas", 9)).grid(row=row_idx, column=2, padx=5, pady=1, sticky="w")
+                    row_idx += 1
+            else:
+                ttk.Label(scroll_inner, text="(No actuator units defined in valve config)",
+                          foreground="gray").grid(row=row_idx, column=0, columnspan=3, padx=5, pady=5, sticky="w")
+
+            scroll_inner.columnconfigure(2, weight=1)
+
+            # Close button
+            ttk.Button(popup, text="Close", command=popup.destroy).pack(pady=(5, 10))
+
+        if not found_any:
+            messagebox.showinfo("I/O", "No enabled valve islands with I/O addresses configured.")
 
     # ---- DB NOTEBOOK -------------------------------------------------------
 
@@ -1290,6 +1489,66 @@ class AWLGeneratorApp:
 
     # ---- AUTO-GENERATION ---------------------------------------------------
 
+    def _check_cross_page_conflicts(self, db_num):
+        """Check if current station name or I/O addresses conflict with other DB pages."""
+        station = self._get_station_name()
+        db_key = str(db_num)
+        errors = []
+
+        # Collect current I/O addresses
+        current_io = {}
+        for isl_idx in range(MAX_ISLANDS):
+            if isl_idx < len(self.island_enabled_vars) and self.island_enabled_vars[isl_idx].get():
+                addr = self.island_io_address_vars[isl_idx].get().strip()
+                if addr:
+                    try:
+                        current_io[str(isl_idx)] = int(addr)
+                    except ValueError:
+                        pass
+
+        # Check against all other DB pages
+        for other_db_key, page_data in self.project["db_pages"].items():
+            if other_db_key == db_key:
+                continue
+            other_station = page_data.get("station_name", "")
+            other_io = page_data.get("io_addresses", {})
+
+            if not other_station and not other_io:
+                continue
+
+            # Check station name
+            if station and other_station and station == other_station:
+                errors.append(f"Station name '{station}' is already used in DB{other_db_key}.")
+
+            # Check I/O addresses
+            for isl_key, addr in current_io.items():
+                for other_isl_key, other_addr_str in other_io.items():
+                    try:
+                        other_addr = int(other_addr_str)
+                    except (ValueError, TypeError):
+                        continue
+                    if addr == other_addr:
+                        errors.append(
+                            f"I/O Address {addr} (BM{int(isl_key)+1:02d}) "
+                            f"is already used in DB{other_db_key} BM{int(other_isl_key)+1:02d}.")
+
+        return errors
+
+    def _store_db_page_metadata(self, db_num):
+        """Store current station name and I/O addresses in the DB page data."""
+        db_key = str(db_num)
+        if db_key not in self.project["db_pages"]:
+            self.project["db_pages"][db_key] = default_db_page()
+
+        self.project["db_pages"][db_key]["station_name"] = self._get_station_name()
+        io_addrs = {}
+        for isl_idx in range(MAX_ISLANDS):
+            if isl_idx < len(self.island_enabled_vars) and self.island_enabled_vars[isl_idx].get():
+                addr = self.island_io_address_vars[isl_idx].get().strip()
+                if addr:
+                    io_addrs[str(isl_idx)] = addr
+        self.project["db_pages"][db_key]["io_addresses"] = io_addrs
+
     def auto_generate_all(self):
         """Auto-generate all sections for the current DB page."""
         station = self._get_station_name()
@@ -1303,9 +1562,19 @@ class AWLGeneratorApp:
         idx = self.db_notebook.index("current")
         db_num = DB_FIRST + idx
 
+        # Cross-page validation
+        conflicts = self._check_cross_page_conflicts(db_num)
+        if conflicts:
+            msg = "Conflicts found:\n\n" + "\n".join(conflicts) + "\n\nContinue anyway?"
+            if not messagebox.askyesno("Conflict Warning", msg, icon="warning"):
+                return
+
         # Make sure page is loaded
         if db_num not in self.loaded_db_pages:
             self._load_db_page(db_num)
+
+        # Store metadata for this DB page
+        self._store_db_page_metadata(db_num)
 
         # Generate all auto sections
         gen_funcs = {
