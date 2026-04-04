@@ -651,6 +651,338 @@ def auto_gen_tio_d(station, islands_config, robot_names):
 
 
 # ============================================================================
+# FB OUTPUT GENERATION
+# ============================================================================
+
+def generate_fb_output(station, hmi_loc_str, islands_config):
+    """
+    Generate the ST-XXX_OUTPUT Function Block AWL text.
+    station        : e.g. "040T01"
+    hmi_loc_str    : e.g. "1"
+    islands_config : list of island valve lists from _get_islands_config()
+    """
+    st3       = station[:3]           # "040"
+    st_suffix = station[3:]           # "T01"
+    st_2dig   = str(int(st3))         # "40"  (drops leading zero)
+
+    try:
+        hmi = int(hmi_loc_str)
+    except (ValueError, TypeError):
+        hmi = 1
+
+    fb_name  = f"ST-{st3}_OUTPUT"
+    var_pfx  = f"ST{st3}_{st_suffix}_"
+    db       = f"G-DB_{station}"
+    vis      = f"VIS_{station}"
+    sig_v    = f"_{station}_"              # valve output prefix  _040T01_
+    sig_u    = f"_{st_2dig}{st_suffix}_"   # unit signal prefix   _40T01_
+
+    out = []
+    def W(s=""):
+        out.append(s)
+
+    # ── Header ───────────────────────────────────────────────────────────
+    W(f'FUNCTION_BLOCK "{fb_name}"')
+    W('TITLE =')
+    W('VERSION : 0.1')
+    W()
+    W()
+    W('VAR')
+
+    # CYL1 / CYL2_5 instance declarations
+    for isl_idx, island in enumerate(islands_config):
+        isl = isl_idx + 1
+        for v_idx, valve in enumerate(island):
+            vv    = v_idx + 1
+            vname = f"{var_pfx}{isl:02d}V{vv:02d}"
+            units = valve.get("units", [])
+            W(f'  {vname}_CYL1 : "Valve_Cylinder_1";\t')
+            if len(units) > 1:
+                W(f'  {vname}_CYL2_5 : "Valve_Cylinder_2_5";\t')
+
+    # Interface DWORDs (only when CYL2_5 is used)
+    for isl_idx, island in enumerate(islands_config):
+        isl = isl_idx + 1
+        for v_idx, valve in enumerate(island):
+            vv    = v_idx + 1
+            units = valve.get("units", [])
+            if len(units) > 1:
+                W(f'  Interface{isl:02d}V{vv:02d} : DWORD ;\t')
+
+    W('  General_Interlock : BOOL ;\t')
+    for isl_idx in range(len(islands_config)):
+        W(f'  DelayCheckPilotValve{isl_idx + 1} : "TON";\t')
+
+    W('END_VAR')
+    W('VAR_TEMP')
+    W('  tAlarmPilotValve : BOOL ;\t')
+    W('END_VAR')
+    W('BEGIN')
+
+    # ── Pilot Valve ──────────────────────────────────────────────────────
+    W('NETWORK')
+    W('TITLE =-------------- Pilot Valve ---------------------------')
+    W()
+    W('NETWORK')
+    W('TITLE =Command Pilot Valves')
+    W()
+    W('      A     M2500.7; ')
+    W('      =     L      1.0; ')
+    for isl_idx in range(len(islands_config)):
+        isl    = isl_idx + 1
+        av_pv  = 12 + isl_idx   # Aux_Cycle._12 for BM01, _13 for BM02
+        W('      A     L      1.0; ')
+        W(f'      AN    "{db}".Aux_Cycle._{av_pv:02d}; ')
+        W(f'      =     "{sig_v}{isl:02d}V00YVA"; ')
+
+    for isl_idx in range(len(islands_config)):
+        isl   = isl_idx + 1
+        av_pv = 12 + isl_idx
+        W('NETWORK')
+        W(f'TITLE =Pilot Valve Error Check Delay Time {station}-{isl:02d}V00')
+        W()
+        W(f'      A     "{sig_v}{isl:02d}V00YVA"; ')
+        W(f'      A     "{sig_v}PILOT-BLK-{isl}"; ')
+        W('      =     L      1.0; ')
+        W('      BLD   103; ')
+        W(f'      CALL #DelayCheckPilotValve{isl} (')
+        W('           IN                       := L      1.0,')
+        W('           PT                       := T#5S,')
+        W('           Q                        := #tAlarmPilotValve);')
+        W()
+        W('      NOP   0; ')
+        W('NETWORK')
+        W(f'TITLE =Aux {station} Pilot Valve Error {isl:02d}V00 (BM{isl:02d})')
+        W()
+        W('      A     #tAlarmPilotValve; ')
+        W(f'      S     "{db}".Aux_Cycle._{av_pv:02d}; ')
+        W('      A(    ; ')
+        W('      A     M2500.7; ')
+        W('      NOT   ; ')
+        W(f'      O     "{db}".Reset_anom1; ')
+        W('      )     ; ')
+        W(f'      R     "{db}".Aux_Cycle._{av_pv:02d}; ')
+        W('      NOP   0; ')
+
+    # ── Interlock ────────────────────────────────────────────────────────
+    W('NETWORK')
+    W('TITLE =------------ Interlock ----------------------')
+    W()
+    W('NETWORK')
+    W('TITLE =General Interlock')
+    W()
+    W('      NOP   0; ')
+
+    # ── Valves ───────────────────────────────────────────────────────────
+    W('NETWORK')
+    W('TITLE =----------- VALVES -----------')
+    W()
+
+    LETTERS   = ['B', 'C', 'D', 'E']
+    global_v  = 0    # 0-based global valve index
+    oi_idx    = 0    # running O_I / A_I index
+    tio_slot  = 32   # running TIO_D slot
+    aux_slot  = 17   # running Aux_Cycle interlock slot
+
+    for isl_idx, island in enumerate(islands_config):
+        isl          = isl_idx + 1
+        ab_fwd_base  = 51 + isl_idx * 10   # 51 / 61
+        ab_bwd_base  = 71 + isl_idx * 10   # 71 / 81
+        key_n        = 1                    # F01 resets per island
+
+        for v_idx, valve in enumerate(island):
+            vv       = v_idx + 1
+            units    = valve.get("units", [])
+            n_units  = len(units)
+            act_type = valve.get("type", "Clamp")
+            vname    = f"{var_pfx}{isl:02d}V{vv:02d}"
+            visu_n   = global_v + 1
+
+            ab_fwd   = ab_fwd_base + v_idx
+            ab_bwd   = ab_bwd_base + v_idx
+            aux_fwd  = aux_slot
+            aux_bwd  = aux_slot + 1
+            aux_slot += 2
+            ma_fwd   = global_v * 2
+            ma_bwd   = global_v * 2 + 1
+            key_str  = f"F{key_n:02d}"
+            key_n   += 2
+
+            # TIO_D slots for CYL1
+            tio_flt     = tio_slot
+            tio_lockfwd = tio_slot + 1
+            tio_lockbwd = tio_slot + 2
+            tio_lposfwd = tio_slot + 3
+            tio_lposbwd = tio_slot + 4
+            tio_aclpfwd = tio_slot + 5
+            tio_aclpbwd = tio_slot + 6
+            tio_slot   += 3 + 5 * max(1, n_units)
+
+            has_aux = n_units > 1
+
+            # ── valve separator ──
+            W('NETWORK')
+            W(f'TITLE =*****{isl:02d}V{vv:02d}******')
+            W()
+
+            # ── Aux Interlock Fwd / Bwd ──
+            W('NETWORK')
+            W(f'TITLE =Aux Interlock Fwd {act_type} {isl:02d}V{vv:02d}')
+            W()
+            W('      A     #General_Interlock; ')
+            W(f'      =     "{db}".Aux_Cycle._{aux_fwd:02d}; ')
+            W('NETWORK')
+            W(f'TITLE =Aux Interlock Bwd {act_type}  {isl:02d}V{vv:02d}')
+            W()
+            W('      A     #General_Interlock; ')
+            W(f'      =     "{db}".Aux_Cycle._{aux_bwd:02d}; ')
+
+            # ── MANAGEMENT CYL1 ──
+            W('NETWORK')
+            W(f'TITLE =MANAGEMENT {isl:02d}V{vv:02d} CYLINDER 1')
+            W()
+            W(f'      A     "{db}".AB._{ab_fwd:02d}; ')
+            W('      =     L      1.0; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".AB._{ab_bwd:02d}; ')
+            W('      =     L      1.1; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".Aux_Cycle._{aux_fwd:02d}; ')
+            W('      =     L      1.2; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".Aux_Cycle._{aux_bwd:02d}; ')
+            W('      =     L      1.3; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".PICS.Pag_cmd_man_{isl:02d}; ')
+            W(f'      A     "G-DB_LINE".MP{hmi:02d}.KEY.{key_str}; ')
+            W(f'      A     "_2HI{hmi:02d}_SB4:4"; ')
+            W('      =     L      1.4; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".PICS.Pag_cmd_man_{isl:02d}; ')
+            W(f'      A     "G-DB_LINE".MP{hmi:02d}.KEY.{key_str}; ')
+            W(f'      A     "_2HI{hmi:02d}_SB5:4"; ')
+            W('      =     L      1.5; ')
+            W('      BLD   103; ')
+            if units:
+                W(f'      A     "{sig_u}{units[0]}SQA"; ')
+                W('      =     L      1.6; ')
+                W('      BLD   103; ')
+                W(f'      A     "{sig_u}{units[0]}SQB"; ')
+                W('      =     L      1.7; ')
+                W('      BLD   103; ')
+            W(f'      A     "{db}".Cycle.Manual; ')
+            W('      =     L      2.0; ')
+            W('      BLD   103; ')
+            W('      A(    ; ')
+            W(f'      O     "{db}".F_Prim.C_AutoL_in_run; ')
+            W(f'      O     "{db}".F_Prim.C_H_R_in_run; ')
+            W('      )     ; ')
+            W('      =     L      2.1; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".F_Prim.C_Start_up; ')
+            W('      =     L      2.2; ')
+            W('      BLD   103; ')
+            W('      A     M2500.7; ')
+            W('      =     L      2.3; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".Reset_anom1; ')
+            W('      =     L      2.4; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".Ma_EP[{ma_fwd}]; ')
+            W('      =     L      2.7; ')
+            W('      BLD   103; ')
+            W(f'      A     "{db}".Ma_EP[{ma_bwd}]; ')
+            W('      =     L      3.0; ')
+            W('      BLD   103; ')
+
+            # CALL CYL1
+            W(f'      CALL #{vname}_CYL1 (')
+            W('           AB_Fwd                   := L      1.0,')
+            W('           AB_Bwd                   := L      1.1,')
+            W('           LockFwd                  := L      1.2,')
+            W('           LockBwd                  := L      1.3,')
+            W('           PbFwd                    := L      1.4,')
+            W('           PbBwd                    := L      1.5,')
+            W('           LPosFwd                  := L      1.6,')
+            W('           LPosBwd                  := L      1.7,')
+            W('           EnMan                    := L      2.0,')
+            W('           EnLAuto                  := L      2.1,')
+            W('           EnAuto                   := L      2.2,')
+            W('           Kas                      := L      2.3,')
+            W('           Reset                    := L      2.4,')
+            W('           ParErrFwd                := L      2.7,')
+            W('           ParErrBwd                := L      3.0,')
+            W(f'           Visu                     := "{vis}".V_DW_CLAMP_{visu_n},')
+            W(f'           Visu_MoP                 := "{vis}".V_MoP_W_CLAMP_{visu_n},')
+            W(f'           Fwd                      := "{sig_v}{isl:02d}V{vv:02d}YVA",')
+            W(f'           Bwd                      := "{sig_v}{isl:02d}V{vv:02d}YVB",')
+            W(f'           O_I_Fwd                  := "{db}".O_I._{oi_idx:02d},')
+            W(f'           O_I_Bwd                  := "{db}".O_I._{oi_idx+1:02d},')
+            W(f'           A_I_Fwd                  := "{db}".A_I._{oi_idx:02d},')
+            W(f'           A_I_Bwd                  := "{db}".A_I._{oi_idx+1:02d},')
+            W(f'           FLT                      := "{db}".TIO_D._{tio_flt:02d},')
+            W(f'           F_LockFwd                := "{db}".TIO_D._{tio_lockfwd:02d},')
+            W(f'           F_LockBwd                := "{db}".TIO_D._{tio_lockbwd:02d},')
+            W(f'           F_LPosFwdL               := "{db}".TIO_D._{tio_lposfwd:02d},')
+            W(f'           F_LPosBwdL               := "{db}".TIO_D._{tio_lposbwd:02d},')
+            W(f'           F_AcLPFwdL               := "{db}".TIO_D._{tio_aclpfwd:02d},')
+            if has_aux:
+                W(f'           F_AcLPBwdL               := "{db}".TIO_D._{tio_aclpbwd:02d},')
+                W(f'           Interface                := #Interface{isl:02d}V{vv:02d});')
+            else:
+                W(f'           F_AcLPBwdL               := "{db}".TIO_D._{tio_aclpbwd:02d});')
+            W('      NOP   0; ')
+
+            # ── MANAGEMENT CYL2_5 ──
+            if has_aux:
+                extra = units[1:5]   # up to 4 extra units (B-E)
+                n_extra = len(extra)
+                W('NETWORK')
+                W(f'TITLE =MANAGEMENT {isl:02d}V{vv:02d} CYLINDER FROM 2 TO 5')
+                W()
+                for eu_i, unit in enumerate(extra):
+                    lb0 = eu_i * 2
+                    lb1 = eu_i * 2 + 1
+                    W(f'      A     "{sig_u}{unit}SQA"; ')
+                    W(f'      =     L      1.{lb0}; ')
+                    W('      BLD   103; ')
+                    W(f'      A     "{sig_u}{unit}SQB"; ')
+                    W(f'      =     L      1.{lb1}; ')
+                    W('      BLD   103; ')
+                W(f'      A     "{db}".Reset_anom1; ')
+                W('      =     L      2.0; ')
+                W('      BLD   103; ')
+                W(f'      CALL #{vname}_CYL2_5 (')
+                W(f'           Num                      := {n_extra},')
+                for eu_i, unit in enumerate(extra):
+                    letter = LETTERS[eu_i]
+                    lb0 = eu_i * 2
+                    lb1 = eu_i * 2 + 1
+                    W(f'           LPosFwd_{letter}                := L      1.{lb0},')
+                    W(f'           LPosBwd_{letter}                := L      1.{lb1},')
+                W('           Reset                    := L      2.0,')
+                W(f'           Visu                     := "{vis}".V_DW_CLAMP_{visu_n}ext_{visu_n}A,')
+                tio_eu_base = tio_flt + 8   # after CYL1 (7 slots) + RESERVE (1)
+                for eu_i in range(n_extra):
+                    letter  = LETTERS[eu_i]
+                    tio_eu  = tio_eu_base + eu_i * 5
+                    W(f'           F_LPosFwdL{letter}              := "{db}".TIO_D._{tio_eu:02d},')
+                    W(f'           F_LPosBwdL{letter}              := "{db}".TIO_D._{tio_eu+1:02d},')
+                    W(f'           F_AcLPFwdL{letter}              := "{db}".TIO_D._{tio_eu+2:02d},')
+                    W(f'           F_AcLPBwdL{letter}              := "{db}".TIO_D._{tio_eu+3:02d},')
+                W(f'           Interface                := #Interface{isl:02d}V{vv:02d});')
+                W('      NOP   0; ')
+
+            global_v += 1
+            oi_idx   += 2
+
+    W('END_FUNCTION_BLOCK')
+    W()
+
+    return '\n'.join(out)
+
+
+# ============================================================================
 # PROJECT DATA MODEL
 # ============================================================================
 
@@ -783,11 +1115,27 @@ class AWLGeneratorApp:
             canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
         canvas.bind_all("<MouseWheel>", _on_mousewheel, add="+")
 
+        self._build_logo(scroll_frame)
         self._build_station_config(scroll_frame)
         self._build_robot_config(scroll_frame)
         self._build_valve_config(scroll_frame)
         self._build_additional_config(scroll_frame)
         self._build_action_buttons(scroll_frame)
+
+    def _build_logo(self, parent):
+        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")
+        try:
+            self._logo_img = tk.PhotoImage(file=logo_path)
+            w = self._logo_img.width()
+            h = self._logo_img.height()
+            # Scale down to max width 340px if needed
+            if w > 340:
+                factor = max(1, round(w / 340))
+                self._logo_img = self._logo_img.subsample(factor, factor)
+            lbl = tk.Label(parent, image=self._logo_img, bg="#f0f0f0")
+            lbl.pack(pady=(8, 2))
+        except Exception:
+            pass  # silently skip if logo.png not found
 
     def _build_station_config(self, parent):
         frame = ttk.LabelFrame(parent, text="Station Configuration", padding=8)
@@ -1322,6 +1670,8 @@ class AWLGeneratorApp:
                    command=self.generate_all_dbs).pack(fill=tk.X, pady=2)
         ttk.Button(frame, text="Create I/O",
                    command=self.create_io_popup).pack(fill=tk.X, pady=2)
+        ttk.Button(frame, text="Generate FB_OUTPUT",
+                   command=self.generate_fb_output_gui).pack(fill=tk.X, pady=2)
 
     # ---- CREATE I/O --------------------------------------------------------
 
@@ -1836,6 +2186,33 @@ class AWLGeneratorApp:
         idx = self.db_notebook.index("current")
         db_num = DB_FIRST + idx
         self._generate_db(db_num)
+
+    def generate_fb_output_gui(self):
+        """Generate the FB_OUTPUT AWL file for the current station."""
+        station = self._get_station_name()
+        if not re.match(r'^\d{3}(T|TT|LIFT|R)\d{2}$', station):
+            messagebox.showwarning("Invalid Station", "Please enter a valid station name first.")
+            return
+        islands_config = self._get_islands_config()
+        if not islands_config:
+            messagebox.showwarning("No Islands", "Please configure and enable at least one valve island.")
+            return
+        hmi_loc = self.hmi_loc_var.get()
+        out_path = filedialog.asksaveasfilename(
+            title="Save FB_OUTPUT AWL",
+            defaultextension=".AWL",
+            initialfile=f"ST-{station[:3]}_OUTPUT.AWL",
+            filetypes=[("AWL Files", "*.AWL"), ("All Files", "*.*")],
+        )
+        if not out_path:
+            return
+        try:
+            content = generate_fb_output(station, hmi_loc, islands_config)
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            messagebox.showinfo("Generated", f"FB_OUTPUT saved to:\n{out_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to generate FB_OUTPUT:\n{e}")
 
     def generate_all_dbs(self):
         """Generate AWL files for all 20 DBs."""
