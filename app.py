@@ -346,28 +346,6 @@ def auto_gen_ab(station, islands_config, robot_names, op_load=None, drop_robot=N
     """
     comments = make_reserve_dict(0, 95)
 
-    # Drop robot entries starting at _16, 10 slots per robot
-    if drop_robot and drop_robot.get("enabled"):
-        drop_names = drop_robot.get("robot_names", [])
-        drop_toolings = drop_robot.get("toolings", [])
-        drop_jobs = drop_robot.get("jobs", [])
-        for i, dname in enumerate(drop_names):
-            if not dname:
-                continue
-            base = 16 + i * 10
-            short = _short_name(dname)
-            tooling = drop_toolings[i] if i < len(drop_toolings) else "1"
-            job = drop_jobs[i] if i < len(drop_jobs) else "1"
-            load_n = i + 1
-            comments[base] = f"CHECK STATION AND MODEL BEFORE CONSENT TO {short}"
-            comments[base + 1] = f"CONSENT TO DROP PART {dname} (JOB{job})"
-            comments[base + 2] = f"CHECK PART PRESENTS ON (LOAD {load_n} {short})"
-            comments[base + 3] = f"WAITING TOOL REQUEST {tooling} FROM {short}"
-            comments[base + 4] = f"CONSENT TOOL RELEASE {tooling} {short}"
-            comments[base + 5] = f"WAITING END OF DROP {short} (JOB{job})"
-            comments[base + 6] = f"CONSENT TO EXIT {short} (ACK JOB{job})"
-            # _07, _08, _09 stay RESERVE (already set)
-
     # Operator loading entries
     if op_load and op_load.get("enabled"):
         try:
@@ -383,9 +361,9 @@ def auto_gen_ab(station, islands_config, robot_names, op_load=None, drop_robot=N
             comments[12] = "CHECK PART PRESENTS ON LOADING 2"
             comments[13] = "CONFIRM / RESET AREA LOADING 2"
 
-    # Robot-related entries starting at _24
+    # Station robot entries starting at _14
     n_robots = len(robot_names)
-    slot = 24
+    slot = 14
     for rname in robot_names:
         comments[slot] = f"START ROBOT {rname}"
         slot += 1
@@ -399,6 +377,28 @@ def auto_gen_ab(station, islands_config, robot_names, op_load=None, drop_robot=N
         slot += 1
         comments[slot] = f"CONSENT TO EXIT {all_names_dash} (ACK JOB1)"
         slot += 1
+
+    # Drop robot entries starting at _21, 10 slots per robot
+    if drop_robot and drop_robot.get("enabled"):
+        drop_names = drop_robot.get("robot_names", [])
+        drop_toolings = drop_robot.get("toolings", [])
+        drop_jobs = drop_robot.get("jobs", [])
+        for i, dname in enumerate(drop_names):
+            if not dname:
+                continue
+            base = 21 + i * 10
+            short = _short_name(dname)
+            tooling = drop_toolings[i] if i < len(drop_toolings) else "1"
+            job = drop_jobs[i] if i < len(drop_jobs) else "1"
+            load_n = i + 1
+            comments[base] = f"CHECK STATION AND MODEL BEFORE CONSENT TO {short}"
+            comments[base + 1] = f"CONSENT TO DROP PART {dname} (JOB{job})"
+            comments[base + 2] = f"CHECK PART PRESENTS ON (LOAD {load_n} {short})"
+            comments[base + 3] = f"WAITING TOOL REQUEST {tooling} FROM {short}"
+            comments[base + 4] = f"CONSENT TOOL RELEASE {tooling} {short}"
+            comments[base + 5] = f"WAITING END OF DROP {short} (JOB{job})"
+            comments[base + 6] = f"CONSENT TO EXIT {short} (ACK JOB{job})"
+            # +7, +8, +9 stay RESERVE (already set)
 
     # Valve forward commands
     base_fwd = [51, 61]
@@ -595,6 +595,7 @@ def auto_gen_mem_cycle(station, robot_names, drop_robot=None, pick_robot=None):
     # Drop robot entries starting at _32
     if drop_robot and drop_robot.get("enabled"):
         drop_names = drop_robot.get("robot_names", [])
+        drop_jobs = drop_robot.get("jobs", [])
         for i, dname in enumerate(drop_names):
             if not dname:
                 continue
@@ -1303,10 +1304,7 @@ class AWLGeneratorApp:
         if idx >= len(name_vars) or idx >= len(valid_labels):
             return
         name = name_vars[idx].get().strip()
-        station_prefix = self.project.get("part1", "")
         valid = bool(re.match(r'^\d{3}R\d{2}$', name))
-        if valid and station_prefix and name[:3] != station_prefix:
-            valid = False
         if valid:
             valid_labels[idx].configure(text="OK", foreground="green")
         else:
