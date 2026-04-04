@@ -675,7 +675,7 @@ def generate_fb_output(station, hmi_loc_str, islands_config):
     db       = f"G-DB_{station}"
     vis      = f"VIS_{station}"
     sig_v    = f"_{station}_"              # valve output prefix  _040T01_
-    sig_u    = f"_{st_2dig}{st_suffix}_"   # unit signal prefix   _40T01_
+    sig_u    = f"_{st3}{st_suffix}_"        # unit signal prefix   _040T01_
 
     out = []
     def W(s=""):
@@ -2187,8 +2187,44 @@ class AWLGeneratorApp:
         db_num = DB_FIRST + idx
         self._generate_db(db_num)
 
+    def _generate_symbol_list_content(self, station):
+        """Build ASC symbol list content from all enabled island I/O entries."""
+        # FB/instance-DB number: T01→319, T02→329, T03→339  formula: 309 + last2digits * 10
+        try:
+            station_idx = int(station[-2:])
+        except ValueError:
+            station_idx = 1
+        fb_num   = 309 + station_idx * 10
+        fb_name  = f"ST-{station[:3]}_OUTPUT"
+        idb_name = f"I-DB-ST{station[:3]}_OUTPUT"
+
+        lines = [
+            f"126,{fb_name:<24} FB    {fb_num}   FB    {fb_num}",
+            f"126,{idb_name:<24} DB    {fb_num}   DB    {fb_num}",
+        ]
+
+        # Global DB entries — one per filled DB page (DB11=global 11, DB13=global 13, ...)
+        gdb_name = f"G-DB_{station}"
+        for db_num in DB_RANGE:
+            db_data = self.project["db_pages"].get(str(db_num), {})
+            sections = db_data.get("sections", {})
+            has_data = any(v for v in sections.values() if isinstance(v, dict) and v)
+            if has_data:
+                lines.append(f"126,{gdb_name:<24} DB    {db_num}   DB    {db_num}")
+
+        for isl_idx in range(MAX_ISLANDS):
+            outputs, inputs = self._build_io_table(isl_idx, station)
+            for entry in outputs + inputs:
+                addr = entry["address"]   # e.g. "Q4000.0" or "I4000.0"
+                type_char = addr[0]       # "Q" or "I"
+                addr_num = addr[1:]       # "4000.0"
+                sym = entry["symbol"]
+                comment = entry["comment"]
+                lines.append(f"126,{sym:<24} {type_char}    {addr_num} BOOL      {comment}")
+        return "\n".join(lines) + "\n" if lines else ""
+
     def generate_fb_output_gui(self):
-        """Generate the FB_OUTPUT AWL file for the current station."""
+        """Generate the FB_OUTPUT AWL file and symbol list for the current station."""
         station = self._get_station_name()
         if not re.match(r'^\d{3}(T|TT|LIFT|R)\d{2}$', station):
             messagebox.showwarning("Invalid Station", "Please enter a valid station name first.")
@@ -2210,7 +2246,16 @@ class AWLGeneratorApp:
             content = generate_fb_output(station, hmi_loc, islands_config)
             with open(out_path, "w", encoding="utf-8") as f:
                 f.write(content)
-            messagebox.showinfo("Generated", f"FB_OUTPUT saved to:\n{out_path}")
+
+            # Auto-save symbol list alongside the AWL file
+            sym_content = self._generate_symbol_list_content(station)
+            sym_path = os.path.join(os.path.dirname(out_path), f"{station}_SYMBOL_LIST.ASC")
+            with open(sym_path, "w", encoding="utf-8") as f:
+                f.write(sym_content)
+
+            messagebox.showinfo("Generated",
+                                f"FB_OUTPUT saved to:\n{out_path}\n\n"
+                                f"Symbol list saved to:\n{sym_path}")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to generate FB_OUTPUT:\n{e}")
 

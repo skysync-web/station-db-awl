@@ -1,0 +1,1471 @@
+FUNCTION_BLOCK "ST-040_OUTPUT"
+TITLE =
+VERSION : 0.1
+
+
+VAR
+  ST040_T01_01V01_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_01V01_CYL2_5 : "Valve_Cylinder_2_5";	
+  Interface01V01 : DWORD ;	
+  ST040_T01_01V02_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_01V02_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_01V03_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_01V03_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_01V04_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_01V04_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_01V05_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_01V05_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_01V06_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_01V06_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_02V01_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_02V01_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_02V02_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_02V02_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_02V03_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_02V03_CYL2_5 : "Valve_Cylinder_2_5";	
+  ST040_T01_02V04_CYL1 : "Valve_Cylinder_1";	
+  ST040_T01_02V04_CYL2_5 : "Valve_Cylinder_2_5";	
+  Interface01V02 : DWORD ;	
+  Interface01V03 : DWORD ;	
+  Interface01V04 : DWORD ;	
+  Interface01V05 : DWORD ;	
+  Interface01V06 : DWORD ;	
+  Interface02V01 : DWORD ;	
+  Interface02V02 : DWORD ;	
+  Interface02V03 : DWORD ;	
+  Interface02V04 : DWORD ;	
+  General_Interlock : BOOL ;	
+  _35R1_Tooling_Interlock : BOOL ;	
+  _45R1_Tooling_Interlock : BOOL ;	
+  DelayCheckPilotValve1 : "TON";	
+  DelayCheckPilotValve2 : "TON";	
+  _40R3_Inside_Interlock : BOOL ;	
+END_VAR
+VAR_TEMP
+  tAlarmPilotValve : BOOL ;	
+END_VAR
+BEGIN
+NETWORK
+TITLE =-------------- Pilot Valve ---------------------------
+
+NETWORK
+TITLE =Command Pilot Valves
+
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      1.0; 
+      A     L      1.0; 
+      AN    "G-DB_ST040".Aux_Cycle._12; 
+      =     "_040T01_01V00YVA"; 
+      A     L      1.0; 
+      AN    "G-DB_ST040".Aux_Cycle._13; 
+      =     "_040T01_02V00YVA"; 
+NETWORK
+TITLE =Pilot Valve Error Check Delay Time 040T01-01V00
+
+      A     "_040T01_01V00YVA"; 
+      A     "_040T01_PILOT-BLK-1"; 
+      =     L      1.0; 
+      BLD   103; 
+      CALL #DelayCheckPilotValve1 (
+           IN                       := L      1.0,
+           PT                       := T#5S,
+           Q                        := #tAlarmPilotValve);
+
+      NOP   0; 
+NETWORK
+TITLE =Aux 040T01 Pilot Valve Error 01V00 (BM01)
+
+      A     #tAlarmPilotValve; 
+      S     "G-DB_ST040".Aux_Cycle._12; 
+      A(    ; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      NOT   ; 
+      O     "G-DB_ST040".Reset_anom1; 
+      )     ; 
+      R     "G-DB_ST040".Aux_Cycle._12; 
+      NOP   0; 
+NETWORK
+TITLE =Pilot Valve Error Check Delay Time 040T01-02V00
+
+      A     "_040T01_02V00YVA"; 
+      A     "_040T01_PILOT-BLK-2"; 
+      =     L      1.0; 
+      BLD   103; 
+      CALL #DelayCheckPilotValve2 (
+           IN                       := L      1.0,
+           PT                       := T#5S,
+           Q                        := #tAlarmPilotValve);
+
+      NOP   0; 
+NETWORK
+TITLE =Aux 040T01 Pilot Valve Error 02V00 (BM01)
+
+      A     #tAlarmPilotValve; 
+      S     "G-DB_ST040".Aux_Cycle._13; 
+      A(    ; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      NOT   ; 
+      O     "G-DB_ST040".Reset_anom1; 
+      )     ; 
+      R     "G-DB_ST040".Aux_Cycle._13; 
+      NOP   0; 
+NETWORK
+TITLE =------------ Interlock ----------------------
+
+NETWORK
+TITLE =General Interlock
+
+      A(    ; 
+      O     "G-DB_ST040".Aux_Cycle._53; 
+      O     "TEST_DRY_SHUNT"; 
+      )     ; 
+      A(    ; 
+      O     "G-DB_ST040".Aux_Cycle._54; 
+      O     ; 
+      AN    "G-DB_ST040".Aux_Cycle._54; 
+      A     "_040T01_410SQ05"; 
+      A     "_040T01_440SQ06"; 
+      )     ; 
+      A     "G-DB_ST040".Aux_Cycle._55; 
+      A     "G-DB_ST040".Aux_Cycle._46; 
+      A     "G-DB_ST040".Aux_Cycle._47; 
+      =     #General_Interlock; 
+NETWORK
+TITLE =35R01 Tooling Interlock 
+
+      AN    "G-DB_ST040".Aux_Cycle._53; 
+      A     "G-DB_ST040".Aux_Cycle._58; 
+      A(    ; 
+      O     "G-DB_ST040".Aux_Cycle._54; 
+      O     ; 
+      AN    "G-DB_ST040".Aux_Cycle._54; 
+      A     "_040T01_410SQ05"; 
+      A     "_040T01_440SQ06"; 
+      )     ; 
+      A     "G-DB_ST040".Aux_Cycle._55; 
+      A     "G-DB_ST040".Aux_Cycle._46; 
+      A     "G-DB_ST040".Aux_Cycle._47; 
+      =     #_35R1_Tooling_Interlock; 
+NETWORK
+TITLE =45R01 Tooling Interlock 
+
+      AN    "G-DB_ST040".Aux_Cycle._55; 
+      A     "G-DB_ST040".Aux_Cycle._60; 
+      A     "G-DB_ST040".Aux_Cycle._53; 
+      A(    ; 
+      O     "G-DB_ST040".Aux_Cycle._54; 
+      O     ; 
+      AN    "G-DB_ST040".Aux_Cycle._54; 
+      A     "_040T01_410SQ05"; 
+      A     "_040T01_440SQ06"; 
+      )     ; 
+      A     "G-DB_ST040".Aux_Cycle._46; 
+      A     "G-DB_ST040".Aux_Cycle._47; 
+      =     #_45R1_Tooling_Interlock; 
+NETWORK
+TITLE =----------- VALVES -----------
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 01V01
+
+      O     #General_Interlock; 
+      O     #_35R1_Tooling_Interlock; 
+      O     #_45R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._17; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  01V01
+
+      O     #General_Interlock; 
+      O     #_35R1_Tooling_Interlock; 
+      O     #_45R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._18; 
+NETWORK
+TITLE =MANAGEMENT 01V01 CYLINDER 1
+
+      A     "G-DB_ST040".AB._51; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._71; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._17; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._18; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F01; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F01; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_050C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_050C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[0]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[1]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V01_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_1,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_1,
+           Fwd                      := "_040T01_01V01YVA",
+           Bwd                      := "_040T01_01V01YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._00,
+           O_I_Bwd                  := "G-DB_ST040".O_I._01,
+           A_I_Fwd                  := "G-DB_ST040".A_I._00,
+           A_I_Bwd                  := "G-DB_ST040".A_I._01,
+           FLT                      := "G-DB_ST040".TIO_D._32,
+           F_LockFwd                := "G-DB_ST040".TIO_D._33,
+           F_LockBwd                := "G-DB_ST040".TIO_D._34,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._35,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._36,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._37,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._38,
+           Interface                := #Interface01V01);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 01V01 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_060C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_060C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V01_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_1ext_1A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._40,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._41,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._42,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._43,
+           Interface                := #Interface01V01);
+      NOP   0; 
+NETWORK
+TITLE =*****01V02******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 01V02
+
+      O     #General_Interlock; 
+      O     #_35R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._19; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  01V02
+
+      O     #General_Interlock; 
+      O     #_35R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._20; 
+NETWORK
+TITLE =MANAGEMENT 01V02 CYLINDER 1
+
+      A     "G-DB_ST040".AB._52; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._72; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._20; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._19; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F03; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F03; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_110C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_110C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[2]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[3]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V02_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_2,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_2,
+           Fwd                      := "_040T01_01V02YVA",
+           Bwd                      := "_040T01_01V02YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._02,
+           O_I_Bwd                  := "G-DB_ST040".O_I._03,
+           A_I_Fwd                  := "G-DB_ST040".A_I._02,
+           A_I_Bwd                  := "G-DB_ST040".A_I._03,
+           FLT                      := "G-DB_ST040".TIO_D._45,
+           F_LockFwd                := "G-DB_ST040".TIO_D._46,
+           F_LockBwd                := "G-DB_ST040".TIO_D._47,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._48,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._49,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._50,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._51,
+           Interface                := #Interface01V02);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 01V02 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_120C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_120C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V02_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_2ext_2A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._53,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._54,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._55,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._56,
+           Interface                := #Interface01V02);
+      NOP   0; 
+NETWORK
+TITLE =*****01V03******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 01V03
+
+      O     #General_Interlock; 
+      O     #_45R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._21; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  01V03
+
+      O     #General_Interlock; 
+      O     #_45R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._22; 
+NETWORK
+TITLE =MANAGEMENT 01V03 CYLINDER 1
+
+      A     "G-DB_ST040".AB._53; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._73; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._21; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._22; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F05; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F05; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_030C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_030C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[4]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[5]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V03_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_3,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_3,
+           Fwd                      := "_040T01_01V03YVA",
+           Bwd                      := "_040T01_01V03YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._04,
+           O_I_Bwd                  := "G-DB_ST040".O_I._05,
+           A_I_Fwd                  := "G-DB_ST040".A_I._04,
+           A_I_Bwd                  := "G-DB_ST040".A_I._05,
+           FLT                      := "G-DB_ST040".TIO_D._53,
+           F_LockFwd                := "G-DB_ST040".TIO_D._59,
+           F_LockBwd                := "G-DB_ST040".TIO_D._60,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._61,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._62,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._63,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._64,
+           Interface                := #Interface01V03);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 01V03 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_300C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_300C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V03_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_3ext_3A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._66,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._67,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._68,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._69,
+           Interface                := #Interface01V03);
+      NOP   0; 
+NETWORK
+TITLE =*****01V04******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 01V04
+
+      A     #General_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._23; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  01V04
+
+      A     #General_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._24; 
+NETWORK
+TITLE =MANAGEMENT 01V04 CYLINDER 1
+
+      A     "G-DB_ST040".AB._54; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._74; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._23; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._24; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F07; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F07; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_130C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_130C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[6]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[7]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V04_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_4,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_4,
+           Fwd                      := "_040T01_01V04YVA",
+           Bwd                      := "_040T01_01V04YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._06,
+           O_I_Bwd                  := "G-DB_ST040".O_I._07,
+           A_I_Fwd                  := "G-DB_ST040".A_I._06,
+           A_I_Bwd                  := "G-DB_ST040".A_I._07,
+           FLT                      := "G-DB_ST040".TIO_D._71,
+           F_LockFwd                := "G-DB_ST040".TIO_D._72,
+           F_LockBwd                := "G-DB_ST040".TIO_D._73,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._74,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._75,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._76,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._77,
+           Interface                := #Interface01V04);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 01V04 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_140C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_140C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V04_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_4ext_4A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._66,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._67,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._68,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._69,
+           Interface                := #Interface01V04);
+      NOP   0; 
+NETWORK
+TITLE =*****01V05******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 01V05
+
+      O     #General_Interlock; 
+      O     #_35R1_Tooling_Interlock; 
+      O     #_45R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._25; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  01V05
+
+      O     #General_Interlock; 
+      O     #_35R1_Tooling_Interlock; 
+      O     #_45R1_Tooling_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._26; 
+NETWORK
+TITLE =MANAGEMENT 01V05 CYLINDER 1
+
+      A     "G-DB_ST040".AB._55; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._75; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._25; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._26; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F09; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F09; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_070C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_070C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[8]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[9]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V05_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_5,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_5,
+           Fwd                      := "_040T01_01V05YVA",
+           Bwd                      := "_040T01_01V05YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._08,
+           O_I_Bwd                  := "G-DB_ST040".O_I._09,
+           A_I_Fwd                  := "G-DB_ST040".A_I._08,
+           A_I_Bwd                  := "G-DB_ST040".A_I._09,
+           FLT                      := "G-DB_ST040".TIO_D._84,
+           F_LockFwd                := "G-DB_ST040".TIO_D._85,
+           F_LockBwd                := "G-DB_ST040".TIO_D._86,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._87,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._88,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._89,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._90,
+           Interface                := #Interface01V05);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 01V05 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_080C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_080C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V05_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_5ext_5A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._92,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._93,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._94,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._95,
+           Interface                := #Interface01V05);
+      NOP   0; 
+NETWORK
+TITLE =*****01V06******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 01V06
+
+      A     #General_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._27; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  01V06
+
+      A     #General_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._28; 
+NETWORK
+TITLE =MANAGEMENT 01V06 CYLINDER 1
+
+      A     "G-DB_ST040".AB._56; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._76; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._27; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._28; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F11; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_01; 
+      A     "G-DB_LINE".MP01.KEY.F11; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_390C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_390C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[10]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[11]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V06_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_6,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_6,
+           Fwd                      := "_040T01_01V06YVA",
+           Bwd                      := "_040T01_01V06YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._10,
+           O_I_Bwd                  := "G-DB_ST040".O_I._11,
+           A_I_Fwd                  := "G-DB_ST040".A_I._10,
+           A_I_Bwd                  := "G-DB_ST040".A_I._11,
+           FLT                      := "G-DB_ST040".TIO_D._97,
+           F_LockFwd                := "G-DB_ST040".TIO_D._98,
+           F_LockBwd                := "G-DB_ST040".TIO_D._99,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._100,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._101,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._102,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._103,
+           Interface                := #Interface01V06);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 01V06 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_400C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_400C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "_40T01_410C01SQA"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "_40T01_410C01SQB"; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "_40T01_440C01SQA"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "_40T01_440C01SQB"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_01V06_CYL2_5 (
+           Num                      := 3,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           LPosFwd_C                := L      1.2,
+           LPosBwd_C                := L      1.3,
+           LPosFwd_D                := L      1.4,
+           LPosBwd_D                := L      1.5,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_6ext_6A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._105,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._106,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._107,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._108,
+           F_LPosFwdLC              := "G-DB_ST040".TIO_D._110,
+           F_LPosBwdLC              := "G-DB_ST040".TIO_D._111,
+           F_AcLPFwdLC              := "G-DB_ST040".TIO_D._112,
+           F_LPosFwdLD              := "G-DB_ST040".TIO_D._115,
+           F_LPosBwdLD              := "G-DB_ST040".TIO_D._116,
+           F_AcLPFwdLD              := "G-DB_ST040".TIO_D._117,
+           F_AcLPBwdLD              := "G-DB_ST040".TIO_D._118,
+           Interface                := #Interface01V06);
+      NOP   0; 
+NETWORK
+TITLE =*****02V01******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 02V01
+
+      A     #General_Interlock; 
+      A     "G-DB_ST040".O_I._14; 
+      =     "G-DB_ST040".Aux_Cycle._29; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  02V01
+
+      A     #General_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._30; 
+NETWORK
+TITLE =MANAGEMENT 02V01 CYLINDER 1
+
+      A     "G-DB_ST040".AB._61; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._81; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._29; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._30; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F01; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F01; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_370C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_370C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[12]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[13]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V01_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_7,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_7,
+           Fwd                      := "_040T01_02V01YVA",
+           Bwd                      := "_040T01_02V01YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._12,
+           O_I_Bwd                  := "G-DB_ST040".O_I._13,
+           A_I_Fwd                  := "G-DB_ST040".A_I._12,
+           A_I_Bwd                  := "G-DB_ST040".A_I._13,
+           FLT                      := "G-DB_ST040".TIO_D._130,
+           F_LockFwd                := "G-DB_ST040".TIO_D._131,
+           F_LockBwd                := "G-DB_ST040".TIO_D._132,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._133,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._134,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._135,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._136,
+           Interface                := #Interface02V01);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 02V01 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_380C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_380C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V01_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_7ext_7A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._138,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._139,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._140,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._141,
+           Interface                := #Interface02V01);
+      NOP   0; 
+NETWORK
+TITLE =*****02V02******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 02V02
+
+      A     #General_Interlock; 
+      A     "G-DB_ST040".O_I._13; 
+      =     "G-DB_ST040".Aux_Cycle._31; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  02V02
+
+      A     #General_Interlock; 
+      A     "G-DB_ST040".O_I._13; 
+      =     "G-DB_ST040".Aux_Cycle._32; 
+NETWORK
+TITLE =MANAGEMENT 02V02 CYLINDER 1
+
+      A     "G-DB_ST040".AB._62; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._82; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._31; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._32; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F03; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F03; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_330C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_330C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[14]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[15]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V02_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_8,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_8,
+           Fwd                      := "_040T01_02V02YVA",
+           Bwd                      := "_040T01_02V02YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._14,
+           O_I_Bwd                  := "G-DB_ST040".O_I._15,
+           A_I_Fwd                  := "G-DB_ST040".A_I._14,
+           A_I_Bwd                  := "G-DB_ST040".A_I._15,
+           FLT                      := "G-DB_ST040".TIO_D._143,
+           F_LockFwd                := "G-DB_ST040".TIO_D._144,
+           F_LockBwd                := "G-DB_ST040".TIO_D._145,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._146,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._147,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._148,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._149,
+           Interface                := #Interface02V02);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 02V02 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_340C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_340C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V02_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_8ext_8A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._151,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._152,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._153,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._154,
+           Interface                := #Interface02V02);
+      NOP   0; 
+NETWORK
+TITLE =*****02V03******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 02V03
+
+      A     #General_Interlock; 
+      A     "G-DB_ST040".O_I._19; 
+      =     "G-DB_ST040".Aux_Cycle._33; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  02V03
+
+      A     #General_Interlock; 
+      A     "G-DB_ST040".O_I._19; 
+      =     "G-DB_ST040".Aux_Cycle._34; 
+NETWORK
+TITLE =MANAGEMENT 02V03 CYLINDER 1
+
+      A     "G-DB_ST040".AB._63; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._83; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._33; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._34; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F05; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F05; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_310C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_310C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[16]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[17]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V03_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_9,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_9,
+           Fwd                      := "_040T01_02V03YVA",
+           Bwd                      := "_040T01_02V03YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._16,
+           O_I_Bwd                  := "G-DB_ST040".O_I._17,
+           A_I_Fwd                  := "G-DB_ST040".A_I._16,
+           A_I_Bwd                  := "G-DB_ST040".A_I._17,
+           FLT                      := "G-DB_ST040".TIO_D._156,
+           F_LockFwd                := "G-DB_ST040".TIO_D._157,
+           F_LockBwd                := "G-DB_ST040".TIO_D._158,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._159,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._160,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._161,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._149,
+           Interface                := #Interface02V03);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 02V03 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_320C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_320C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V03_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_9ext_9A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._164,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._165,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._166,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._167,
+           Interface                := #Interface02V03);
+      NOP   0; 
+NETWORK
+TITLE =*****02V04******
+
+NETWORK
+TITLE =Aux Interlock Fwd Clamp 02V04
+
+      A     #General_Interlock; 
+      A     "G-DB_ST040".O_I._16; 
+      =     "G-DB_ST040".Aux_Cycle._35; 
+NETWORK
+TITLE =Aux Interlock Bwd Clamp  02V04
+
+      A     #General_Interlock; 
+      =     "G-DB_ST040".Aux_Cycle._35; 
+NETWORK
+TITLE =MANAGEMENT 02V04 CYLINDER 1
+
+      A     "G-DB_ST040".AB._64; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "G-DB_ST040".AB._84; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._33; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "G-DB_ST040".Aux_Cycle._34; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F07; 
+      A     "_2HI01_SB4:4"; 
+      =     L      1.4; 
+      BLD   103; 
+      A     "G-DB_ST040".PICS.Pag_cmd_man_02; 
+      A     "G-DB_LINE".MP01.KEY.F07; 
+      A     "_2HI01_SB5:4"; 
+      =     L      1.5; 
+      BLD   103; 
+      A     "_40T01_350C01SQA"; 
+      =     L      1.6; 
+      BLD   103; 
+      A     "_40T01_350C01SQB"; 
+      =     L      1.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Cycle.Manual; 
+      =     L      2.0; 
+      BLD   103; 
+      A(    ; 
+      O     "G-DB_ST040".F_Prim.C_AutoL_in_run; 
+      O     "G-DB_ST040".F_Prim.C_H_R_in_run; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A     "G-DB_ST040".F_Prim.C_Start_up; 
+      =     L      2.2; 
+      BLD   103; 
+      A     "_2HC01_KAS0134.00A:A1"; 
+      =     L      2.3; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.4; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[18]; 
+      =     L      2.7; 
+      BLD   103; 
+      A     "G-DB_ST040".Ma_EP[19]; 
+      =     L      3.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V04_CYL1 (
+           AB_Fwd                   := L      1.0,
+           AB_Bwd                   := L      1.1,
+           LockFwd                  := L      1.2,
+           LockBwd                  := L      1.3,
+           PbFwd                    := L      1.4,
+           PbBwd                    := L      1.5,
+           LPosFwd                  := L      1.6,
+           LPosBwd                  := L      1.7,
+           EnMan                    := L      2.0,
+           EnLAuto                  := L      2.1,
+           EnAuto                   := L      2.2,
+           Kas                      := L      2.3,
+           Reset                    := L      2.4,
+           ParErrFwd                := L      2.7,
+           ParErrBwd                := L      3.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_10,
+           Visu_MoP                 := "Vis_ST040".V_MoP_W_CLAMP_10,
+           Fwd                      := "_040T01_02V04YVA",
+           Bwd                      := "_040T01_02V04YVB",
+           O_I_Fwd                  := "G-DB_ST040".O_I._18,
+           O_I_Bwd                  := "G-DB_ST040".O_I._19,
+           A_I_Fwd                  := "G-DB_ST040".A_I._18,
+           A_I_Bwd                  := "G-DB_ST040".A_I._19,
+           FLT                      := "G-DB_ST040".TIO_D._169,
+           F_LockFwd                := "G-DB_ST040".TIO_D._170,
+           F_LockBwd                := "G-DB_ST040".TIO_D._171,
+           F_LPosFwdL               := "G-DB_ST040".TIO_D._172,
+           F_LPosBwdL               := "G-DB_ST040".TIO_D._173,
+           F_AcLPFwdL               := "G-DB_ST040".TIO_D._174,
+           F_AcLPBwdL               := "G-DB_ST040".TIO_D._175,
+           Interface                := #Interface02V04);
+      NOP   0; 
+NETWORK
+TITLE =MANAGEMENT 02V04 CYLINDER FROM 2 TO 5
+
+      A     "_40T01_360C01SQA"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "_40T01_360C01SQB"; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "G-DB_ST040".Reset_anom1; 
+      =     L      2.0; 
+      BLD   103; 
+      CALL #ST040_T01_02V04_CYL2_5 (
+           Num                      := 1,
+           LPosFwd_B                := L      1.0,
+           LPosBwd_B                := L      1.1,
+           Reset                    := L      2.0,
+           Visu                     := "Vis_ST040".V_DW_CLAMP_10ext_10A,
+           F_LPosFwdLB              := "G-DB_ST040".TIO_D._177,
+           F_LPosBwdLB              := "G-DB_ST040".TIO_D._178,
+           F_AcLPFwdLB              := "G-DB_ST040".TIO_D._179,
+           F_AcLPBwdLB              := "G-DB_ST040".TIO_D._180,
+           Interface                := #Interface02V03);
+      NOP   0; 
+NETWORK
+TITLE =Fault Group Message Output
+
+      AN    "G-DB_ST040".TIO_D._32; 
+      AN    "G-DB_ST040".TIO_D._45; 
+      AN    "G-DB_ST040".TIO_D._58; 
+      AN    "G-DB_ST040".TIO_D._71; 
+      AN    "G-DB_ST040".TIO_D._84; 
+      AN    "G-DB_ST040".TIO_D._97; 
+      AN    "G-DB_ST040".TIO_D._130; 
+      AN    "G-DB_ST040".TIO_D._143; 
+      AN    "G-DB_ST040".TIO_D._156; 
+      AN    "G-DB_ST040".TIO_D._169; 
+      =     "G-DB_ST040".Aux_Cycle._95; 
+END_FUNCTION_BLOCK
+
