@@ -32,7 +32,12 @@
       "Bash(ls /c/Python*)",
       "Bash(/c/Users/mini/AppData/Local/Python/bin/python.exe -c \"import ast; ast.parse\\(open\\(''/c/Users/mini/Desktop/Claude Workspace/Station DB AWL Generation/Source/app.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
       "Bash(/c/Users/mini/AppData/Local/Python/bin/python.exe -c \"import ast; ast.parse\\(open\\(''C:/Users/mini/Desktop/Claude Workspace/Station DB AWL Generation/Source/app.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
-      "Bash(ls \"C:\\\\Users\\\\mini\\\\.claude\\\\projects\"\" 2>/dev/null || echo \"NOT FOUND \")"
+      "Bash(ls \"C:\\\\Users\\\\mini\\\\.claude\\\\projects\"\" 2>/dev/null || echo \"NOT FOUND \")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\(''app.py'', doraise=True\\)\")",
+      "Bash(timeout 5 python app.py)",
+      "Bash(ls \"/c/Users/HP/Desktop/Claude Workspace/Station DB AWL Generation/Source/\"*.xlsx)",
+      "Bash(ls \"/c/Users/HP/Desktop/Claude Workspace/Station DB AWL Generation/Source/\"Robot*.xlsx)",
+      "Bash(ls \"/c/Users/HP/Desktop/Claude Workspace/Station DB AWL Generation/Source/\"robot*.xlsx)"
     ]
   }
 }
