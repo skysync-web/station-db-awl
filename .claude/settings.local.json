@@ -37,7 +37,10 @@
       "Bash(timeout 5 python app.py)",
       "Bash(ls \"/c/Users/HP/Desktop/Claude Workspace/Station DB AWL Generation/Source/\"*.xlsx)",
       "Bash(ls \"/c/Users/HP/Desktop/Claude Workspace/Station DB AWL Generation/Source/\"Robot*.xlsx)",
-      "Bash(ls \"/c/Users/HP/Desktop/Claude Workspace/Station DB AWL Generation/Source/\"robot*.xlsx)"
+      "Bash(ls \"/c/Users/HP/Desktop/Claude Workspace/Station DB AWL Generation/Source/\"robot*.xlsx)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''app.py''\\).read\\(\\)\\); print\\(''syntax OK''\\)\")",
+      "Bash(dir \"C:\\\\Users\\\\mini\\\\Desktop\\\\Claude Workspace\\\\Station DB AWL Generation\\\\Source\" /b)",
+      "Bash(python -m PyInstaller --onefile --windowed --add-data \"db11.AWL;.\" --add-data \"logo.png;.\" --add-data \"VISU.AWL;.\" --name \"StationDBGenerator\" app.py)"
     ]
   }
 }
