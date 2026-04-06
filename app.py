@@ -539,6 +539,12 @@ def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None, drop_
         if load_count >= 2:
             comments[13] = "Aux.2nd Operator Part Load OK"
 
+    # Pilot valve alarm slots at _12 + isl_idx (set/reset by FB_OUTPUT)
+    for isl_idx, _ in enumerate(islands_config):
+        slot = 12 + isl_idx
+        if comments.get(slot) == "RESERVE":
+            comments[slot] = f"Aux. Pilot Valve Alarm {isl_idx+1:02d}V00 (BM{isl_idx+1:02d})"
+
     # Robot out of interference starting at _46
     for i, rname in enumerate(robot_names):
         comments[46 + i] = f"Aux. Robot {rname} out of interference from {station}"
@@ -615,6 +621,14 @@ def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None, drop_
     n_drops = 0
     if drop_robot and drop_robot.get("enabled"):
         n_drops = len([d for d in drop_robot.get("robot_names", []) if d])
+
+    # Pick robot out of interference at _53 + n_drops + i  (mirrors drop at _53 + i)
+    if pick_robot and pick_robot.get("enabled"):
+        for i, pname in enumerate(pick_robot.get("robot_names", [])):
+            if not pname:
+                continue
+            comments[53 + n_drops + i] = f"Aux. Robot {pname} out of interference from {station}"
+
     pick_tooling_base = 64 + n_drops * 3  # after drop consent/release/exit block
     if pick_robot and pick_robot.get("enabled"):
         pick_names = pick_robot.get("robot_names", [])
@@ -656,19 +670,30 @@ def auto_gen_mem_cycle(station, robot_names, drop_robot=None, pick_robot=None):
 
     for i, rname in enumerate(robot_names):
         base = 17 + i * 8
-        short_name = rname[1:] if len(rname) == 6 else rname[-5:]
-        comments[base] = f"MEMORY END JOB 1  ROBOT {short_name} End of welding {station}"
+        comments[base]     = f"MEMORY END JOB 1  ROBOT {rname} End of welding {station}"
         comments[base + 4] = f"MEMORY CHANGE TIPS OK {rname}"
 
     # Drop robot entries starting at _32
+    n_drops = 0
     if drop_robot and drop_robot.get("enabled"):
         drop_names = drop_robot.get("robot_names", [])
-        drop_jobs = drop_robot.get("jobs", [])
+        drop_jobs  = drop_robot.get("jobs", [])
         for i, dname in enumerate(drop_names):
             if not dname:
                 continue
             job = drop_jobs[i] if i < len(drop_jobs) else "1"
             comments[32 + i] = f"MEMORY END JOB {dname} JOB{job} Part dropped on {station}"
+            n_drops += 1
+
+    # Pick robot entries starting after drop entries
+    if pick_robot and pick_robot.get("enabled"):
+        pick_names = pick_robot.get("robot_names", [])
+        pick_jobs  = pick_robot.get("jobs", [])
+        for i, pname in enumerate(pick_names):
+            if not pname:
+                continue
+            job = pick_jobs[i] if i < len(pick_jobs) else "1"
+            comments[32 + n_drops + i] = f"MEMORY END JOB {pname} JOB{job} Part picked from {station}"
 
     return comments
 
@@ -796,7 +821,7 @@ def generate_fb_output(station, hmi_loc_str, islands_config, robot_names=None, d
     W('NETWORK')
     W('TITLE =Command Pilot Valves')
     W()
-    W('      A     M2500.7; ')
+    W('      A     M2508.0; ')
     W('      =     L      1.0; ')
     for isl_idx in range(len(islands_config)):
         isl    = isl_idx + 1
@@ -827,7 +852,7 @@ def generate_fb_output(station, hmi_loc_str, islands_config, robot_names=None, d
         W('      A     #tAlarmPilotValve; ')
         W(f'      S     "{db}".Aux_Cycle._{av_pv:02d}; ')
         W('      A(    ; ')
-        W('      A     M2500.7; ')
+        W('      A     M2508.0; ')
         W('      NOT   ; ')
         W(f'      O     "{db}".Reset_anom1; ')
         W('      )     ; ')
@@ -974,7 +999,7 @@ def generate_fb_output(station, hmi_loc_str, islands_config, robot_names=None, d
             W(f'      A     "{db}".F_Prim.C_Start_up; ')
             W('      =     L      2.2; ')
             W('      BLD   103; ')
-            W('      A     M2500.7; ')
+            W('      A     M2508.0; ')
             W('      =     L      2.3; ')
             W('      BLD   103; ')
             W(f'      A     "{db}".Reset_anom1; ')
@@ -1147,6 +1172,8 @@ def default_project():
                 "enabled": True,
                 "valve_count": 1,
                 "io_address": "",
+                "pilot_out_addr": "",
+                "pilot_in_addr": "",
                 "valves": [{"type": "Clamp", "units": ""}
                            for _ in range(MAX_VALVES)],
             },
@@ -1154,6 +1181,8 @@ def default_project():
                 "enabled": False,
                 "valve_count": 0,
                 "io_address": "",
+                "pilot_out_addr": "",
+                "pilot_in_addr": "",
                 "valves": [{"type": "Clamp", "units": ""}
                            for _ in range(MAX_VALVES)],
             },
@@ -1471,6 +1500,8 @@ class AWLGeneratorApp:
         self.island_valve_count_vars = []
         self.island_io_address_vars = []
         self.island_io_address_labels = []
+        self.island_pilot_out_vars = []
+        self.island_pilot_in_vars = []
         self.valve_type_vars = []
         self.valve_unit_vars = []
         self.valve_widgets = []
@@ -1506,6 +1537,21 @@ class AWLGeneratorApp:
             io_valid_label.pack(side=tk.LEFT, padx=2)
             self.island_io_address_labels.append(io_valid_label)
             io_var.trace_add("write", lambda *a, i=isl: self._validate_io_addresses())
+
+            # Pilot valve addresses
+            ttk.Label(top_row, text="Pilot Q:").pack(side=tk.LEFT, padx=(10, 2))
+            pout_var = tk.StringVar(value=str(self.project["islands"][isl].get("pilot_out_addr", "")))
+            ttk.Entry(top_row, textvariable=pout_var, width=6).pack(side=tk.LEFT, padx=2)
+            self.island_pilot_out_vars.append(pout_var)
+            pout_var.trace_add("write", lambda *a, i=isl: self.project["islands"][i].update(
+                {"pilot_out_addr": self.island_pilot_out_vars[i].get()}))
+
+            ttk.Label(top_row, text="Pilot I:").pack(side=tk.LEFT, padx=(5, 2))
+            pin_var = tk.StringVar(value=str(self.project["islands"][isl].get("pilot_in_addr", "")))
+            ttk.Entry(top_row, textvariable=pin_var, width=6).pack(side=tk.LEFT, padx=2)
+            self.island_pilot_in_vars.append(pin_var)
+            pin_var.trace_add("write", lambda *a, i=isl: self.project["islands"][i].update(
+                {"pilot_in_addr": self.island_pilot_in_vars[i].get()}))
 
             valves_frame = ttk.Frame(isl_frame)
             valves_frame.pack(fill=tk.X, pady=2)
@@ -1803,8 +1849,8 @@ class AWLGeneratorApp:
                    command=self.generate_all_dbs).pack(fill=tk.X, pady=2)
         ttk.Button(frame, text="Create I/O",
                    command=self.create_io_popup).pack(fill=tk.X, pady=2)
-        ttk.Button(frame, text="Generate FB_OUTPUT",
-                   command=self.generate_fb_output_gui).pack(fill=tk.X, pady=2)
+        ttk.Button(frame, text="Generate Station",
+                   command=self.generate_station_gui).pack(fill=tk.X, pady=2)
 
     # ---- CREATE I/O --------------------------------------------------------
 
@@ -1886,6 +1932,32 @@ class AWLGeneratorApp:
                 inputs.append({"symbol": sym_sqa, "address": f"I{byte_sqa}.{bit_sqa}",
                                "comment": comment_sqa})
                 in_bit += 1
+
+        # Pilot valve output (V00YVA) and blocked input (PILOT-BLK)
+        pilot_out = ""
+        pilot_in  = ""
+        if isl_idx < len(self.island_pilot_out_vars):
+            pilot_out = self.island_pilot_out_vars[isl_idx].get().strip()
+        if isl_idx < len(self.island_pilot_in_vars):
+            pilot_in = self.island_pilot_in_vars[isl_idx].get().strip()
+
+        if pilot_out:
+            try:
+                po_byte = int(pilot_out)
+                sym_pv = f"_{station}_{isl_num:02d}V00YVA"
+                outputs.insert(0, {"symbol": sym_pv, "address": f"Q{po_byte}.0",
+                                   "comment": "COMMAND PILOT AIR VALVE"})
+            except ValueError:
+                pass
+
+        if pilot_in:
+            try:
+                pi_byte = int(pilot_in)
+                sym_pb = f"_{station}_PILOT-BLK-{isl_num}"
+                inputs.append({"symbol": sym_pb, "address": f"I{pi_byte}.0",
+                               "comment": "PILOT AIR VALVE BLOCKED"})
+            except ValueError:
+                pass
 
         return outputs, inputs
 
@@ -2331,20 +2403,25 @@ class AWLGeneratorApp:
         fb_name  = f"ST-{station[:3]}_OUTPUT"
         idb_name = f"I-DB-ST{station[:3]}_OUTPUT"
 
+        vis_num  = 500 + station_idx
+        vis_name = f"VIS_{station}"
+
         lines = [
-            f"126,{'FLAG_PERS_BIT':<24} M      10.4 BOOL      FLAG PERSONALIZE BIT",
-            f"126,{fb_name:<24} FB    {fb_num}   FB    {fb_num}",
-            f"126,{idb_name:<24} DB    {fb_num}   DB    {fb_num}",
+            f"126,{'PERSO':<24}M    2508.0 BOOL      PERSONALIZE BIT",
+            f"126,{fb_name:<24}FB    {fb_num}   FB    {fb_num}",
+            f"126,{idb_name:<24}DB    {fb_num}   DB    {fb_num}",
+            f"126,{vis_name:<24}DB    {vis_num}   DB    {vis_num}",
         ]
 
-        # Global DB entries — one per filled DB page (DB11=global 11, DB13=global 13, ...)
+        # Global DB — only the first filled DB page (avoid duplicate symbol names)
         gdb_name = f"G-DB_{station}"
         for db_num in DB_RANGE:
             db_data = self.project["db_pages"].get(str(db_num), {})
             sections = db_data.get("sections", {})
             has_data = any(v for v in sections.values() if isinstance(v, dict) and v)
             if has_data:
-                lines.append(f"126,{gdb_name:<24} DB    {db_num}   DB    {db_num}")
+                lines.append(f"126,{gdb_name:<24}DB    {db_num}   DB    {db_num}")
+                break  # one G-DB entry per station
 
         for isl_idx in range(MAX_ISLANDS):
             outputs, inputs = self._build_io_table(isl_idx, station)
@@ -2354,29 +2431,68 @@ class AWLGeneratorApp:
                 addr_num = addr[1:]       # "4000.0"
                 sym = entry["symbol"]
                 comment = entry["comment"]
-                lines.append(f"126,{sym:<24} {type_char}    {addr_num} BOOL      {comment}")
+                lines.append(f"126,{sym:<24}{type_char}    {addr_num} BOOL      {comment}")
         return "\n".join(lines) + "\n" if lines else ""
 
-    def generate_fb_output_gui(self):
-        """Generate the FB_OUTPUT AWL file and symbol list for the current station."""
+    def generate_station_gui(self):
+        """Generate all station files: DB AWLs, VIS DB, FB OUTPUT, symbol list."""
         station = self._get_station_name()
         if not re.match(r'^\d{3}(T|TT|LIFT|R)\d{2}$', station):
             messagebox.showwarning("Invalid Station", "Please enter a valid station name first.")
+            return
+        if not self.template_path:
+            messagebox.showerror("Error", "Template file not found!")
             return
         islands_config = self._get_islands_config()
         if not islands_config:
             messagebox.showwarning("No Islands", "Please configure and enable at least one valve island.")
             return
-        hmi_loc = self.hmi_loc_var.get()
-        out_path = filedialog.asksaveasfilename(
-            title="Save FB_OUTPUT AWL",
-            defaultextension=".AWL",
-            initialfile=f"ST-{station[:3]}_OUTPUT.AWL",
-            filetypes=[("AWL Files", "*.AWL"), ("All Files", "*.*")],
-        )
-        if not out_path:
+
+        out_dir = filedialog.askdirectory(title="Select Output Folder for Station Files")
+        if not out_dir:
             return
+
         try:
+            generated = []
+
+            # Save any open DB page widgets first
+            for db_num in self.loaded_db_pages:
+                self._save_section_widgets_to_project(db_num)
+
+            # ── Generate filled DB AWL files ──
+            db_name = f"G-DB_{station}"
+            for db_num in DB_RANGE:
+                db_key = str(db_num)
+                sections_raw = self.project["db_pages"].get(db_key, {}).get("sections", {})
+                sections_data = {}
+                for sec_name, sec_comments in sections_raw.items():
+                    int_comments = {int(k): v for k, v in sec_comments.items()
+                                    if str(k).isdigit()}
+                    if int_comments:
+                        sections_data[sec_name] = int_comments
+                has_data = bool(sections_data)
+                if has_data:
+                    awl_lines = generate_awl(db_num, station, db_name, sections_data, self.template_path)
+                    fpath = os.path.join(out_dir, f"db{db_num}.AWL")
+                    with open(fpath, "w", encoding="utf-8") as f:
+                        f.writelines(awl_lines)
+                    generated.append(f"db{db_num}.AWL  ({db_name})")
+
+            # ── Generate VIS DB (empty template) ──
+            try:
+                station_idx = int(station[-2:])
+            except ValueError:
+                station_idx = 1
+            vis_num  = 500 + station_idx
+            vis_name = f"VIS_{station}"
+            vis_awl  = generate_awl(vis_num, station, vis_name, {}, self.template_path)
+            vis_path = os.path.join(out_dir, f"db{vis_num}.AWL")
+            with open(vis_path, "w", encoding="utf-8") as f:
+                f.writelines(vis_awl)
+            generated.append(f"db{vis_num}.AWL  ({vis_name})")
+
+            # ── Generate FB OUTPUT ──
+            hmi_loc = self.hmi_loc_var.get()
             robot_names = self._get_robot_names()
             drop_robot_cfg = {
                 "enabled": self.drop_robot_var.get(),
@@ -2390,22 +2506,27 @@ class AWLGeneratorApp:
                 "toolings": [v.get() for v in self.pick_robot_tooling_vars],
                 "jobs": [v.get() for v in self.pick_robot_job_vars],
             }
-            content = generate_fb_output(station, hmi_loc, islands_config,
-                                         robot_names, drop_robot_cfg, pick_robot_cfg)
-            with open(out_path, "w", encoding="utf-8") as f:
-                f.write(content)
+            fb_content = generate_fb_output(station, hmi_loc, islands_config,
+                                            robot_names, drop_robot_cfg, pick_robot_cfg)
+            fb_fname = f"ST-{station[:3]}_OUTPUT.AWL"
+            fb_path  = os.path.join(out_dir, fb_fname)
+            with open(fb_path, "w", encoding="utf-8") as f:
+                f.write(fb_content)
+            generated.append(fb_fname)
 
-            # Auto-save symbol list alongside the AWL file
+            # ── Generate symbol list ──
             sym_content = self._generate_symbol_list_content(station)
-            sym_path = os.path.join(os.path.dirname(out_path), f"{station}_SYMBOL_LIST.ASC")
-            with open(sym_path, "w", encoding="utf-8") as f:
+            sym_fname   = f"{station}_SYMBOL_LIST.ASC"
+            sym_path    = os.path.join(out_dir, sym_fname)
+            with open(sym_path, "w", encoding="cp1252", newline="\r\n") as f:
                 f.write(sym_content)
+            generated.append(sym_fname)
 
-            messagebox.showinfo("Generated",
-                                f"FB_OUTPUT saved to:\n{out_path}\n\n"
-                                f"Symbol list saved to:\n{sym_path}")
+            messagebox.showinfo("Station Generated",
+                                f"All files saved to:\n{out_dir}\n\n"
+                                + "\n".join(generated))
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to generate FB_OUTPUT:\n{e}")
+            messagebox.showerror("Error", f"Failed to generate station files:\n{e}")
 
     def generate_all_dbs(self):
         """Generate AWL files for all 20 DBs."""
