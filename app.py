@@ -14,6 +14,17 @@ import os
 import sys
 import copy
 
+
+def resource_path(relative_name):
+    """Return absolute path to a bundled resource.
+    Works both in normal Python run and when frozen by PyInstaller --onefile."""
+    try:
+        base = sys._MEIPASS          # PyInstaller unpacks files here at runtime
+    except AttributeError:
+        base = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base, relative_name)
+
+
 # ============================================================================
 # CONSTANTS
 # ============================================================================
@@ -75,7 +86,7 @@ AUTO_GEN_SECTIONS = [
 def find_template():
     """Find the db11.AWL template file."""
     candidates = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), TEMPLATE_NAME),
+        resource_path(TEMPLATE_NAME),
         os.path.join(os.getcwd(), TEMPLATE_NAME),
     ]
     for p in candidates:
@@ -1283,7 +1294,7 @@ class AWLGeneratorApp:
         self._build_action_buttons(scroll_frame)
 
     def _build_logo(self, parent):
-        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")
+        logo_path = resource_path("logo.png")
         try:
             self._logo_img = tk.PhotoImage(file=logo_path)
             w = self._logo_img.width()
@@ -2455,7 +2466,7 @@ class AWLGeneratorApp:
 
             # ── Generate VIS DB (duplicate VISU.AWL template, rename block) ──
             vis_name     = f"VIS_{station}"
-            visu_tpl     = os.path.join(os.path.dirname(self.template_path), "VISU.AWL")
+            visu_tpl     = resource_path("VISU.AWL")
             vis_path     = os.path.join(out_dir, f"db{vis_num}.AWL")
             if os.path.exists(visu_tpl):
                 with open(visu_tpl, "r", encoding="utf-8", errors="replace") as f:
