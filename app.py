@@ -272,10 +272,12 @@ def auto_gen_rqm(station, op_load=None, drop_robot=None, pick_robot=None):
             comments[8] = f"RQM 08 [{station}] Wait operator enter loading area 2"
             comments[9] = f"RQM 09 [{station}] Wait operator exit loading area 2"
 
-    # Drop robot entries: 6 slots per robot (5 entries + 1 RESERVE) starting at _22
+    # Drop robot entries: 5 slots per robot starting at _22
+    n_drops = 0
     if drop_robot and drop_robot.get("enabled"):
         drop_names = drop_robot.get("robot_names", [])
         drop_toolings = drop_robot.get("toolings", [])
+        n_drops = len([d for d in drop_names if d])
         slot = 22
         for i, dname in enumerate(drop_names):
             if not dname:
@@ -286,8 +288,23 @@ def auto_gen_rqm(station, op_load=None, drop_robot=None, pick_robot=None):
             comments[slot + 2] = f"RQM {slot+2:02d} [ST{station}] Wait tool Request OFF {dname} (TOOLING {tooling})"
             comments[slot + 3] = f"RQM {slot+3:02d} [ST{station}] Wait robot {dname} drop part done"
             comments[slot + 4] = f"RQM {slot+4:02d} [ST{station}] Wait Out of interference {dname}"
-            # next slot is RESERVE (already set)
-            slot += 6
+            slot += 5
+
+    # Pick robot entries: 4 slots per robot, starting after drop entries
+    pick_rqm_base = 22 + n_drops * 5
+    if pick_robot and pick_robot.get("enabled"):
+        pick_names = pick_robot.get("robot_names", [])
+        pick_toolings = pick_robot.get("toolings", [])
+        slot = pick_rqm_base
+        for i, pname in enumerate(pick_names):
+            if not pname:
+                continue
+            tooling = pick_toolings[i] if i < len(pick_toolings) else "1"
+            comments[slot] = f"RQM {slot:02d} [ST{station}] Wait tool Request ON {pname} (TOOLING {tooling})"
+            comments[slot + 1] = f"RQM {slot+1:02d} [ST{station}] Wait robot {pname} Pick part done"
+            comments[slot + 2] = f"RQM {slot+2:02d} [ST{station}] Wait Out of interference {pname}"
+            comments[slot + 3] = f"RQM {slot+3:02d} [ST{station}] Wait tool Request OFF {pname} (TOOLING {tooling})"
+            slot += 4
 
     return comments
 
@@ -341,8 +358,8 @@ def auto_gen_ab(station, islands_config, robot_names, op_load=None, drop_robot=N
     """
     Generate AB section comments.
     All fields _00 to _95 default RESERVE first.
-    Drop robot at _04+, operator load at _06-_15, robot entries at _24+,
-    valve fwd at _51/_61, valve bwd at _71/_81.
+    Operator load at _06-_13, station robots at _14+, drop at _21+ (7/robot),
+    pick after drop (7/robot), valve fwd at _51/_61, valve bwd at _71/_81.
     """
     comments = make_reserve_dict(0, 95)
 
@@ -378,15 +395,17 @@ def auto_gen_ab(station, islands_config, robot_names, op_load=None, drop_robot=N
         comments[slot] = f"CONSENT TO EXIT {all_names_dash} (ACK JOB1)"
         slot += 1
 
-    # Drop robot entries starting at _21, 10 slots per robot
+    # Drop robot entries starting at _21, 7 slots per robot
+    n_drops = 0
     if drop_robot and drop_robot.get("enabled"):
         drop_names = drop_robot.get("robot_names", [])
         drop_toolings = drop_robot.get("toolings", [])
         drop_jobs = drop_robot.get("jobs", [])
+        n_drops = len([d for d in drop_names if d])
         for i, dname in enumerate(drop_names):
             if not dname:
                 continue
-            base = 21 + i * 10
+            base = 21 + i * 7
             short = _short_name(dname)
             tooling = drop_toolings[i] if i < len(drop_toolings) else "1"
             job = drop_jobs[i] if i < len(drop_jobs) else "1"
@@ -398,7 +417,27 @@ def auto_gen_ab(station, islands_config, robot_names, op_load=None, drop_robot=N
             comments[base + 4] = f"CONSENT TOOL RELEASE {tooling} {short}"
             comments[base + 5] = f"WAITING END OF DROP {short} (JOB{job})"
             comments[base + 6] = f"CONSENT TO EXIT {short} (ACK JOB{job})"
-            # +7, +8, +9 stay RESERVE (already set)
+
+    # Pick robot entries after drop, 7 slots per robot
+    pick_ab_base = 21 + n_drops * 7
+    if pick_robot and pick_robot.get("enabled"):
+        pick_names = pick_robot.get("robot_names", [])
+        pick_toolings = pick_robot.get("toolings", [])
+        pick_jobs = pick_robot.get("jobs", [])
+        for i, pname in enumerate(pick_names):
+            if not pname:
+                continue
+            base = pick_ab_base + i * 7
+            short = _short_name(pname)
+            tooling = pick_toolings[i] if i < len(pick_toolings) else "1"
+            job = pick_jobs[i] if i < len(pick_jobs) else "1"
+            comments[base] = f"CHECK STATION AND MODEL BEFORE CONSENT TO {short}"
+            comments[base + 1] = f"CONSENT TO PICK PART {pname} (JOB{job})"
+            comments[base + 2] = f"CHECK PART PRESENTS OFF"
+            comments[base + 3] = f"WAITING TOOL REQUEST {tooling} FROM {pname}"
+            comments[base + 4] = f"CONSENT TOOL RELEASE {tooling} {pname}"
+            comments[base + 5] = f"WAITING END OF PICK {pname} (JOB{job})"
+            comments[base + 6] = f"CONSENT TO EXIT {pname} (ACK JOB{job})"
 
     # Valve forward commands
     base_fwd = [51, 61]
@@ -572,6 +611,35 @@ def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None, drop_
             comments[slot_drop + 2] = f"Aux. Consent To Exit {dname}"
             slot_drop += 3
 
+    # Pick robot entries - dynamic start after drop consent block
+    n_drops = 0
+    if drop_robot and drop_robot.get("enabled"):
+        n_drops = len([d for d in drop_robot.get("robot_names", []) if d])
+    pick_tooling_base = 64 + n_drops * 3  # after drop consent/release/exit block
+    if pick_robot and pick_robot.get("enabled"):
+        pick_names = pick_robot.get("robot_names", [])
+        pick_toolings = pick_robot.get("toolings", [])
+        n_picks = len([p for p in pick_names if p])
+
+        # Robot tooling request
+        for i, pname in enumerate(pick_names):
+            if not pname:
+                continue
+            tooling = pick_toolings[i] if i < len(pick_toolings) else "1"
+            comments[pick_tooling_base + i] = f"Aux. Robot {pname} tooling request {tooling}"
+
+        # Consent To Pick / Tooling Release / Consent To Exit
+        pick_consent_base = pick_tooling_base + n_picks
+        slot_pick = pick_consent_base
+        for i, pname in enumerate(pick_names):
+            if not pname:
+                continue
+            tooling = pick_toolings[i] if i < len(pick_toolings) else "1"
+            comments[slot_pick] = f"Aux. Consent To Pick {pname}"
+            comments[slot_pick + 1] = f"Aux. Tooling Release {tooling} {pname}"
+            comments[slot_pick + 2] = f"Aux. Consent To Exit {pname}"
+            slot_pick += 3
+
     return comments
 
 
@@ -654,7 +722,7 @@ def auto_gen_tio_d(station, islands_config, robot_names):
 # FB OUTPUT GENERATION
 # ============================================================================
 
-def generate_fb_output(station, hmi_loc_str, islands_config):
+def generate_fb_output(station, hmi_loc_str, islands_config, robot_names=None, drop_robot=None, pick_robot=None):
     """
     Generate the ST-XXX_OUTPUT Function Block AWL text.
     station        : e.g. "040T01"
@@ -699,6 +767,8 @@ def generate_fb_output(station, hmi_loc_str, islands_config):
             W(f'  {vname}_CYL1 : "Valve_Cylinder_1";\t')
             if len(units) > 1:
                 W(f'  {vname}_CYL2_5 : "Valve_Cylinder_2_5";\t')
+            if len(units) > 5:
+                W(f'  {vname}_CYL6_9 : "Valve_Cylinder_6_9";\t')
 
     # Interface DWORDs (only when CYL2_5 is used)
     for isl_idx, island in enumerate(islands_config):
@@ -771,14 +841,36 @@ def generate_fb_output(station, hmi_loc_str, islands_config):
     W('NETWORK')
     W('TITLE =General Interlock')
     W()
-    W('      NOP   0; ')
+
+    # Collect all robots with their Aux_Cycle OOI slot for General Interlock
+    ooi_entries = []  # list of (aux_slot, robot_name)
+    if robot_names:
+        for i, rname in enumerate(robot_names):
+            ooi_entries.append((46 + i, rname))
+    if drop_robot and drop_robot.get("enabled"):
+        for i, dname in enumerate(drop_robot.get("robot_names", [])):
+            if dname:
+                ooi_entries.append((53 + i, dname))
+    if pick_robot and pick_robot.get("enabled"):
+        for i, pname in enumerate(pick_robot.get("robot_names", [])):
+            if pname:
+                ooi_entries.append((53 + len(drop_robot.get("robot_names", [])) + i
+                                    if drop_robot and drop_robot.get("enabled")
+                                    else 53 + i, pname))
+
+    if ooi_entries:
+        for aux_slot, rname in ooi_entries:
+            W(f'      A     "{db}".Aux_Cycle._{aux_slot:02d}; // Out of interference {rname}')
+        W(f'      =     #General_Interlock; ')
+    else:
+        W('      NOP   0; ')
 
     # ── Valves ───────────────────────────────────────────────────────────
     W('NETWORK')
     W('TITLE =----------- VALVES -----------')
     W()
 
-    LETTERS   = ['B', 'C', 'D', 'E']
+    LETTERS   = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
     global_v  = 0    # 0-based global valve index
     oi_idx    = 0    # running O_I / A_I index
     tio_slot  = 32   # running TIO_D slot
@@ -966,6 +1058,47 @@ def generate_fb_output(station, hmi_loc_str, islands_config):
                 for eu_i in range(n_extra):
                     letter  = LETTERS[eu_i]
                     tio_eu  = tio_eu_base + eu_i * 5
+                    W(f'           F_LPosFwdL{letter}              := "{db}".TIO_D._{tio_eu:02d},')
+                    W(f'           F_LPosBwdL{letter}              := "{db}".TIO_D._{tio_eu+1:02d},')
+                    W(f'           F_AcLPFwdL{letter}              := "{db}".TIO_D._{tio_eu+2:02d},')
+                    W(f'           F_AcLPBwdL{letter}              := "{db}".TIO_D._{tio_eu+3:02d},')
+                W(f'           Interface                := #Interface{isl:02d}V{vv:02d});')
+                W('      NOP   0; ')
+
+            # ── MANAGEMENT CYL6_9 ──
+            has_cyl69 = n_units > 5
+            if has_cyl69:
+                extra69 = units[5:9]   # units 6-9 (indices 5-8)
+                n_extra69 = len(extra69)
+                W('NETWORK')
+                W(f'TITLE =MANAGEMENT {isl:02d}V{vv:02d} CYLINDER FROM 6 TO 9')
+                W()
+                for eu_i, unit in enumerate(extra69):
+                    lb0 = eu_i * 2
+                    lb1 = eu_i * 2 + 1
+                    W(f'      A     "{sig_u}{unit}SQA"; ')
+                    W(f'      =     L      1.{lb0}; ')
+                    W('      BLD   103; ')
+                    W(f'      A     "{sig_u}{unit}SQB"; ')
+                    W(f'      =     L      1.{lb1}; ')
+                    W('      BLD   103; ')
+                W(f'      A     "{db}".Reset_anom1; ')
+                W('      =     L      2.0; ')
+                W('      BLD   103; ')
+                W(f'      CALL #{vname}_CYL6_9 (')
+                W(f'           Num                      := {n_extra69},')
+                for eu_i, unit in enumerate(extra69):
+                    letter = LETTERS[4 + eu_i]  # F, G, H, I
+                    lb0 = eu_i * 2
+                    lb1 = eu_i * 2 + 1
+                    W(f'           LPosFwd_{letter}                := L      1.{lb0},')
+                    W(f'           LPosBwd_{letter}                := L      1.{lb1},')
+                W('           Reset                    := L      2.0,')
+                W(f'           Visu                     := "{vis}".V_DW_CLAMP_{visu_n}ext_{visu_n}B,')
+                tio_69_base = tio_flt + 8 + min(n_units - 1, 4) * 5  # after CYL2_5 slots
+                for eu_i in range(n_extra69):
+                    letter  = LETTERS[4 + eu_i]
+                    tio_eu  = tio_69_base + eu_i * 5
                     W(f'           F_LPosFwdL{letter}              := "{db}".TIO_D._{tio_eu:02d},')
                     W(f'           F_LPosBwdL{letter}              := "{db}".TIO_D._{tio_eu+1:02d},')
                     W(f'           F_AcLPFwdL{letter}              := "{db}".TIO_D._{tio_eu+2:02d},')
@@ -2199,6 +2332,7 @@ class AWLGeneratorApp:
         idb_name = f"I-DB-ST{station[:3]}_OUTPUT"
 
         lines = [
+            f"126,{'FLAG_PERS_BIT':<24} M      10.4 BOOL      FLAG PERSONALIZE BIT",
             f"126,{fb_name:<24} FB    {fb_num}   FB    {fb_num}",
             f"126,{idb_name:<24} DB    {fb_num}   DB    {fb_num}",
         ]
@@ -2243,7 +2377,21 @@ class AWLGeneratorApp:
         if not out_path:
             return
         try:
-            content = generate_fb_output(station, hmi_loc, islands_config)
+            robot_names = self._get_robot_names()
+            drop_robot_cfg = {
+                "enabled": self.drop_robot_var.get(),
+                "robot_names": [v.get().strip() for v in self.drop_robot_name_vars],
+                "toolings": [v.get() for v in self.drop_robot_tooling_vars],
+                "jobs": [v.get() for v in self.drop_robot_job_vars],
+            }
+            pick_robot_cfg = {
+                "enabled": self.pick_robot_var.get(),
+                "robot_names": [v.get().strip() for v in self.pick_robot_name_vars],
+                "toolings": [v.get() for v in self.pick_robot_tooling_vars],
+                "jobs": [v.get() for v in self.pick_robot_job_vars],
+            }
+            content = generate_fb_output(station, hmi_loc, islands_config,
+                                         robot_names, drop_robot_cfg, pick_robot_cfg)
             with open(out_path, "w", encoding="utf-8") as f:
                 f.write(content)
 
