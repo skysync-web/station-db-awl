@@ -763,7 +763,7 @@ def generate_fb_output(station, hmi_loc_str, islands_config, robot_names=None, d
     except (ValueError, TypeError):
         hmi = 1
 
-    fb_name  = f"ST-{st3}_OUTPUT"
+    fb_name  = f"ST-{station}_OUTPUT"
     var_pfx  = f"ST{st3}_{st_suffix}_"
     db       = f"G-DB_{station}"
     vis      = f"VIS_{station}"
@@ -1172,8 +1172,7 @@ def default_project():
                 "enabled": True,
                 "valve_count": 1,
                 "io_address": "",
-                "pilot_out_addr": "",
-                "pilot_in_addr": "",
+                "pilot_addr": "",
                 "valves": [{"type": "Clamp", "units": ""}
                            for _ in range(MAX_VALVES)],
             },
@@ -1181,8 +1180,7 @@ def default_project():
                 "enabled": False,
                 "valve_count": 0,
                 "io_address": "",
-                "pilot_out_addr": "",
-                "pilot_in_addr": "",
+                "pilot_addr": "",
                 "valves": [{"type": "Clamp", "units": ""}
                            for _ in range(MAX_VALVES)],
             },
@@ -1500,8 +1498,7 @@ class AWLGeneratorApp:
         self.island_valve_count_vars = []
         self.island_io_address_vars = []
         self.island_io_address_labels = []
-        self.island_pilot_out_vars = []
-        self.island_pilot_in_vars = []
+        self.island_pilot_addr_vars = []
         self.valve_type_vars = []
         self.valve_unit_vars = []
         self.valve_widgets = []
@@ -1538,20 +1535,13 @@ class AWLGeneratorApp:
             self.island_io_address_labels.append(io_valid_label)
             io_var.trace_add("write", lambda *a, i=isl: self._validate_io_addresses())
 
-            # Pilot valve addresses
-            ttk.Label(top_row, text="Pilot Q:").pack(side=tk.LEFT, padx=(10, 2))
-            pout_var = tk.StringVar(value=str(self.project["islands"][isl].get("pilot_out_addr", "")))
-            ttk.Entry(top_row, textvariable=pout_var, width=6).pack(side=tk.LEFT, padx=2)
-            self.island_pilot_out_vars.append(pout_var)
-            pout_var.trace_add("write", lambda *a, i=isl: self.project["islands"][i].update(
-                {"pilot_out_addr": self.island_pilot_out_vars[i].get()}))
-
-            ttk.Label(top_row, text="Pilot I:").pack(side=tk.LEFT, padx=(5, 2))
-            pin_var = tk.StringVar(value=str(self.project["islands"][isl].get("pilot_in_addr", "")))
-            ttk.Entry(top_row, textvariable=pin_var, width=6).pack(side=tk.LEFT, padx=2)
-            self.island_pilot_in_vars.append(pin_var)
-            pin_var.trace_add("write", lambda *a, i=isl: self.project["islands"][i].update(
-                {"pilot_in_addr": self.island_pilot_in_vars[i].get()}))
+            # Pilot valve IO address (used for both Q output and I input)
+            ttk.Label(top_row, text="Pilot IO:").pack(side=tk.LEFT, padx=(10, 2))
+            paddr_var = tk.StringVar(value=str(self.project["islands"][isl].get("pilot_addr", "")))
+            ttk.Entry(top_row, textvariable=paddr_var, width=6).pack(side=tk.LEFT, padx=2)
+            self.island_pilot_addr_vars.append(paddr_var)
+            paddr_var.trace_add("write", lambda *a, i=isl: self.project["islands"][i].update(
+                {"pilot_addr": self.island_pilot_addr_vars[i].get()}))
 
             valves_frame = ttk.Frame(isl_frame)
             valves_frame.pack(fill=tk.X, pady=2)
@@ -1933,28 +1923,19 @@ class AWLGeneratorApp:
                                "comment": comment_sqa})
                 in_bit += 1
 
-        # Pilot valve output (V00YVA) and blocked input (PILOT-BLK)
-        pilot_out = ""
-        pilot_in  = ""
-        if isl_idx < len(self.island_pilot_out_vars):
-            pilot_out = self.island_pilot_out_vars[isl_idx].get().strip()
-        if isl_idx < len(self.island_pilot_in_vars):
-            pilot_in = self.island_pilot_in_vars[isl_idx].get().strip()
+        # Pilot valve: single IO address used for both Q output (V00YVA) and I input (PILOT-BLK)
+        pilot_addr = ""
+        if isl_idx < len(self.island_pilot_addr_vars):
+            pilot_addr = self.island_pilot_addr_vars[isl_idx].get().strip()
 
-        if pilot_out:
+        if pilot_addr:
             try:
-                po_byte = int(pilot_out)
-                sym_pv = f"_{station}_{isl_num:02d}V00YVA"
-                outputs.insert(0, {"symbol": sym_pv, "address": f"Q{po_byte}.0",
+                p_byte = int(pilot_addr)
+                outputs.insert(0, {"symbol": f"_{station}_{isl_num:02d}V00YVA",
+                                   "address": f"Q{p_byte}.0",
                                    "comment": "COMMAND PILOT AIR VALVE"})
-            except ValueError:
-                pass
-
-        if pilot_in:
-            try:
-                pi_byte = int(pilot_in)
-                sym_pb = f"_{station}_PILOT-BLK-{isl_num}"
-                inputs.append({"symbol": sym_pb, "address": f"I{pi_byte}.0",
+                inputs.append({"symbol": f"_{station}_PILOT-BLK-{isl_num}",
+                               "address": f"I{p_byte}.0",
                                "comment": "PILOT AIR VALVE BLOCKED"})
             except ValueError:
                 pass
@@ -2392,36 +2373,28 @@ class AWLGeneratorApp:
         db_num = DB_FIRST + idx
         self._generate_db(db_num)
 
-    def _generate_symbol_list_content(self, station):
-        """Build ASC symbol list content from all enabled island I/O entries."""
-        # FB/instance-DB number: T01→319, T02→329, T03→339  formula: 309 + last2digits * 10
-        try:
-            station_idx = int(station[-2:])
-        except ValueError:
-            station_idx = 1
-        fb_num   = 309 + station_idx * 10
-        fb_name  = f"ST-{station[:3]}_OUTPUT"
-        idb_name = f"I-DB-ST{station[:3]}_OUTPUT"
-
-        vis_num  = 500 + station_idx
+    def _generate_symbol_list_content(self, station, active_db_num=None):
+        """Build ASC symbol list content from all enabled island I/O entries.
+        active_db_num: the DB page number the user is working on (drives FB/VIS numbers).
+        DB11→FB319/IDB319/VIS501, DB12→FB329/IDB329/VIS502, DB13→FB339/IDB339/VIS503.
+        Formula: fb_num = db_num*10+209,  vis_num = db_num+490
+        """
+        if active_db_num is None:
+            active_db_num = DB_FIRST
+        fb_num   = active_db_num * 10 + 209
+        vis_num  = active_db_num + 490
+        fb_name  = f"ST-{station}_OUTPUT"
+        idb_name = f"I-DB-ST{station}_OUTPUT"
         vis_name = f"VIS_{station}"
 
+        gdb_name = f"G-DB_{station}"
         lines = [
             f"126,{'PERSO':<24}M    2508.0 BOOL      PERSONALIZE BIT",
             f"126,{fb_name:<24}FB    {fb_num}   FB    {fb_num}",
             f"126,{idb_name:<24}DB    {fb_num}   DB    {fb_num}",
             f"126,{vis_name:<24}DB    {vis_num}   DB    {vis_num}",
+            f"126,{gdb_name:<24}DB    {active_db_num}   DB    {active_db_num}",
         ]
-
-        # Global DB — only the first filled DB page (avoid duplicate symbol names)
-        gdb_name = f"G-DB_{station}"
-        for db_num in DB_RANGE:
-            db_data = self.project["db_pages"].get(str(db_num), {})
-            sections = db_data.get("sections", {})
-            has_data = any(v for v in sections.values() if isinstance(v, dict) and v)
-            if has_data:
-                lines.append(f"126,{gdb_name:<24}DB    {db_num}   DB    {db_num}")
-                break  # one G-DB entry per station
 
         for isl_idx in range(MAX_ISLANDS):
             outputs, inputs = self._build_io_table(isl_idx, station)
@@ -2453,37 +2426,34 @@ class AWLGeneratorApp:
             return
 
         try:
+            # Active DB page drives all block numbers
+            active_db_num = DB_FIRST + self.db_notebook.index("current")
+            fb_num  = active_db_num * 10 + 209   # DB11→319, DB12→329, DB13→339
+            vis_num = active_db_num + 490          # DB11→501, DB12→502, DB13→503
+
             generated = []
 
-            # Save any open DB page widgets first
+            # Save current DB page widgets first
             for db_num in self.loaded_db_pages:
                 self._save_section_widgets_to_project(db_num)
 
-            # ── Generate filled DB AWL files ──
-            db_name = f"G-DB_{station}"
-            for db_num in DB_RANGE:
-                db_key = str(db_num)
-                sections_raw = self.project["db_pages"].get(db_key, {}).get("sections", {})
-                sections_data = {}
-                for sec_name, sec_comments in sections_raw.items():
-                    int_comments = {int(k): v for k, v in sec_comments.items()
-                                    if str(k).isdigit()}
-                    if int_comments:
-                        sections_data[sec_name] = int_comments
-                has_data = bool(sections_data)
-                if has_data:
-                    awl_lines = generate_awl(db_num, station, db_name, sections_data, self.template_path)
-                    fpath = os.path.join(out_dir, f"db{db_num}.AWL")
-                    with open(fpath, "w", encoding="utf-8") as f:
-                        f.writelines(awl_lines)
-                    generated.append(f"db{db_num}.AWL  ({db_name})")
+            # ── Generate active DB AWL ──
+            db_name  = f"G-DB_{station}"
+            db_key   = str(active_db_num)
+            sections_raw = self.project["db_pages"].get(db_key, {}).get("sections", {})
+            sections_data = {}
+            for sec_name, sec_comments in sections_raw.items():
+                int_comments = {int(k): v for k, v in sec_comments.items()
+                                if str(k).isdigit()}
+                if int_comments:
+                    sections_data[sec_name] = int_comments
+            awl_lines = generate_awl(active_db_num, station, db_name, sections_data, self.template_path)
+            db_path = os.path.join(out_dir, f"db{active_db_num}.AWL")
+            with open(db_path, "w", encoding="utf-8") as f:
+                f.writelines(awl_lines)
+            generated.append(f"db{active_db_num}.AWL  ({db_name})")
 
-            # ── Generate VIS DB (empty template) ──
-            try:
-                station_idx = int(station[-2:])
-            except ValueError:
-                station_idx = 1
-            vis_num  = 500 + station_idx
+            # ── Generate VIS DB ──
             vis_name = f"VIS_{station}"
             vis_awl  = generate_awl(vis_num, station, vis_name, {}, self.template_path)
             vis_path = os.path.join(out_dir, f"db{vis_num}.AWL")
@@ -2508,14 +2478,14 @@ class AWLGeneratorApp:
             }
             fb_content = generate_fb_output(station, hmi_loc, islands_config,
                                             robot_names, drop_robot_cfg, pick_robot_cfg)
-            fb_fname = f"ST-{station[:3]}_OUTPUT.AWL"
+            fb_fname = f"ST-{station}_OUTPUT.AWL"
             fb_path  = os.path.join(out_dir, fb_fname)
             with open(fb_path, "w", encoding="utf-8") as f:
                 f.write(fb_content)
-            generated.append(fb_fname)
+            generated.append(f"{fb_fname}  (FB{fb_num})")
 
             # ── Generate symbol list ──
-            sym_content = self._generate_symbol_list_content(station)
+            sym_content = self._generate_symbol_list_content(station, active_db_num)
             sym_fname   = f"{station}_SYMBOL_LIST.ASC"
             sym_path    = os.path.join(out_dir, sym_fname)
             with open(sym_path, "w", encoding="cp1252", newline="\r\n") as f:
