@@ -1,0 +1,947 @@
+DATA_BLOCK "VIS_130T01"
+TITLE =
+{ S7_language := '16(1) Italiano (Italia)  09.02.2008  07:33:54' }
+VERSION : 0.1
+
+
+  STRUCT 	
+   V_OP_MODE : DWORD ;	//OP_MODE
+   V_OP_STATE : DWORD ;	//State of station e.g. End of work and so on
+   V_STEP_NUMBER : INT ;	//Step number 
+   V_PARITY : DWORD ;	//Parity Fault mask
+   V_CAR_TYPE : INT ;	//Type of Car Body
+   W_COUNTDOWN_SECONDI : INT ;	//Impostazione da WinCC tempo di countdown (secondi confermati)
+   W_COUNTDOWN_MINUTI : INT ;	//Impostazione da WinCC tempo di countdown (minuti confermati)
+   R_COUNTDOWN_SECONDI : INT ;	//Impostazione da WinCC tempo di countdown (secondi preselezione)
+   R_COUNTDOWN_MINUTI : INT ;	//Impostazione da WinCC tempo di countdown (minuti preselezione)
+   Riserv2 : INT ;	//Riserva
+   Riserv3 : INT ;	//Riserva
+   Riserv4 : INT ;	//Riserva
+   Riserv5 : INT ;	//Riserva
+   Riserv6 : INT ;	//Riserva
+   Riserv7 : INT ;	//Riserva
+   Riserv8 : INT ;	//Riserva
+   Riserv9 : INT ;	//Riserva
+   Riserva10 : INT ;	//Riserva
+   Riserva11 : INT ;	//Riserva
+   Riserva12 : INT ;	//Riserva
+   Message_1_1 : BOOL ;	//Message for HMI system
+   Message_1_2 : BOOL ;	//Message for HMI system
+   Message_1_3 : BOOL ;	//Message for HMI system
+   Message_1_4 : BOOL ;	//Message for HMI system
+   Message_1_5 : BOOL ;	//Message for HMI system
+   Message_1_6 : BOOL ;	//Message for HMI system
+   Message_1_7 : BOOL ;	//Message for HMI system
+   Message_1_8 : BOOL ;	//Message for HMI system
+   Message_2_1 : BOOL ;	//Message for HMI system
+   Message_2_2 : BOOL ;	//Message for HMI system
+   Message_2_3 : BOOL ;	//Message for HMI system
+   Message_2_4 : BOOL ;	//Message for HMI system
+   Message_2_5 : BOOL ;	//Message for HMI system
+   Message_2_6 : BOOL ;	//Message for HMI system
+   Message_2_7 : BOOL ;	//Message for HMI system
+   Message_2_8 : BOOL ;	//Message for HMI system
+   Message_3_1 : BOOL ;	//Message for HMI system
+   Message_3_2 : BOOL ;	//Message for HMI system
+   Message_3_3 : BOOL ;	//Message for HMI system
+   Message_3_4 : BOOL ;	//Message for HMI system
+   Message_3_5 : BOOL ;	//Message for HMI system
+   Message_3_6 : BOOL ;	//Message for HMI system
+   Message_3_7 : BOOL ;	//Message for HMI system
+   Message_3_8 : BOOL ;	//Message for HMI system
+   Message_4_1 : BOOL ;	//Message for HMI system
+   Message_4_2 : BOOL ;	//Message for HMI system
+   Message_4_3 : BOOL ;	//Message for HMI system
+   Message_4_4 : BOOL ;	//Message for HMI system
+   Message_4_5 : BOOL ;	//Message for HMI system
+   Message_4_6 : BOOL ;	//Message for HMI system
+   Message_4_7 : BOOL ;	//Message for HMI system
+   Message_4_8 : BOOL ;	//Message for HMI system
+   Message_5_1 : BOOL ;	//Message for HMI system
+   Message_5_2 : BOOL ;	//Message for HMI system
+   Message_5_3 : BOOL ;	//Message for HMI system
+   Message_5_4 : BOOL ;	//Message for HMI system
+   Message_5_5 : BOOL ;	//Message for HMI system
+   Message_5_6 : BOOL ;	//Message for HMI system
+   Message_5_7 : BOOL ;	//Message for HMI system
+   Message_5_8 : BOOL ;	//Message for HMI system
+   Message_6_1 : BOOL ;	//Message for HMI system
+   Message_6_2 : BOOL ;	//Message for HMI system
+   Message_6_3 : BOOL ;	//Message for HMI system
+   Message_6_4 : BOOL ;	//Message for HMI system
+   Message_6_5 : BOOL ;	//Message for HMI system
+   Message_6_6 : BOOL ;	//Message for HMI system
+   Message_6_7 : BOOL ;	//Message for HMI system
+   Message_6_8 : BOOL ;	//Message for HMI system
+   Message_7_1 : BOOL ;	//Message for HMI system
+   Message_7_2 : BOOL ;	//Message for HMI system
+   Message_7_3 : BOOL ;	//Message for HMI system
+   Message_7_4 : BOOL ;	//Message for HMI system
+   Message_7_5 : BOOL ;	//Message for HMI system
+   Message_7_6 : BOOL ;	//Message for HMI system
+   Message_7_7 : BOOL ;	//Message for HMI system
+   Message_7_8 : BOOL ;	//Message for HMI system
+   Message_8_1 : BOOL ;	//Message for HMI system
+   Message_8_2 : BOOL ;	//Message for HMI system
+   Message_8_3 : BOOL ;	//Message for HMI system
+   Message_8_4 : BOOL ;	//Message for HMI system
+   Message_8_5 : BOOL ;	//Message for HMI system
+   Message_8_6 : BOOL ;	//Message for HMI system
+   Message_8_7 : BOOL ;	//Message for HMI system
+   Message_8_8 : BOOL ;	//Message for HMI system
+   Reserve_1 : WORD ;	//Reserve
+   Safety_Door_1 : BYTE ;	//Safety Door 1
+   Safety_Door_2 : BYTE ;	//Safety Door 2
+   Safety_Door_3 : BYTE ;	//Safety Door 3
+   Safety_Door_4 : BYTE ;	//Safety Door 4
+   Reserve_4 : WORD ;	//Reserve
+   Reserve_5 : WORD ;	//Reserve
+   Reserve_6 : WORD ;	//Reserve
+   Reserve_7 : WORD ;	//Reserve
+   Reserve_8 : WORD ;	//Reserve
+   V_DW_ROLLER_1 : DWORD ;	//ROLLER 1
+   V_MoP_W_ROLLER_1 : WORD ;	//ROLLER 1 visu for Mobil Panel
+   V_DW_ROLLER_2 : DWORD ;	//ROLLER 2
+   V_MoP_W_ROLLER_2 : WORD ;	//ROLLER 2 visu for Mobil Panel
+   V_DW_ROLLER_3 : DWORD ;	//ROLLER 3
+   V_MoP_W_ROLLER_3 : WORD ;	//ROLLER 3 visu for Mobil Panel
+   V_DW_ROLLER_4 : DWORD ;	//ROLLER 4
+   V_MoP_W_ROLLER_4 : WORD ;	//ROLLER 4 visu for Mobil Panel
+   V_DW_Lifter_1_1 : DWORD ;	//LIFTER TABLE or ELEVATOR 1 DWord 1
+   V_DW_Lifter_1_2 : WORD ;	//LIFTER TABLE or ELEVATOR 1 Word 2
+   V_MoP_Lifter_1 : WORD ;	//LIFTER TABLE or ELEVATOR 1 visu for Mobil Panel
+   V_DW_Lifter_2_1 : DWORD ;	//LIFTER TABLE or ELEVATOR 2
+   V_DW_Lifter_2_2 : WORD ;	//LIFTER TABLE or ELEVATOR 1
+   V_MoP_Lifter_2 : WORD ;	//LIFTER TABLE or ELEVATOR 2 visu for Mobil Panel
+   V_DW_Lifter_3_1 : DWORD ;	//LIFTER TABLE or ELEVATOR 3
+   V_DW_Lifter_3_2 : WORD ;	//LIFTER TABLE or ELEVATOR 1
+   V_MoP_Lifter_3 : WORD ;	//LIFTER TABLE or ELEVATOR 3 visu for Mobil Panel
+   V_DW_Lifter_4_1 : DWORD ;	//TRASLATOR or ELEVATOR 4
+   V_DW_Lifter_4_2 : WORD ;	//TRASLATORor ELEVATOR 1
+   V_MoP_Lifter_4 : WORD ;	//TRASLATOR or ELEVATOR 4 visu for Mobil Panel
+   V_DW_CROSSCONV1_1 : DWORD ;	//CROSS CONVEYER 1 DWord 1
+   V_DW_CROSSCONV1_2 : WORD ;	//CROSS CONVEYER 1 DWord 2
+   V_MoP_W_CROSSCONV_1 : WORD ;	//CROSS CONVEYER 1 visu for Mobil Panel
+   V_DW_CROSSCONV2_1 : DWORD ;	//CROSS CONVEYER 2 DWord 1
+   V_DW_CROSSCONV2_2 : WORD ;	//CROSS CONVEYER 2 DWord 2
+   V_MoP_W_CROSSCONV_2 : WORD ;	//CROSS CONVEYER 3 visu for Mobil Panel
+   V_DW_CROSSCONV3_1 : DWORD ;	//CROSS CONVEYER 3 DWord 1
+   V_DW_CROSSCONV3_2 : WORD ;	//CROSS CONVEYER 3 DWord 2
+   V_MoP_W_CROSSCONV_3 : WORD ;	//CROSS CONVEYER 3 visu for Mobil Panel
+   V_DW_CROSSCONV4_1 : DWORD ;	//CROSS CONVEYER 4 DWord 1
+   V_DW_CROSSCONV4_2 : WORD ;	//CROSS CONVEYER 4 DWord 2
+   V_MoP_W_CROSSCONV_4 : WORD ;	//CROSS CONVEYER 4 visu for Mobil Panel
+   V_DW_CLAMP_1 : DWORD ;	//CLAMP_GROUP_1
+   V_MoP_W_CLAMP_1 : WORD ;	//CLAMP_GROUP_1 visu for Mobil Panel
+   V_DW_CLAMP_1ext_1A : DWORD ;	//CLAMP_GROUP_1 extention 1
+   V_DW_CLAMP_1ext_1B : DWORD ;	//CLAMP_GROUP_1 extention 2
+   V_DW_CLAMP_2 : DWORD ;	//CLAMP_GROUP 2
+   V_MoP_W_CLAMP_2 : WORD ;	//CLAMP_GROUP 2 visu for Mobil Panel
+   V_DW_CLAMP_2ext_2A : DWORD ;	//CLAMP_GROUP_2 extention 1
+   V_DW_CLAMP_2ext_2B : DWORD ;	//CLAMP_GROUP_2 extention 2
+   V_DW_CLAMP_3 : DWORD ;	//CLAMP_GROUP 3
+   V_MoP_W_CLAMP_3 : WORD ;	//CLAMP_GROUP 3 visu for Mobil Panel
+   V_DW_CLAMP_3ext_3A : DWORD ;	//CLAMP_GROUP_3 extention 1
+   V_DW_CLAMP_3ext_3B : DWORD ;	//CLAMP_GROUP_3 extention 2
+   V_DW_CLAMP_4 : DWORD ;	//CLAMP_GROUP_4
+   V_MoP_W_CLAMP_4 : WORD ;	//CLAMP_GROUP_4 visu for Mobil Panel
+   V_DW_CLAMP_4ext_4A : DWORD ;	//CLAMP_GROUP_4 extention 1
+   V_DW_CLAMP_4ext_4B : DWORD ;	//CLAMP_GROUP_4 extention 2
+   V_DW_CLAMP_5 : DWORD ;	//CLAMP_GROUP_5
+   V_MoP_W_CLAMP_5 : WORD ;	//CLAMP_GROUP_5 visu for Mobil Panel
+   V_DW_CLAMP_5ext_5A : DWORD ;	//CLAMP_GROUP_5 extention 1
+   V_DW_CLAMP_5ext_5B : DWORD ;	//CLAMP_GROUP_5 extention 2
+   V_DW_CLAMP_6 : DWORD ;	//CLAMP_GROUP_6
+   V_MoP_W_CLAMP_6 : WORD ;	//CLAMP_GROUP_6 visu for Mobil Panel
+   V_DW_CLAMP_6ext_6A : DWORD ;	//CLAMP_GROUP_6 extention 1
+   V_DW_CLAMP_6ext_6B : DWORD ;	//CLAMP_GROUP_6 extention 2
+   V_DW_CLAMP_7 : DWORD ;	//CLAMP_GROUP_7
+   V_MoP_W_CLAMP_7 : WORD ;	//CLAMP_GROUP_7 visu for Mobil Panel
+   V_DW_CLAMP_7ext_7A : DWORD ;	//CLAMP_GROUP_7 extention 1
+   V_DW_CLAMP_7ext_7B : DWORD ;	//CLAMP_GROUP_7 extention 2
+   V_DW_CLAMP_8 : DWORD ;	//CLAMP_GROUP_8
+   V_MoP_W_CLAMP_8 : WORD ;	//CLAMP_GROUP_8 visu for Mobil Panel
+   V_DW_CLAMP_8ext_8A : DWORD ;	//CLAMP_GROUP_8 extention 1
+   V_DW_CLAMP_8ext_8B : DWORD ;	//CLAMP_GROUP_8 extention 2
+   V_DW_ROBOT_1 : "ROBOT_VISU";	//ROBOT 1
+   V_DW_ROBOT_2 : "ROBOT_VISU";	//ROBOT 2
+   V_DW_ROBOT_3 : "ROBOT_VISU";	//ROBOT 3
+   V_DW_ROBOT_4 : "ROBOT_VISU";	//ROBOT 4
+   V_DW_ROBOT_5 : "ROBOT_VISU";	//ROBOT 5
+   V_DW_ROBOT_6 : "ROBOT_VISU";	//ROBOT 6
+   V_DW_ROBOT_7 : "ROBOT_VISU";	//ROBOT 7
+   V_DW_ROBOT_8 : "ROBOT_VISU";	//ROBOT 8
+   V_DW_Paratia_1 : DWORD ;	//Paratia 1
+   V_MoP_Paratia_1 : WORD ;	//Paratia 1 visu for Mobil Panel
+   V_DW_Paratia_2 : DWORD ;	//Paratia 2
+   V_MoP_Paratia_2 : WORD ;	//Paratia 2 visu for Mobil Panel
+   V_DW_Paratia_3 : DWORD ;	//Paratia 3
+   V_MoP_Paratia_3 : WORD ;	//Paratia 3 visu for Mobil Panel
+   V_DW_Paratia_4 : DWORD ;	//Paratia 4
+   V_MoP_Paratia_4 : WORD ;	//Paratia 4 visu for Mobil Panel
+   Spare : DWORD ;	//Spare
+   V_DW_MotorStarter_1 : DWORD ;	//MotorStarter Phoenix 1 (solo popup diagnostica)
+   V_DW_MotorStarter_2 : DWORD ;	//MotorStarter Phoenix 2 (solo popup diagnostica)
+   V_DW_MotorStarter_3 : DWORD ;	//MotorStarter Phoenix 3 (solo popup diagnostica)
+   V_DW_MotorStarter_4 : DWORD ;	//MotorStarter Phoenix 4 (solo popup diagnostica)
+   Spare1 : DWORD ;	//Spare
+   Spare2 : DWORD ;	//Spare
+   Spare3 : DWORD ;	//Spare
+   Spare4 : DWORD ;	//Spare
+   V_DW_CLAMP_9 : DWORD ;	//CLAMP_GROUP_9
+   V_MoP_W_CLAMP_9 : WORD ;	//CLAMP_GROUP_9 visu for Mobil Panel
+   V_DW_CLAMP_9ext_9A : DWORD ;	//CLAMP_GROUP_9 extention 1
+   V_DW_CLAMP_9ext_9B : DWORD ;	//CLAMP_GROUP_9 extention 2
+   V_DW_CLAMP_10 : DWORD ;	//CLAMP_GROUP 10
+   V_MoP_W_CLAMP_10 : WORD ;	//CLAMP_GROUP 10 visu for Mobil Panel
+   V_DW_CLAMP_10ext_10A : DWORD ;	//CLAMP_GROUP_10 extention 1
+   V_DW_CLAMP_10ext_10B : DWORD ;	//CLAMP_GROUP_10 extention 2
+   V_DW_CLAMP_11 : DWORD ;	//CLAMP_GROUP 11
+   V_MoP_W_CLAMP_11 : WORD ;	//CLAMP_GROUP 11 visu for Mobil Panel
+   V_DW_CLAMP_11ext_11A : DWORD ;	//CLAMP_GROUP_11 extention 1
+   V_DW_CLAMP_11ext_11B : DWORD ;	//CLAMP_GROUP_11 extention 2
+   V_DW_CLAMP_12 : DWORD ;	//CLAMP_GROUP_12
+   V_MoP_W_CLAMP_12 : WORD ;	//CLAMP_GROUP_12 visu for Mobil Panel
+   V_DW_CLAMP_12ext_12A : DWORD ;	//CLAMP_GROUP_12 extention 1
+   V_DW_CLAMP_12ext_12B : DWORD ;	//CLAMP_GROUP_12 extention 2
+   V_DW_CLAMP_13 : DWORD ;	//CLAMP_GROUP_13
+   V_MoP_W_CLAMP_13 : WORD ;	//CLAMP_GROUP_13 visu for Mobil Panel
+   V_DW_CLAMP_13ext_13A : DWORD ;	//CLAMP_GROUP_13 extention 1
+   V_DW_CLAMP_13ext_13B : DWORD ;	//CLAMP_GROUP_13 extention 2
+   V_DW_CLAMP_14 : DWORD ;	//CLAMP_GROUP_14
+   V_MoP_W_CLAMP_14 : WORD ;	//CLAMP_GROUP_14 visu for Mobil Panel
+   V_DW_CLAMP_14ext_14A : DWORD ;	//CLAMP_GROUP_14 extention 1
+   V_DW_CLAMP_14ext_14B : DWORD ;	//CLAMP_GROUP_14 extention 2
+   V_DW_CLAMP_15 : DWORD ;	//CLAMP_GROUP_15
+   V_MoP_W_CLAMP_15 : WORD ;	//CLAMP_GROUP_15 visu for Mobil Panel
+   V_DW_CLAMP_15ext_15A : DWORD ;	//CLAMP_GROUP_15 extention 1
+   V_DW_CLAMP_15ext_15B : DWORD ;	//CLAMP_GROUP_15 extention 2
+   V_DW_CLAMP_16 : DWORD ;	//CLAMP_GROUP_16
+   V_MoP_W_CLAMP_16 : WORD ;	//CLAMP_GROUP_16 visu for Mobil Panel
+   V_DW_CLAMP_16ext_16A : DWORD ;	//CLAMP_GROUP_16 extention 1
+   V_DW_CLAMP_16ext_16B : DWORD ;	//CLAMP_GROUP_16 extention 2
+   V_DW_CLAMP_17 : DWORD ;	//CLAMP_GROUP_17
+   V_MoP_W_CLAMP_17 : WORD ;	//CLAMP_GROUP_17 visu for Mobil Panel
+   V_DW_CLAMP_17ext_17A : DWORD ;	//CLAMP_GROUP_17 extention 1
+   V_DW_CLAMP_17ext_17B : DWORD ;	//CLAMP_GROUP_17 extention 2
+   V_DW_CLAMP_18 : DWORD ;	//CLAMP_GROUP 10
+   V_MoP_W_CLAMP_18 : WORD ;	//CLAMP_GROUP 18 visu for Mobil Panel
+   V_DW_CLAMP_18ext_18A : DWORD ;	//CLAMP_GROUP_18 extention 1
+   V_DW_CLAMP_18ext_18B : DWORD ;	//CLAMP_GROUP_18 extention 2
+   V_DW_CLAMP_19 : DWORD ;	//CLAMP_GROUP 19
+   V_MoP_W_CLAMP_19 : WORD ;	//CLAMP_GROUP 19 visu for Mobil Panel
+   V_DW_CLAMP_19ext_19A : DWORD ;	//CLAMP_GROUP_19 extention 1
+   V_DW_CLAMP_19ext_19B : DWORD ;	//CLAMP_GROUP_19 extention 2
+   V_DW_CLAMP_20 : DWORD ;	//CLAMP_GROUP_20
+   V_MoP_W_CLAMP_20 : WORD ;	//CLAMP_GROUP_20 visu for Mobil Panel
+   V_DW_CLAMP_20ext_20A : DWORD ;	//CLAMP_GROUP_20 extention 1
+   V_DW_CLAMP_20ext_20B : DWORD ;	//CLAMP_GROUP_20 extention 2
+   V_DW_CLAMP_21 : DWORD ;	//CLAMP_GROUP_21
+   V_MoP_W_CLAMP_21 : WORD ;	//CLAMP_GROUP_21 visu for Mobil Panel
+   V_DW_CLAMP_21ext_21A : DWORD ;	//CLAMP_GROUP_21 extention 1
+   V_DW_CLAMP_21ext_21B : DWORD ;	//CLAMP_GROUP_21 extention 2
+   V_DW_CLAMP_22 : DWORD ;	//CLAMP_GROUP_22
+   V_MoP_W_CLAMP_22 : WORD ;	//CLAMP_GROUP_22 visu for Mobil Panel
+   V_DW_CLAMP_22ext_22A : DWORD ;	//CLAMP_GROUP_22 extention 1
+   V_DW_CLAMP_22ext_22B : DWORD ;	//CLAMP_GROUP_22 extention 2
+   V_DW_CLAMP_23 : DWORD ;	//CLAMP_GROUP_23
+   V_MoP_W_CLAMP_23 : WORD ;	//CLAMP_GROUP_23 visu for Mobil Panel
+   V_DW_CLAMP_23ext_23A : DWORD ;	//CLAMP_GROUP_23 extention 1
+   V_DW_CLAMP_23ext_23B : DWORD ;	//CLAMP_GROUP_23 extention 2
+   V_DW_CLAMP_24 : DWORD ;	//CLAMP_GROUP_24
+   V_MoP_W_CLAMP_24 : WORD ;	//CLAMP_GROUP_24 visu for Mobil Panel
+   V_DW_CLAMP_24ext_24A : DWORD ;	//CLAMP_GROUP_24 extention 1
+   V_DW_CLAMP_24ext_24B : DWORD ;	//CLAMP_GROUP_24 extention 2
+   V_DW_CLAMP_25 : DWORD ;	//CLAMP_GROUP_25
+   V_MoP_W_CLAMP_25 : WORD ;	//CLAMP_GROUP_25 visu for Mobil Panel
+   V_DW_CLAMP_25ext_25A : DWORD ;	//CLAMP_GROUP_25 extention 1
+   V_DW_CLAMP_25ext_25B : DWORD ;	//CLAMP_GROUP_25 extention 2
+   V_DW_CLAMP_26 : DWORD ;	//CLAMP_GROUP 26
+   V_MoP_W_CLAMP_26 : WORD ;	//CLAMP_GROUP 26 visu for Mobil Panel
+   V_DW_CLAMP_26ext_26A : DWORD ;	//CLAMP_GROUP_26 extention 1
+   V_DW_CLAMP_26ext_26B : DWORD ;	//CLAMP_GROUP_26 extention 2
+   V_DW_CLAMP_27 : DWORD ;	//CLAMP_GROUP 27
+   V_MoP_W_CLAMP_27 : WORD ;	//CLAMP_GROUP 27 visu for Mobil Panel
+   V_DW_CLAMP_27ext_27A : DWORD ;	//CLAMP_GROUP_27 extention 1
+   V_DW_CLAMP_27ext_27B : DWORD ;	//CLAMP_GROUP_27 extention 2
+   V_DW_CLAMP_28 : DWORD ;	//CLAMP_GROUP_28
+   V_MoP_W_CLAMP_28 : WORD ;	//CLAMP_GROUP_28 visu for Mobil Panel
+   V_DW_CLAMP_28ext_28A : DWORD ;	//CLAMP_GROUP_28 extention 1
+   V_DW_CLAMP_28ext_28B : DWORD ;	//CLAMP_GROUP_28 extention 2
+   V_DW_CLAMP_29 : DWORD ;	//CLAMP_GROUP_29
+   V_MoP_W_CLAMP_29 : WORD ;	//CLAMP_GROUP_29 visu for Mobil Panel
+   V_DW_CLAMP_29ext_29A : DWORD ;	//CLAMP_GROUP_29 extention 1
+   V_DW_CLAMP_29ext_29B : DWORD ;	//CLAMP_GROUP_29 extention 2
+   V_DW_CLAMP_30 : DWORD ;	//CLAMP_GROUP_30
+   V_MoP_W_CLAMP_30 : WORD ;	//CLAMP_GROUP_30 visu for Mobil Panel
+   V_DW_CLAMP_30ext_30A : DWORD ;	//CLAMP_GROUP_30 extention 1
+   V_DW_CLAMP_30ext_30B : DWORD ;	//CLAMP_GROUP_30 extention 2
+   V_DW_CLAMP_31 : DWORD ;	//CLAMP_GROUP_31
+   V_MoP_W_CLAMP_31 : WORD ;	//CLAMP_GROUP_31 visu for Mobil Panel
+   V_DW_CLAMP_31ext_31A : DWORD ;	//CLAMP_GROUP_31 extention 1
+   V_DW_CLAMP_31ext_31B : DWORD ;	//CLAMP_GROUP_31 extention 2
+   V_DW_CLAMP_32 : DWORD ;	//CLAMP_GROUP_32
+   V_MoP_W_CLAMP_32 : WORD ;	//CLAMP_GROUP_32 visu for Mobil Panel
+   V_DW_CLAMP_32ext_32A : DWORD ;	//CLAMP_GROUP_32 extention 1
+   V_DW_CLAMP_32ext_32B : DWORD ;	//CLAMP_GROUP_32 extention 2
+   Spare5 : DWORD ;	//Spare
+   Spare6 : DWORD ;	//Spare
+   Spare7 : DWORD ;	//Spare
+   Spare8 : DWORD ;	//Spare
+   V_DW_Advantis_Altivar_1 : DWORD ;	//Advantis_Altivar_1 visu for Mobil Panel
+   V_DW_Advantis_Altivar_2 : DWORD ;	//Advantis_Altivar_2 visu for Mobil Panel
+   V_DW_Advantis_Altivar_3 : DWORD ;	//Advantis_Altivar_3 visu for Mobil Panel
+   V_DW_Advantis_Altivar_4 : DWORD ;	//Advantis_Altivar_4 visu for Mobil Panel
+   V_DW_Advantis_Altivar_5 : DWORD ;	//Advantis_Altivar_5 visu for Mobil Panel
+   V_DW_Advantis_Altivar_6 : DWORD ;	//Advantis_Altivar_6 visu for Mobil Panel
+   V_DW_Advantis_Altivar_7 : DWORD ;	//Advantis_Altivar_7 visu for Mobil Panel
+   V_DW_Advantis_Altivar_8 : DWORD ;	//Advantis_Altivar_8 visu for Mobil Panel
+   V_DW_Advantis_Altivar_9 : DWORD ;	//Advantis_Altivar_9 visu for Mobil Panel
+   V_DW_Advantis_Altivar_10 : DWORD ;	//Advantis_Altivar_10 visu for Mobil Panel
+   V_DW_CLAMP_33 : DWORD ;	//CLAMP_GROUP_33
+   V_MoP_W_CLAMP_33 : WORD ;	//CLAMP_GROUP_33 visu for Mobil Panel
+   V_DW_CLAMP_33ext_33A : DWORD ;	//CLAMP_GROUP_33 extention 1
+   V_DW_CLAMP_33ext_33B : DWORD ;	//CLAMP_GROUP_33 extention 2
+   V_DW_CLAMP_34 : DWORD ;	//CLAMP_GROUP_34
+   V_MoP_W_CLAMP_34 : WORD ;	//CLAMP_GROUP_34 visu for Mobil Panel
+   V_DW_CLAMP_34ext_34A : DWORD ;	//CLAMP_GROUP_34 extention 1
+   V_DW_CLAMP_34ext_34B : DWORD ;	//CLAMP_GROUP_34 extention 2
+   V_DW_CLAMP_35 : DWORD ;	//CLAMP_GROUP_35
+   V_MoP_W_CLAMP_35 : WORD ;	//CLAMP_GROUP_35 visu for Mobil Panel
+   V_DW_CLAMP_35ext_35A : DWORD ;	//CLAMP_GROUP_35 extention 1
+   V_DW_CLAMP_35ext_35B : DWORD ;	//CLAMP_GROUP_35 extention 2
+   V_DW_CLAMP_36 : DWORD ;	//CLAMP_GROUP_36
+   V_MoP_W_CLAMP_36 : WORD ;	//CLAMP_GROUP_36 visu for Mobil Panel
+   V_DW_CLAMP_36ext_36A : DWORD ;	//CLAMP_GROUP_36 extention 1
+   V_DW_CLAMP_36ext_36B : DWORD ;	//CLAMP_GROUP_36 extention 2
+   V_DW_CLAMP_37 : DWORD ;	//CLAMP_GROUP_37
+   V_MoP_W_CLAMP_37 : WORD ;	//CLAMP_GROUP_37 visu for Mobil Panel
+   V_DW_CLAMP_37ext_37A : DWORD ;	//CLAMP_GROUP_37 extention 1
+   V_DW_CLAMP_37ext_37B : DWORD ;	//CLAMP_GROUP_37 extention 2
+   V_DW_CLAMP_38 : DWORD ;	//CLAMP_GROUP_38
+   V_MoP_W_CLAMP_38 : WORD ;	//CLAMP_GROUP_38 visu for Mobil Panel
+   V_DW_CLAMP_38ext_38A : DWORD ;	//CLAMP_GROUP_38 extention 1
+   V_DW_CLAMP_38ext_38B : DWORD ;	//CLAMP_GROUP_38 extention 2
+   V_DW_CLAMP_39 : DWORD ;	//CLAMP_GROUP_39
+   V_MoP_W_CLAMP_39 : WORD ;	//CLAMP_GROUP_39 visu for Mobil Panel
+   V_DW_CLAMP_39ext_39A : DWORD ;	//CLAMP_GROUP_39 extention 1
+   V_DW_CLAMP_39ext_39B : DWORD ;	//CLAMP_GROUP_39 extention 2
+   V_DW_CLAMP_40 : DWORD ;	//CLAMP_GROUP_40
+   V_MoP_W_CLAMP_40 : WORD ;	//CLAMP_GROUP_40 visu for Mobil Panel
+   V_DW_CLAMP_40ext_40A : DWORD ;	//CLAMP_GROUP_40 extention 1
+   V_DW_CLAMP_40ext_40B : DWORD ;	//CLAMP_GROUP_40 extention 2
+   V_DW_CLAMP_41 : DWORD ;	//CLAMP_GROUP_41
+   V_MoP_W_CLAMP_41 : WORD ;	//CLAMP_GROUP_41 visu for Mobil Panel
+   V_DW_CLAMP_41ext_41A : DWORD ;	//CLAMP_GROUP_41 extention 1
+   V_DW_CLAMP_41ext_41B : DWORD ;	//CLAMP_GROUP_41 extention 2
+   V_DW_CLAMP_42 : DWORD ;	//CLAMP_GROUP_42
+   V_MoP_W_CLAMP_42 : WORD ;	//CLAMP_GROUP_42 visu for Mobil Panel
+   V_DW_CLAMP_42ext_42A : DWORD ;	//CLAMP_GROUP_42 extention 1
+   V_DW_CLAMP_42ext_42B : DWORD ;	//CLAMP_GROUP_42 extention 2
+   V_DW_CLAMP_43 : DWORD ;	//CLAMP_GROUP_43
+   V_MoP_W_CLAMP_43 : WORD ;	//CLAMP_GROUP_43 visu for Mobil Panel
+   V_DW_CLAMP_43ext_43A : DWORD ;	//CLAMP_GROUP_43 extention 1
+   V_DW_CLAMP_43ext_43B : DWORD ;	//CLAMP_GROUP_43 extention 2
+   V_DW_CLAMP_44 : DWORD ;	//CLAMP_GROUP_44
+   V_MoP_W_CLAMP_44 : WORD ;	//CLAMP_GROUP_44 visu for Mobil Panel
+   V_DW_CLAMP_44ext_44A : DWORD ;	//CLAMP_GROUP_44 extention 1
+   V_DW_CLAMP_44ext_44B : DWORD ;	//CLAMP_GROUP_44 extention 2
+   V_DW_CLAMP_45 : DWORD ;	//CLAMP_GROUP_45
+   V_MoP_W_CLAMP_45 : WORD ;	//CLAMP_GROUP_45 visu for Mobil Panel
+   V_DW_CLAMP_45ext_45A : DWORD ;	//CLAMP_GROUP_45 extention 1
+   V_DW_CLAMP_45ext_45B : DWORD ;	//CLAMP_GROUP_45 extention 2
+   V_DW_CLAMP_46 : DWORD ;	//CLAMP_GROUP_46
+   V_MoP_W_CLAMP_46 : WORD ;	//CLAMP_GROUP_46 visu for Mobil Panel
+   V_DW_CLAMP_46ext_46A : DWORD ;	//CLAMP_GROUP_46 extention 1
+   V_DW_CLAMP_46ext_46B : DWORD ;	//CLAMP_GROUP_46 extention 2
+   V_DW_CLAMP_47 : DWORD ;	//CLAMP_GROUP_47
+   V_MoP_W_CLAMP_47 : WORD ;	//CLAMP_GROUP_47 visu for Mobil Panel
+   V_DW_CLAMP_47ext_47A : DWORD ;	//CLAMP_GROUP_47 extention 1
+   V_DW_CLAMP_47ext_47B : DWORD ;	//CLAMP_GROUP_47 extention 2
+   V_DW_CLAMP_48 : DWORD ;	//CLAMP_GROUP_48
+   V_MoP_W_CLAMP_48 : WORD ;	//CLAMP_GROUP_48 visu for Mobil Panel
+   V_DW_CLAMP_48ext_48A : DWORD ;	//CLAMP_GROUP_48 extention 1
+   V_DW_CLAMP_48ext_48B : DWORD ;	//CLAMP_GROUP_48 extention 2
+   V_DW_CLAMP_49 : DWORD ;	//CLAMP_GROUP_49
+   V_MoP_W_CLAMP_49 : WORD ;	//CLAMP_GROUP_49 visu for Mobil Panel
+   V_DW_CLAMP_49ext_49A : DWORD ;	//CLAMP_GROUP_49 extention 1
+   V_DW_CLAMP_49ext_49B : DWORD ;	//CLAMP_GROUP_49 extention 2
+   V_DW_CLAMP_50 : DWORD ;	//CLAMP_GROUP_50
+   V_MoP_W_CLAMP_50 : WORD ;	//CLAMP_GROUP_50 visu for Mobil Panel
+   V_DW_CLAMP_50ext_50A : DWORD ;	//CLAMP_GROUP_50 extention 1
+   V_DW_CLAMP_50ext_50B : DWORD ;	//CLAMP_GROUP_50 extention 2
+   V_DW_CLAMP_51 : DWORD ;	//CLAMP_GROUP_51
+   V_MoP_W_CLAMP_51 : WORD ;	//CLAMP_GROUP_51 visu for Mobil Panel
+   V_DW_CLAMP_51ext_51A : DWORD ;	//CLAMP_GROUP_51 extention 1
+   V_DW_CLAMP_51ext_51B : DWORD ;	//CLAMP_GROUP_51 extention 2
+   V_DW_CLAMP_52 : DWORD ;	//CLAMP_GROUP_52
+   V_MoP_W_CLAMP_52 : WORD ;	//CLAMP_GROUP_52 visu for Mobil Panel
+   V_DW_CLAMP_52ext_52A : DWORD ;	//CLAMP_GROUP_52 extention 1
+   V_DW_CLAMP_52ext_52B : DWORD ;	//CLAMP_GROUP_52 extention 2
+   V_DW_CLAMP_53 : DWORD ;	//CLAMP_GROUP_53
+   V_MoP_W_CLAMP_53 : WORD ;	//CLAMP_GROUP_53 visu for Mobil Panel
+   V_DW_CLAMP_53ext_53A : DWORD ;	//CLAMP_GROUP_53 extention 1
+   V_DW_CLAMP_53ext_53B : DWORD ;	//CLAMP_GROUP_53 extention 2
+   V_DW_CLAMP_54 : DWORD ;	//CLAMP_GROUP_54
+   V_MoP_W_CLAMP_54 : WORD ;	//CLAMP_GROUP_54 visu for Mobil Panel
+   V_DW_CLAMP_54ext_54A : DWORD ;	//CLAMP_GROUP_54 extention 1
+   V_DW_CLAMP_54ext_54B : DWORD ;	//CLAMP_GROUP_54 extention 2
+   V_DW_CLAMP_55 : DWORD ;	//CLAMP_GROUP_55
+   V_MoP_W_CLAMP_55 : WORD ;	//CLAMP_GROUP_55 visu for Mobil Panel
+   V_DW_CLAMP_55ext_55A : DWORD ;	//CLAMP_GROUP_55 extention 1
+   V_DW_CLAMP_55ext_55B : DWORD ;	//CLAMP_GROUP_55 extention 2
+   V_DW_CLAMP_56 : DWORD ;	//CLAMP_GROUP_56
+   V_MoP_W_CLAMP_56 : WORD ;	//CLAMP_GROUP_56 visu for Mobil Panel
+   V_DW_CLAMP_56ext_56A : DWORD ;	//CLAMP_GROUP_56 extention 1
+   V_DW_CLAMP_56ext_56B : DWORD ;	//CLAMP_GROUP_56 extention 2
+   V_DW_CLAMP_57 : DWORD ;	//CLAMP_GROUP_57
+   V_MoP_W_CLAMP_57 : WORD ;	//CLAMP_GROUP_57 visu for Mobil Panel
+   V_DW_CLAMP_57ext_57A : DWORD ;	//CLAMP_GROUP_57 extention 1
+   V_DW_CLAMP_57ext_57B : DWORD ;	//CLAMP_GROUP_57 extention 2
+   V_DW_CLAMP_58 : DWORD ;	//CLAMP_GROUP_58
+   V_MoP_W_CLAMP_58 : WORD ;	//CLAMP_GROUP_58 visu for Mobil Panel
+   V_DW_CLAMP_58ext_58A : DWORD ;	//CLAMP_GROUP_58 extention 1
+   V_DW_CLAMP_58ext_58B : DWORD ;	//CLAMP_GROUP_58 extention 2
+   V_DW_CLAMP_59 : DWORD ;	//CLAMP_GROUP_59
+   V_MoP_W_CLAMP_59 : WORD ;	//CLAMP_GROUP_59 visu for Mobil Panel
+   V_DW_CLAMP_59ext_59A : DWORD ;	//CLAMP_GROUP_59 extention 1
+   V_DW_CLAMP_59ext_59B : DWORD ;	//CLAMP_GROUP_59 extention 2
+   V_DW_CLAMP_60 : DWORD ;	//CLAMP_GROUP_60    
+   V_MoP_W_CLAMP_60 : WORD ;	//CLAMP_GROUP_60 visu for Mobil Panel
+   V_DW_CLAMP_60ext_60A : DWORD ;	//CLAMP_GROUP_60 extention 1
+   V_DW_CLAMP_60ext_60B : DWORD ;	//CLAMP_GROUP_60 extention 2
+   V_DW_CLAMP_61 : DWORD ;	//CLAMP_GROUP_61
+   V_MoP_W_CLAMP_61 : WORD ;	//CLAMP_GROUP_61 visu for Mobil Panel
+   V_DW_CLAMP_61ext_61A : DWORD ;	//CLAMP_GROUP_61 extention 1
+   V_DW_CLAMP_61ext_61B : DWORD ;	//CLAMP_GROUP_61 extention 2
+   V_DW_CLAMP_62 : DWORD ;	//CLAMP_GROUP_62
+   V_MoP_W_CLAMP_62 : WORD ;	//CLAMP_GROUP_62 visu for Mobil Panel
+   V_DW_CLAMP_62ext_62A : DWORD ;	//CLAMP_GROUP_62 extention 1
+   V_DW_CLAMP_62ext_62B : DWORD ;	//CLAMP_GROUP_62 extention 2
+   V_DW_CLAMP_63 : DWORD ;	//CLAMP_GROUP_63
+   V_MoP_W_CLAMP_63 : WORD ;	//CLAMP_GROUP_63 visu for Mobil Panel
+   V_DW_CLAMP_63ext_63A : DWORD ;	//CLAMP_GROUP_63 extention 1
+   V_DW_CLAMP_63ext_63B : DWORD ;	//CLAMP_GROUP_63 extention 2
+   V_DW_CLAMP_64 : DWORD ;	//CLAMP_GROUP_64
+   V_MoP_W_CLAMP_64 : WORD ;	//CLAMP_GROUP_64 visu for Mobil Panel
+   V_DW_CLAMP_64ext_64A : DWORD ;	//CLAMP_GROUP_64 extention 1
+   V_DW_CLAMP_64ext_64B : DWORD ;	//CLAMP_GROUP_64 extention 2
+   V_DW_Lifter_5_1 : DWORD ;	//TRASLATOR or ELEVATOR 4
+   V_DW_Lifter_5_2 : WORD ;	//TRASLATORor ELEVATOR 1
+   V_MoP_Lifter_5 : WORD ;	//TRASLATOR or ELEVATOR 4 visu for Mobil Panel
+  END_STRUCT ;	
+BEGIN
+   V_OP_MODE := DW#16#40065501; 
+   V_OP_STATE := DW#16#0; 
+   V_STEP_NUMBER := 0; 
+   V_PARITY := DW#16#0; 
+   V_CAR_TYPE := 0; 
+   W_COUNTDOWN_SECONDI := 0; 
+   W_COUNTDOWN_MINUTI := 0; 
+   R_COUNTDOWN_SECONDI := 0; 
+   R_COUNTDOWN_MINUTI := 0; 
+   Riserv2 := 0; 
+   Riserv3 := 0; 
+   Riserv4 := 0; 
+   Riserv5 := 0; 
+   Riserv6 := 0; 
+   Riserv7 := 0; 
+   Riserv8 := 0; 
+   Riserv9 := 0; 
+   Riserva10 := 0; 
+   Riserva11 := 0; 
+   Riserva12 := 0; 
+   Message_1_1 := FALSE; 
+   Message_1_2 := FALSE; 
+   Message_1_3 := FALSE; 
+   Message_1_4 := FALSE; 
+   Message_1_5 := FALSE; 
+   Message_1_6 := FALSE; 
+   Message_1_7 := FALSE; 
+   Message_1_8 := FALSE; 
+   Message_2_1 := FALSE; 
+   Message_2_2 := FALSE; 
+   Message_2_3 := FALSE; 
+   Message_2_4 := FALSE; 
+   Message_2_5 := FALSE; 
+   Message_2_6 := FALSE; 
+   Message_2_7 := FALSE; 
+   Message_2_8 := FALSE; 
+   Message_3_1 := FALSE; 
+   Message_3_2 := FALSE; 
+   Message_3_3 := FALSE; 
+   Message_3_4 := FALSE; 
+   Message_3_5 := FALSE; 
+   Message_3_6 := FALSE; 
+   Message_3_7 := FALSE; 
+   Message_3_8 := FALSE; 
+   Message_4_1 := FALSE; 
+   Message_4_2 := FALSE; 
+   Message_4_3 := FALSE; 
+   Message_4_4 := FALSE; 
+   Message_4_5 := FALSE; 
+   Message_4_6 := FALSE; 
+   Message_4_7 := FALSE; 
+   Message_4_8 := FALSE; 
+   Message_5_1 := FALSE; 
+   Message_5_2 := FALSE; 
+   Message_5_3 := FALSE; 
+   Message_5_4 := FALSE; 
+   Message_5_5 := FALSE; 
+   Message_5_6 := FALSE; 
+   Message_5_7 := FALSE; 
+   Message_5_8 := FALSE; 
+   Message_6_1 := FALSE; 
+   Message_6_2 := FALSE; 
+   Message_6_3 := FALSE; 
+   Message_6_4 := FALSE; 
+   Message_6_5 := FALSE; 
+   Message_6_6 := FALSE; 
+   Message_6_7 := FALSE; 
+   Message_6_8 := FALSE; 
+   Message_7_1 := FALSE; 
+   Message_7_2 := FALSE; 
+   Message_7_3 := FALSE; 
+   Message_7_4 := FALSE; 
+   Message_7_5 := FALSE; 
+   Message_7_6 := FALSE; 
+   Message_7_7 := FALSE; 
+   Message_7_8 := FALSE; 
+   Message_8_1 := FALSE; 
+   Message_8_2 := FALSE; 
+   Message_8_3 := FALSE; 
+   Message_8_4 := FALSE; 
+   Message_8_5 := FALSE; 
+   Message_8_6 := FALSE; 
+   Message_8_7 := FALSE; 
+   Message_8_8 := FALSE; 
+   Reserve_1 := W#16#0; 
+   Safety_Door_1 := B#16#0; 
+   Safety_Door_2 := B#16#0; 
+   Safety_Door_3 := B#16#0; 
+   Safety_Door_4 := B#16#0; 
+   Reserve_4 := W#16#0; 
+   Reserve_5 := W#16#0; 
+   Reserve_6 := W#16#0; 
+   Reserve_7 := W#16#0; 
+   Reserve_8 := W#16#0; 
+   V_DW_ROLLER_1 := DW#16#0; 
+   V_MoP_W_ROLLER_1 := W#16#0; 
+   V_DW_ROLLER_2 := DW#16#0; 
+   V_MoP_W_ROLLER_2 := W#16#0; 
+   V_DW_ROLLER_3 := DW#16#0; 
+   V_MoP_W_ROLLER_3 := W#16#0; 
+   V_DW_ROLLER_4 := DW#16#0; 
+   V_MoP_W_ROLLER_4 := W#16#0; 
+   V_DW_Lifter_1_1 := DW#16#0; 
+   V_DW_Lifter_1_2 := W#16#0; 
+   V_MoP_Lifter_1 := W#16#0; 
+   V_DW_Lifter_2_1 := DW#16#0; 
+   V_DW_Lifter_2_2 := W#16#0; 
+   V_MoP_Lifter_2 := W#16#0; 
+   V_DW_Lifter_3_1 := DW#16#0; 
+   V_DW_Lifter_3_2 := W#16#0; 
+   V_MoP_Lifter_3 := W#16#0; 
+   V_DW_Lifter_4_1 := DW#16#0; 
+   V_DW_Lifter_4_2 := W#16#0; 
+   V_MoP_Lifter_4 := W#16#0; 
+   V_DW_CROSSCONV1_1 := DW#16#0; 
+   V_DW_CROSSCONV1_2 := W#16#0; 
+   V_MoP_W_CROSSCONV_1 := W#16#0; 
+   V_DW_CROSSCONV2_1 := DW#16#0; 
+   V_DW_CROSSCONV2_2 := W#16#0; 
+   V_MoP_W_CROSSCONV_2 := W#16#0; 
+   V_DW_CROSSCONV3_1 := DW#16#0; 
+   V_DW_CROSSCONV3_2 := W#16#0; 
+   V_MoP_W_CROSSCONV_3 := W#16#0; 
+   V_DW_CROSSCONV4_1 := DW#16#0; 
+   V_DW_CROSSCONV4_2 := W#16#0; 
+   V_MoP_W_CROSSCONV_4 := W#16#0; 
+   V_DW_CLAMP_1 := DW#16#0; 
+   V_MoP_W_CLAMP_1 := W#16#0; 
+   V_DW_CLAMP_1ext_1A := DW#16#0; 
+   V_DW_CLAMP_1ext_1B := DW#16#0; 
+   V_DW_CLAMP_2 := DW#16#82120002; 
+   V_MoP_W_CLAMP_2 := W#16#A; 
+   V_DW_CLAMP_2ext_2A := DW#16#82200007; 
+   V_DW_CLAMP_2ext_2B := DW#16#0; 
+   V_DW_CLAMP_3 := DW#16#82020002; 
+   V_MoP_W_CLAMP_3 := W#16#A; 
+   V_DW_CLAMP_3ext_3A := DW#16#0; 
+   V_DW_CLAMP_3ext_3B := DW#16#0; 
+   V_DW_CLAMP_4 := DW#16#82020002; 
+   V_MoP_W_CLAMP_4 := W#16#A; 
+   V_DW_CLAMP_4ext_4A := DW#16#0; 
+   V_DW_CLAMP_4ext_4B := DW#16#0; 
+   V_DW_CLAMP_5 := DW#16#82120002; 
+   V_MoP_W_CLAMP_5 := W#16#A; 
+   V_DW_CLAMP_5ext_5A := DW#16#82000003; 
+   V_DW_CLAMP_5ext_5B := DW#16#0; 
+   V_DW_CLAMP_6 := DW#16#82020002; 
+   V_MoP_W_CLAMP_6 := W#16#A; 
+   V_DW_CLAMP_6ext_6A := DW#16#0; 
+   V_DW_CLAMP_6ext_6B := DW#16#0; 
+   V_DW_CLAMP_7 := DW#16#82020002; 
+   V_MoP_W_CLAMP_7 := W#16#A; 
+   V_DW_CLAMP_7ext_7A := DW#16#0; 
+   V_DW_CLAMP_7ext_7B := DW#16#0; 
+   V_DW_CLAMP_8 := DW#16#82120002; 
+   V_MoP_W_CLAMP_8 := W#16#A; 
+   V_DW_CLAMP_8ext_8A := DW#16#2000001; 
+   V_DW_CLAMP_8ext_8B := DW#16#0; 
+   V_DW_ROBOT_1._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_1._Sta_3 := B#16#0; 
+   V_DW_ROBOT_1._Sta_2 := B#16#0; 
+   V_DW_ROBOT_1._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_1._In := DW#16#0; 
+   V_DW_ROBOT_1._ProgNo := B#16#0; 
+   V_DW_ROBOT_1._CSS := W#16#0; 
+   V_DW_ROBOT_1._Help_In1 := W#16#0; 
+   V_DW_ROBOT_1._Help_In2 := W#16#0; 
+   V_DW_ROBOT_1._Visu := DW#16#0; 
+   V_DW_ROBOT_1._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_1._Help_Out2 := W#16#0; 
+   V_DW_ROBOT_2._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_2._Sta_3 := B#16#0; 
+   V_DW_ROBOT_2._Sta_2 := B#16#0; 
+   V_DW_ROBOT_2._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_2._In := DW#16#0; 
+   V_DW_ROBOT_2._ProgNo := B#16#0; 
+   V_DW_ROBOT_2._CSS := W#16#0; 
+   V_DW_ROBOT_2._Help_In1 := W#16#0; 
+   V_DW_ROBOT_2._Help_In2 := W#16#0; 
+   V_DW_ROBOT_2._Visu := DW#16#0; 
+   V_DW_ROBOT_2._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_2._Help_Out2 := W#16#0; 
+   V_DW_ROBOT_3._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_3._Sta_3 := B#16#0; 
+   V_DW_ROBOT_3._Sta_2 := B#16#0; 
+   V_DW_ROBOT_3._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_3._In := DW#16#0; 
+   V_DW_ROBOT_3._ProgNo := B#16#0; 
+   V_DW_ROBOT_3._CSS := W#16#0; 
+   V_DW_ROBOT_3._Help_In1 := W#16#0; 
+   V_DW_ROBOT_3._Help_In2 := W#16#0; 
+   V_DW_ROBOT_3._Visu := DW#16#0; 
+   V_DW_ROBOT_3._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_3._Help_Out2 := W#16#0; 
+   V_DW_ROBOT_4._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_4._Sta_3 := B#16#0; 
+   V_DW_ROBOT_4._Sta_2 := B#16#0; 
+   V_DW_ROBOT_4._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_4._In := DW#16#0; 
+   V_DW_ROBOT_4._ProgNo := B#16#0; 
+   V_DW_ROBOT_4._CSS := W#16#0; 
+   V_DW_ROBOT_4._Help_In1 := W#16#0; 
+   V_DW_ROBOT_4._Help_In2 := W#16#0; 
+   V_DW_ROBOT_4._Visu := DW#16#0; 
+   V_DW_ROBOT_4._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_4._Help_Out2 := W#16#0; 
+   V_DW_ROBOT_5._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_5._Sta_3 := B#16#0; 
+   V_DW_ROBOT_5._Sta_2 := B#16#0; 
+   V_DW_ROBOT_5._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_5._In := DW#16#0; 
+   V_DW_ROBOT_5._ProgNo := B#16#0; 
+   V_DW_ROBOT_5._CSS := W#16#0; 
+   V_DW_ROBOT_5._Help_In1 := W#16#0; 
+   V_DW_ROBOT_5._Help_In2 := W#16#0; 
+   V_DW_ROBOT_5._Visu := DW#16#0; 
+   V_DW_ROBOT_5._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_5._Help_Out2 := W#16#0; 
+   V_DW_ROBOT_6._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_6._Sta_3 := B#16#0; 
+   V_DW_ROBOT_6._Sta_2 := B#16#0; 
+   V_DW_ROBOT_6._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_6._In := DW#16#0; 
+   V_DW_ROBOT_6._ProgNo := B#16#0; 
+   V_DW_ROBOT_6._CSS := W#16#0; 
+   V_DW_ROBOT_6._Help_In1 := W#16#0; 
+   V_DW_ROBOT_6._Help_In2 := W#16#0; 
+   V_DW_ROBOT_6._Visu := DW#16#0; 
+   V_DW_ROBOT_6._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_6._Help_Out2 := W#16#0; 
+   V_DW_ROBOT_7._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_7._Sta_3 := B#16#0; 
+   V_DW_ROBOT_7._Sta_2 := B#16#0; 
+   V_DW_ROBOT_7._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_7._In := DW#16#0; 
+   V_DW_ROBOT_7._ProgNo := B#16#0; 
+   V_DW_ROBOT_7._CSS := W#16#0; 
+   V_DW_ROBOT_7._Help_In1 := W#16#0; 
+   V_DW_ROBOT_7._Help_In2 := W#16#0; 
+   V_DW_ROBOT_7._Visu := DW#16#0; 
+   V_DW_ROBOT_7._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_7._Help_Out2 := W#16#0; 
+   V_DW_ROBOT_8._SPARE1 := DW#16#0; 
+   V_DW_ROBOT_8._Sta_3 := B#16#0; 
+   V_DW_ROBOT_8._Sta_2 := B#16#0; 
+   V_DW_ROBOT_8._Sta_1 := DW#16#0; 
+   V_DW_ROBOT_8._In := DW#16#0; 
+   V_DW_ROBOT_8._ProgNo := B#16#0; 
+   V_DW_ROBOT_8._CSS := W#16#0; 
+   V_DW_ROBOT_8._Help_In1 := W#16#0; 
+   V_DW_ROBOT_8._Help_In2 := W#16#0; 
+   V_DW_ROBOT_8._Visu := DW#16#0; 
+   V_DW_ROBOT_8._Help_Out1 := DW#16#0; 
+   V_DW_ROBOT_8._Help_Out2 := W#16#0; 
+   V_DW_Paratia_1 := DW#16#0; 
+   V_MoP_Paratia_1 := W#16#0; 
+   V_DW_Paratia_2 := DW#16#0; 
+   V_MoP_Paratia_2 := W#16#0; 
+   V_DW_Paratia_3 := DW#16#0; 
+   V_MoP_Paratia_3 := W#16#0; 
+   V_DW_Paratia_4 := DW#16#0; 
+   V_MoP_Paratia_4 := W#16#0; 
+   Spare := DW#16#0; 
+   V_DW_MotorStarter_1 := DW#16#0; 
+   V_DW_MotorStarter_2 := DW#16#0; 
+   V_DW_MotorStarter_3 := DW#16#0; 
+   V_DW_MotorStarter_4 := DW#16#0; 
+   Spare1 := DW#16#0; 
+   Spare2 := DW#16#0; 
+   Spare3 := DW#16#0; 
+   Spare4 := DW#16#0; 
+   V_DW_CLAMP_9 := DW#16#80100000; 
+   V_MoP_W_CLAMP_9 := W#16#A; 
+   V_DW_CLAMP_9ext_9A := DW#16#20080F; 
+   V_DW_CLAMP_9ext_9B := DW#16#0; 
+   V_DW_CLAMP_10 := DW#16#82120002; 
+   V_MoP_W_CLAMP_10 := W#16#A; 
+   V_DW_CLAMP_10ext_10A := DW#16#82000003; 
+   V_DW_CLAMP_10ext_10B := DW#16#0; 
+   V_DW_CLAMP_11 := DW#16#82120002; 
+   V_MoP_W_CLAMP_11 := W#16#A; 
+   V_DW_CLAMP_11ext_11A := DW#16#2000001; 
+   V_DW_CLAMP_11ext_11B := DW#16#0; 
+   V_DW_CLAMP_12 := DW#16#82020002; 
+   V_MoP_W_CLAMP_12 := W#16#A; 
+   V_DW_CLAMP_12ext_12A := DW#16#0; 
+   V_DW_CLAMP_12ext_12B := DW#16#0; 
+   V_DW_CLAMP_13 := DW#16#82020002; 
+   V_MoP_W_CLAMP_13 := W#16#A; 
+   V_DW_CLAMP_13ext_13A := DW#16#0; 
+   V_DW_CLAMP_13ext_13B := DW#16#0; 
+   V_DW_CLAMP_14 := DW#16#82020002; 
+   V_MoP_W_CLAMP_14 := W#16#A; 
+   V_DW_CLAMP_14ext_14A := DW#16#0; 
+   V_DW_CLAMP_14ext_14B := DW#16#0; 
+   V_DW_CLAMP_15 := DW#16#82020002; 
+   V_MoP_W_CLAMP_15 := W#16#A; 
+   V_DW_CLAMP_15ext_15A := DW#16#0; 
+   V_DW_CLAMP_15ext_15B := DW#16#0; 
+   V_DW_CLAMP_16 := DW#16#0; 
+   V_MoP_W_CLAMP_16 := W#16#0; 
+   V_DW_CLAMP_16ext_16A := DW#16#0; 
+   V_DW_CLAMP_16ext_16B := DW#16#0; 
+   V_DW_CLAMP_17 := DW#16#82020002; 
+   V_MoP_W_CLAMP_17 := W#16#A; 
+   V_DW_CLAMP_17ext_17A := DW#16#0; 
+   V_DW_CLAMP_17ext_17B := DW#16#0; 
+   V_DW_CLAMP_18 := DW#16#82020002; 
+   V_MoP_W_CLAMP_18 := W#16#A; 
+   V_DW_CLAMP_18ext_18A := DW#16#0; 
+   V_DW_CLAMP_18ext_18B := DW#16#0; 
+   V_DW_CLAMP_19 := DW#16#82020002; 
+   V_MoP_W_CLAMP_19 := W#16#A; 
+   V_DW_CLAMP_19ext_19A := DW#16#0; 
+   V_DW_CLAMP_19ext_19B := DW#16#0; 
+   V_DW_CLAMP_20 := DW#16#82020002; 
+   V_MoP_W_CLAMP_20 := W#16#A; 
+   V_DW_CLAMP_20ext_20A := DW#16#0; 
+   V_DW_CLAMP_20ext_20B := DW#16#0; 
+   V_DW_CLAMP_21 := DW#16#82020002; 
+   V_MoP_W_CLAMP_21 := W#16#A; 
+   V_DW_CLAMP_21ext_21A := DW#16#0; 
+   V_DW_CLAMP_21ext_21B := DW#16#0; 
+   V_DW_CLAMP_22 := DW#16#0; 
+   V_MoP_W_CLAMP_22 := W#16#0; 
+   V_DW_CLAMP_22ext_22A := DW#16#0; 
+   V_DW_CLAMP_22ext_22B := DW#16#0; 
+   V_DW_CLAMP_23 := DW#16#0; 
+   V_MoP_W_CLAMP_23 := W#16#0; 
+   V_DW_CLAMP_23ext_23A := DW#16#0; 
+   V_DW_CLAMP_23ext_23B := DW#16#0; 
+   V_DW_CLAMP_24 := DW#16#0; 
+   V_MoP_W_CLAMP_24 := W#16#0; 
+   V_DW_CLAMP_24ext_24A := DW#16#0; 
+   V_DW_CLAMP_24ext_24B := DW#16#0; 
+   V_DW_CLAMP_25 := DW#16#0; 
+   V_MoP_W_CLAMP_25 := W#16#0; 
+   V_DW_CLAMP_25ext_25A := DW#16#0; 
+   V_DW_CLAMP_25ext_25B := DW#16#0; 
+   V_DW_CLAMP_26 := DW#16#0; 
+   V_MoP_W_CLAMP_26 := W#16#0; 
+   V_DW_CLAMP_26ext_26A := DW#16#0; 
+   V_DW_CLAMP_26ext_26B := DW#16#0; 
+   V_DW_CLAMP_27 := DW#16#0; 
+   V_MoP_W_CLAMP_27 := W#16#0; 
+   V_DW_CLAMP_27ext_27A := DW#16#0; 
+   V_DW_CLAMP_27ext_27B := DW#16#0; 
+   V_DW_CLAMP_28 := DW#16#0; 
+   V_MoP_W_CLAMP_28 := W#16#0; 
+   V_DW_CLAMP_28ext_28A := DW#16#0; 
+   V_DW_CLAMP_28ext_28B := DW#16#0; 
+   V_DW_CLAMP_29 := DW#16#0; 
+   V_MoP_W_CLAMP_29 := W#16#0; 
+   V_DW_CLAMP_29ext_29A := DW#16#0; 
+   V_DW_CLAMP_29ext_29B := DW#16#0; 
+   V_DW_CLAMP_30 := DW#16#0; 
+   V_MoP_W_CLAMP_30 := W#16#0; 
+   V_DW_CLAMP_30ext_30A := DW#16#0; 
+   V_DW_CLAMP_30ext_30B := DW#16#0; 
+   V_DW_CLAMP_31 := DW#16#0; 
+   V_MoP_W_CLAMP_31 := W#16#0; 
+   V_DW_CLAMP_31ext_31A := DW#16#0; 
+   V_DW_CLAMP_31ext_31B := DW#16#0; 
+   V_DW_CLAMP_32 := DW#16#0; 
+   V_MoP_W_CLAMP_32 := W#16#0; 
+   V_DW_CLAMP_32ext_32A := DW#16#0; 
+   V_DW_CLAMP_32ext_32B := DW#16#0; 
+   Spare5 := DW#16#0; 
+   Spare6 := DW#16#0; 
+   Spare7 := DW#16#0; 
+   Spare8 := DW#16#0; 
+   V_DW_Advantis_Altivar_1 := DW#16#0; 
+   V_DW_Advantis_Altivar_2 := DW#16#0; 
+   V_DW_Advantis_Altivar_3 := DW#16#0; 
+   V_DW_Advantis_Altivar_4 := DW#16#0; 
+   V_DW_Advantis_Altivar_5 := DW#16#0; 
+   V_DW_Advantis_Altivar_6 := DW#16#0; 
+   V_DW_Advantis_Altivar_7 := DW#16#0; 
+   V_DW_Advantis_Altivar_8 := DW#16#0; 
+   V_DW_Advantis_Altivar_9 := DW#16#0; 
+   V_DW_Advantis_Altivar_10 := DW#16#0; 
+   V_DW_CLAMP_33 := DW#16#0; 
+   V_MoP_W_CLAMP_33 := W#16#0; 
+   V_DW_CLAMP_33ext_33A := DW#16#0; 
+   V_DW_CLAMP_33ext_33B := DW#16#0; 
+   V_DW_CLAMP_34 := DW#16#0; 
+   V_MoP_W_CLAMP_34 := W#16#0; 
+   V_DW_CLAMP_34ext_34A := DW#16#0; 
+   V_DW_CLAMP_34ext_34B := DW#16#0; 
+   V_DW_CLAMP_35 := DW#16#0; 
+   V_MoP_W_CLAMP_35 := W#16#0; 
+   V_DW_CLAMP_35ext_35A := DW#16#0; 
+   V_DW_CLAMP_35ext_35B := DW#16#0; 
+   V_DW_CLAMP_36 := DW#16#0; 
+   V_MoP_W_CLAMP_36 := W#16#0; 
+   V_DW_CLAMP_36ext_36A := DW#16#0; 
+   V_DW_CLAMP_36ext_36B := DW#16#0; 
+   V_DW_CLAMP_37 := DW#16#0; 
+   V_MoP_W_CLAMP_37 := W#16#0; 
+   V_DW_CLAMP_37ext_37A := DW#16#0; 
+   V_DW_CLAMP_37ext_37B := DW#16#0; 
+   V_DW_CLAMP_38 := DW#16#0; 
+   V_MoP_W_CLAMP_38 := W#16#0; 
+   V_DW_CLAMP_38ext_38A := DW#16#0; 
+   V_DW_CLAMP_38ext_38B := DW#16#0; 
+   V_DW_CLAMP_39 := DW#16#0; 
+   V_MoP_W_CLAMP_39 := W#16#0; 
+   V_DW_CLAMP_39ext_39A := DW#16#0; 
+   V_DW_CLAMP_39ext_39B := DW#16#0; 
+   V_DW_CLAMP_40 := DW#16#0; 
+   V_MoP_W_CLAMP_40 := W#16#0; 
+   V_DW_CLAMP_40ext_40A := DW#16#0; 
+   V_DW_CLAMP_40ext_40B := DW#16#0; 
+   V_DW_CLAMP_41 := DW#16#0; 
+   V_MoP_W_CLAMP_41 := W#16#0; 
+   V_DW_CLAMP_41ext_41A := DW#16#0; 
+   V_DW_CLAMP_41ext_41B := DW#16#0; 
+   V_DW_CLAMP_42 := DW#16#0; 
+   V_MoP_W_CLAMP_42 := W#16#0; 
+   V_DW_CLAMP_42ext_42A := DW#16#0; 
+   V_DW_CLAMP_42ext_42B := DW#16#0; 
+   V_DW_CLAMP_43 := DW#16#0; 
+   V_MoP_W_CLAMP_43 := W#16#0; 
+   V_DW_CLAMP_43ext_43A := DW#16#0; 
+   V_DW_CLAMP_43ext_43B := DW#16#0; 
+   V_DW_CLAMP_44 := DW#16#0; 
+   V_MoP_W_CLAMP_44 := W#16#0; 
+   V_DW_CLAMP_44ext_44A := DW#16#0; 
+   V_DW_CLAMP_44ext_44B := DW#16#0; 
+   V_DW_CLAMP_45 := DW#16#0; 
+   V_MoP_W_CLAMP_45 := W#16#0; 
+   V_DW_CLAMP_45ext_45A := DW#16#0; 
+   V_DW_CLAMP_45ext_45B := DW#16#0; 
+   V_DW_CLAMP_46 := DW#16#0; 
+   V_MoP_W_CLAMP_46 := W#16#0; 
+   V_DW_CLAMP_46ext_46A := DW#16#0; 
+   V_DW_CLAMP_46ext_46B := DW#16#0; 
+   V_DW_CLAMP_47 := DW#16#0; 
+   V_MoP_W_CLAMP_47 := W#16#0; 
+   V_DW_CLAMP_47ext_47A := DW#16#0; 
+   V_DW_CLAMP_47ext_47B := DW#16#0; 
+   V_DW_CLAMP_48 := DW#16#0; 
+   V_MoP_W_CLAMP_48 := W#16#0; 
+   V_DW_CLAMP_48ext_48A := DW#16#0; 
+   V_DW_CLAMP_48ext_48B := DW#16#0; 
+   V_DW_CLAMP_49 := DW#16#0; 
+   V_MoP_W_CLAMP_49 := W#16#0; 
+   V_DW_CLAMP_49ext_49A := DW#16#0; 
+   V_DW_CLAMP_49ext_49B := DW#16#0; 
+   V_DW_CLAMP_50 := DW#16#0; 
+   V_MoP_W_CLAMP_50 := W#16#0; 
+   V_DW_CLAMP_50ext_50A := DW#16#0; 
+   V_DW_CLAMP_50ext_50B := DW#16#0; 
+   V_DW_CLAMP_51 := DW#16#0; 
+   V_MoP_W_CLAMP_51 := W#16#0; 
+   V_DW_CLAMP_51ext_51A := DW#16#0; 
+   V_DW_CLAMP_51ext_51B := DW#16#0; 
+   V_DW_CLAMP_52 := DW#16#0; 
+   V_MoP_W_CLAMP_52 := W#16#0; 
+   V_DW_CLAMP_52ext_52A := DW#16#0; 
+   V_DW_CLAMP_52ext_52B := DW#16#0; 
+   V_DW_CLAMP_53 := DW#16#0; 
+   V_MoP_W_CLAMP_53 := W#16#0; 
+   V_DW_CLAMP_53ext_53A := DW#16#0; 
+   V_DW_CLAMP_53ext_53B := DW#16#0; 
+   V_DW_CLAMP_54 := DW#16#0; 
+   V_MoP_W_CLAMP_54 := W#16#0; 
+   V_DW_CLAMP_54ext_54A := DW#16#0; 
+   V_DW_CLAMP_54ext_54B := DW#16#0; 
+   V_DW_CLAMP_55 := DW#16#0; 
+   V_MoP_W_CLAMP_55 := W#16#0; 
+   V_DW_CLAMP_55ext_55A := DW#16#0; 
+   V_DW_CLAMP_55ext_55B := DW#16#0; 
+   V_DW_CLAMP_56 := DW#16#0; 
+   V_MoP_W_CLAMP_56 := W#16#0; 
+   V_DW_CLAMP_56ext_56A := DW#16#0; 
+   V_DW_CLAMP_56ext_56B := DW#16#0; 
+   V_DW_CLAMP_57 := DW#16#0; 
+   V_MoP_W_CLAMP_57 := W#16#0; 
+   V_DW_CLAMP_57ext_57A := DW#16#0; 
+   V_DW_CLAMP_57ext_57B := DW#16#0; 
+   V_DW_CLAMP_58 := DW#16#0; 
+   V_MoP_W_CLAMP_58 := W#16#0; 
+   V_DW_CLAMP_58ext_58A := DW#16#0; 
+   V_DW_CLAMP_58ext_58B := DW#16#0; 
+   V_DW_CLAMP_59 := DW#16#0; 
+   V_MoP_W_CLAMP_59 := W#16#0; 
+   V_DW_CLAMP_59ext_59A := DW#16#0; 
+   V_DW_CLAMP_59ext_59B := DW#16#0; 
+   V_DW_CLAMP_60 := DW#16#0; 
+   V_MoP_W_CLAMP_60 := W#16#0; 
+   V_DW_CLAMP_60ext_60A := DW#16#0; 
+   V_DW_CLAMP_60ext_60B := DW#16#0; 
+   V_DW_CLAMP_61 := DW#16#0; 
+   V_MoP_W_CLAMP_61 := W#16#0; 
+   V_DW_CLAMP_61ext_61A := DW#16#0; 
+   V_DW_CLAMP_61ext_61B := DW#16#0; 
+   V_DW_CLAMP_62 := DW#16#0; 
+   V_MoP_W_CLAMP_62 := W#16#0; 
+   V_DW_CLAMP_62ext_62A := DW#16#0; 
+   V_DW_CLAMP_62ext_62B := DW#16#0; 
+   V_DW_CLAMP_63 := DW#16#0; 
+   V_MoP_W_CLAMP_63 := W#16#0; 
+   V_DW_CLAMP_63ext_63A := DW#16#0; 
+   V_DW_CLAMP_63ext_63B := DW#16#0; 
+   V_DW_CLAMP_64 := DW#16#0; 
+   V_MoP_W_CLAMP_64 := W#16#0; 
+   V_DW_CLAMP_64ext_64A := DW#16#0; 
+   V_DW_CLAMP_64ext_64B := DW#16#0; 
+   V_DW_Lifter_5_1 := DW#16#0; 
+   V_DW_Lifter_5_2 := W#16#0; 
+   V_MoP_Lifter_5 := W#16#0; 
+END_DATA_BLOCK
+

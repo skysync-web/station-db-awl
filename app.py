@@ -539,9 +539,9 @@ def auto_gen_aux_cycle(station, islands_config, robot_names, op_load=None, drop_
         if load_count >= 2:
             comments[13] = "Aux.2nd Operator Part Load OK"
 
-    # Pilot valve alarm slots at _12 + isl_idx (set/reset by FB_OUTPUT)
+    # Pilot valve alarm slots at _10 + isl_idx (set/reset by FB_OUTPUT)
     for isl_idx, _ in enumerate(islands_config):
-        slot = 12 + isl_idx
+        slot = 10 + isl_idx
         if comments.get(slot) == "RESERVE":
             comments[slot] = f"Aux. Pilot Valve Alarm {isl_idx+1:02d}V00 (BM{isl_idx+1:02d})"
 
@@ -825,14 +825,14 @@ def generate_fb_output(station, hmi_loc_str, islands_config, robot_names=None, d
     W('      =     L      1.0; ')
     for isl_idx in range(len(islands_config)):
         isl    = isl_idx + 1
-        av_pv  = 12 + isl_idx   # Aux_Cycle._12 for BM01, _13 for BM02
+        av_pv  = 10 + isl_idx   # Aux_Cycle._10 for BM01, _11 for BM02
         W('      A     L      1.0; ')
         W(f'      AN    "{db}".Aux_Cycle._{av_pv:02d}; ')
         W(f'      =     "{sig_v}{isl:02d}V00YVA"; ')
 
     for isl_idx in range(len(islands_config)):
         isl   = isl_idx + 1
-        av_pv = 12 + isl_idx
+        av_pv = 10 + isl_idx
         W('NETWORK')
         W(f'TITLE =Pilot Valve Error Check Delay Time {station}-{isl:02d}V00')
         W()
@@ -2453,12 +2453,23 @@ class AWLGeneratorApp:
                 f.writelines(awl_lines)
             generated.append(f"db{active_db_num}.AWL  ({db_name})")
 
-            # ── Generate VIS DB ──
-            vis_name = f"VIS_{station}"
-            vis_awl  = generate_awl(vis_num, station, vis_name, {}, self.template_path)
-            vis_path = os.path.join(out_dir, f"db{vis_num}.AWL")
-            with open(vis_path, "w", encoding="utf-8") as f:
-                f.writelines(vis_awl)
+            # ── Generate VIS DB (duplicate VISU.AWL template, rename block) ──
+            vis_name     = f"VIS_{station}"
+            visu_tpl     = os.path.join(os.path.dirname(self.template_path), "VISU.AWL")
+            vis_path     = os.path.join(out_dir, f"db{vis_num}.AWL")
+            if os.path.exists(visu_tpl):
+                with open(visu_tpl, "r", encoding="utf-8", errors="replace") as f:
+                    visu_lines = f.readlines()
+                with open(vis_path, "w", encoding="utf-8") as f:
+                    for line in visu_lines:
+                        if line.strip().startswith("DATA_BLOCK"):
+                            f.write(f'DATA_BLOCK "{vis_name}"\n')
+                        else:
+                            f.write(line)
+            else:
+                vis_awl = generate_awl(vis_num, station, vis_name, {}, self.template_path)
+                with open(vis_path, "w", encoding="utf-8") as f:
+                    f.writelines(vis_awl)
             generated.append(f"db{vis_num}.AWL  ({vis_name})")
 
             # ── Generate FB OUTPUT ──
