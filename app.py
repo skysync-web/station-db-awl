@@ -67,6 +67,90 @@ ACTUATOR_AUX = {
 
 TEMPLATE_NAME = "db11.AWL"
 
+# Robot DO (outputs from robot = PLC inputs I) signal comments, 256 entries (index 0 = DO1)
+ROBOT_DO_COMMENTS = [
+    "Robot Fault (UO6)",                        # DO1
+    "System Ready (UO2)",                       # DO2
+    "Start / Not Hold (UO3)",                   # DO3
+    "Robot selection key switch",               # DO4
+    "Teach selection key switch",               # DO5
+    "Reserved", "Reserved",                     # DO6-7
+    "Process Fault",                            # DO8
+    "Handling Fault",                           # DO9
+    "Collision Guard Alarm",                    # DO10
+    "Stroke Enabled",                           # DO11
+    "Weld Enabled",                             # DO12
+    "Glue Enabled",                             # DO13
+    "Reserved", "Reserved",                     # DO14-15
+    "Heart Bit (640 ms pulse)",                 # DO16
+    "Reserved",                                 # DO17
+    "Request maintenance head (STUD)",          # DO18
+    "Tip Change ongoing",                       # DO19
+    "Tip Change position reached",              # DO20
+    "Tip Dress ongoing",                        # DO21
+    "End Program",                              # DO22
+    "Program Running",                          # DO23
+    "Home Position",                            # DO24
+    "Reserved", "Reserved",                     # DO25-26
+    "Maintenance ongoing",                      # DO27
+    "Maintenance position reached",             # DO28
+    "Reserved", "Reserved", "Reserved",         # DO29-31
+    "TryOut On",                                # DO32
+    "Tip Change Warning Gun 1",                 # DO33
+    "Tip Change Alarm Gun 1",                   # DO34
+    "Tip Change Warning Gun 2",                 # DO35
+    "Tip Change Alarm Gun 2",                   # DO36
+    "Reserved", "Reserved", "Reserved", "Reserved",  # DO37-40
+] + ["Reserved"] * 72 + [                      # DO41-112
+    "Part 1 on board",                          # DO113
+    "Part 2 on board",                          # DO114
+    "Part 3 on board",                          # DO115
+    "Part 4 on board",                          # DO116
+    "Reserved", "Reserved", "Reserved", "Reserved",  # DO117-120
+] + [f"Out of JOB {n}" for n in range(1, 17)] + [   # DO121-136
+    f"End JOB {n}" for n in range(1, 17)             # DO137-152
+] + [f"Request to Enter Collision Area {n}" for n in range(1, 17)] + [  # DO153-168
+    f"Collision Area Free {n}" for n in range(1, 17)  # DO169-184
+] + [f"Request {n}" for n in range(1, 9)] + [        # DO185-192
+    "Spare"
+] * 64                                               # DO193-256
+
+# Robot DI (inputs to robot = PLC outputs Q) signal comments, 256 entries (index 0 = DI1)
+ROBOT_DI_COMMENTS = [
+    "Fault Reset (UI5)",                        # DI1
+    "Not Drive OFF (UI1-MSTP)",                 # DI2
+    "Start Command (UI6)",                      # DI3
+    "Not Hold (UI2)",                           # DI4
+    "Reserved", "Reserved", "Reserved", "Reserved",  # DI5-8
+    "Reserved", "Reserved",                     # DI9-10
+    "Stroke ON/OFF Command",                    # DI11
+    "Weld ON/OFF Command",                      # DI12
+    "Glue ON/OFF (WET/DRY) Command",            # DI13
+    "Reserved", "Reserved", "Reserved",         # DI14-16
+    "Start Program",                            # DI17
+    "Program Selection Code 1",                 # DI18
+    "Program Selection Code 2",                 # DI19
+    "Program Selection Code 4",                 # DI20
+    "Program Selection Code 8",                 # DI21
+    "Program Selection Code 16",                # DI22
+    "Program Selection Code 32",                # DI23
+    "Reserved",                                 # DI24
+    "Service Program allowed",                  # DI25
+    "Tip Change Done",                          # DI26
+    "Reserved",                                 # DI27
+    "Maintenance Done",                         # DI28
+    "Reserved",                                 # DI29
+    "Ack End Program",                          # DI30
+    "Reserved",                                 # DI31
+    "TryOut (Dry Cycle) ON/OFF Command",        # DI32
+] + ["Reserved"] * 88 + [                      # DI33-120
+    f"Proceed to JOB {n}" for n in range(1, 17)  # DI121-136
+] + [f"Ack END JOB {n}" for n in range(1, 17)] + [  # DI137-152
+    f"Consent to Enter Collision Area {n}" for n in range(1, 17)  # DI153-168
+] + ["Spare"] * 16 + [                          # DI169-184
+    f"Release Request {n}" for n in range(1, 9)  # DI185-192
+] + ["Spare"] * 64                              # DI193-256
+
 SECTION_NAMES = [
     "Header", "F_Gen", "Cycle", "F_Prim",
     "O_I", "AB", "A_I", "RQM", "RQT",
@@ -1164,6 +1248,16 @@ def default_db_page():
     }
 
 
+def robot_short_name(rname):
+    """Convert robot name to Step7 symbol prefix.
+    '040R01' -> '40R1',  '110R02' -> '110R2'
+    """
+    m = re.match(r'^(\d+)R(\d+)$', rname)
+    if m:
+        return f"{int(m.group(1))}R{int(m.group(2))}"
+    return rname
+
+
 def default_project():
     """Create a new empty project."""
     return {
@@ -1178,6 +1272,7 @@ def default_project():
         "pick_part_robot": {"enabled": False, "count": "1", "robot_names": [], "toolings": [], "jobs": []},
         "robot_count": 0,
         "robot_names": [],
+        "robot_io_addrs": [],
         "islands": [
             {
                 "enabled": True,
@@ -1449,10 +1544,13 @@ class AWLGeneratorApp:
         count = self.project["robot_count"]
         self.robot_name_vars = []
         self.robot_valid_labels = []
+        self.robot_io_addr_vars = []
 
-        # Pad existing robot_names list
+        # Pad existing robot_names and robot_io_addrs lists
         while len(self.project["robot_names"]) < count:
             self.project["robot_names"].append("")
+        while len(self.project.setdefault("robot_io_addrs", [])) < count:
+            self.project["robot_io_addrs"].append("")
 
         for i in range(count):
             row = ttk.Frame(self.robot_entries_frame)
@@ -1465,6 +1563,12 @@ class AWLGeneratorApp:
             valid_lbl.pack(side=tk.LEFT, padx=2)
             self.robot_name_vars.append(var)
             self.robot_valid_labels.append(valid_lbl)
+
+            ttk.Label(row, text="IO Addr:").pack(side=tk.LEFT, padx=(8, 2))
+            io_var = tk.StringVar(value=self.project["robot_io_addrs"][i] if i < len(self.project["robot_io_addrs"]) else "")
+            ttk.Entry(row, textvariable=io_var, width=7).pack(side=tk.LEFT, padx=2)
+            self.robot_io_addr_vars.append(io_var)
+            io_var.trace_add("write", lambda *a, idx=i: self._save_robot_io_addr(idx))
 
             var.trace_add("write", lambda *a, idx=i: self._validate_robot_name(idx))
             self._validate_robot_name(i)
@@ -1489,6 +1593,13 @@ class AWLGeneratorApp:
         while len(self.project["robot_names"]) <= idx:
             self.project["robot_names"].append("")
         self.project["robot_names"][idx] = name
+
+    def _save_robot_io_addr(self, idx):
+        if idx >= len(self.robot_io_addr_vars):
+            return
+        while len(self.project.setdefault("robot_io_addrs", [])) <= idx:
+            self.project["robot_io_addrs"].append("")
+        self.project["robot_io_addrs"][idx] = self.robot_io_addr_vars[idx].get().strip()
 
     def _get_robot_names(self):
         """Get validated robot names from current UI state."""
@@ -1850,6 +1961,8 @@ class AWLGeneratorApp:
                    command=self.generate_all_dbs).pack(fill=tk.X, pady=2)
         ttk.Button(frame, text="Create I/O",
                    command=self.create_io_popup).pack(fill=tk.X, pady=2)
+        ttk.Button(frame, text="Generate Robot IO",
+                   command=self.create_robot_io_popup).pack(fill=tk.X, pady=2)
         ttk.Button(frame, text="Generate Station",
                    command=self.generate_station_gui).pack(fill=tk.X, pady=2)
 
@@ -2064,6 +2177,123 @@ class AWLGeneratorApp:
 
         if not found_any:
             messagebox.showinfo("I/O", "No enabled valve islands with I/O addresses configured.")
+
+    # ---- ROBOT I/O ---------------------------------------------------------
+
+    @staticmethod
+    def _build_robot_io_table(robot_name, io_addr):
+        """Build DO (inputs I) and DI (outputs Q) entries for one robot.
+        Returns (do_entries, di_entries) each a list of {symbol, address, comment}.
+        Base address is io_addr (integer string, e.g. '5000').
+        Both DO and DI blocks start at the same base address.
+        DO1-256: I{base}.0 .. I{base+31}.7
+        DI1-256: Q{base}.0 .. Q{base+31}.7
+        """
+        try:
+            base = int(io_addr)
+        except (ValueError, TypeError):
+            return [], []
+        prefix = robot_short_name(robot_name)
+        do_entries, di_entries = [], []
+        for n in range(1, 257):
+            byte_off = (n - 1) // 8
+            bit = (n - 1) % 8
+            addr_str = f"{base + byte_off}.{bit}"
+            do_entries.append({
+                "symbol":  f"{prefix} DO{n}",
+                "address": f"I{addr_str}",
+                "comment": ROBOT_DO_COMMENTS[n - 1],
+            })
+            di_entries.append({
+                "symbol":  f"{prefix} DI{n}",
+                "address": f"Q{addr_str}",
+                "comment": ROBOT_DI_COMMENTS[n - 1],
+            })
+        return do_entries, di_entries
+
+    def create_robot_io_popup(self):
+        """Show robot I/O mapping popup for each station robot that has an IO address."""
+        station = self._get_station_name()
+        if not station:
+            messagebox.showwarning("Warning", "Please configure station name first.")
+            return
+
+        robot_names = self._get_robot_names()
+        if not robot_names:
+            messagebox.showwarning("Robot IO", "No valid station robots configured.")
+            return
+
+        found_any = False
+        for i, rname in enumerate(robot_names):
+            io_addr = ""
+            if hasattr(self, "robot_io_addr_vars") and i < len(self.robot_io_addr_vars):
+                io_addr = self.robot_io_addr_vars[i].get().strip()
+            if not io_addr:
+                continue
+            found_any = True
+
+            do_entries, di_entries = self._build_robot_io_table(rname, io_addr)
+
+            popup = tk.Toplevel(self.root)
+            popup.title(f"Robot I/O - {rname}")
+            popup.geometry("860x540")
+            popup.transient(self.root)
+
+            ttk.Label(popup, text=f"Robot {rname}  —  I/O Mapping  (Base: {io_addr})",
+                      font=("TkDefaultFont", 12, "bold")).pack(padx=10, pady=(10, 5))
+
+            table_frame = ttk.Frame(popup)
+            table_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+
+            canvas = tk.Canvas(table_frame)
+            scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=canvas.yview)
+            scroll_inner = ttk.Frame(canvas)
+            scroll_inner.bind("<Configure>", lambda e, c=canvas: c.configure(scrollregion=c.bbox("all")))
+            canvas.create_window((0, 0), window=scroll_inner, anchor="nw")
+            canvas.configure(yscrollcommand=scrollbar.set)
+            canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            canvas.bind("<Enter>", lambda e, c=canvas: c.bind_all("<MouseWheel>",
+                        lambda ev, cc=c: cc.yview_scroll(int(-1 * (ev.delta / 120)), "units")))
+            canvas.bind("<Leave>", lambda e, c=canvas: c.unbind_all("<MouseWheel>"))
+
+            row_idx = 0
+
+            def _section_header(text, color):
+                nonlocal row_idx
+                ttk.Label(scroll_inner, text=text, font=("TkDefaultFont", 11, "bold"),
+                          foreground=color).grid(row=row_idx, column=0, columnspan=3,
+                                                 padx=5, pady=(10, 2), sticky="w")
+                row_idx += 1
+                for col, (hdr, w) in enumerate([("Symbol", 22), ("Address", 10), ("Comment", 52)]):
+                    ttk.Label(scroll_inner, text=hdr, font=("TkDefaultFont", 10, "bold"),
+                              width=w, anchor="w").grid(row=row_idx, column=col, padx=5, pady=2, sticky="w")
+                row_idx += 1
+                ttk.Separator(scroll_inner, orient="horizontal").grid(
+                    row=row_idx, column=0, columnspan=3, sticky="ew", pady=2)
+                row_idx += 1
+
+            def _add_entries(entries):
+                nonlocal row_idx
+                for entry in entries:
+                    ttk.Label(scroll_inner, text=entry["symbol"], width=22, anchor="w",
+                              font=("Consolas", 9)).grid(row=row_idx, column=0, padx=5, pady=1, sticky="w")
+                    ttk.Label(scroll_inner, text=entry["address"], width=10, anchor="w",
+                              font=("Consolas", 9)).grid(row=row_idx, column=1, padx=5, pady=1, sticky="w")
+                    ttk.Label(scroll_inner, text=entry["comment"], width=52, anchor="w",
+                              font=("Consolas", 9)).grid(row=row_idx, column=2, padx=5, pady=1, sticky="w")
+                    row_idx += 1
+
+            _section_header("OUTPUTS FROM PLC  (DI → Robot Inputs  Q)", "blue")
+            _add_entries(di_entries)
+            _section_header("INPUTS TO PLC  (DO → Robot Outputs  I)", "green")
+            _add_entries(do_entries)
+
+            scroll_inner.columnconfigure(2, weight=1)
+            ttk.Button(popup, text="Close", command=popup.destroy).pack(pady=(5, 10))
+
+        if not found_any:
+            messagebox.showinfo("Robot IO", "No station robots with IO addresses configured.")
 
     # ---- DB NOTEBOOK -------------------------------------------------------
 
@@ -2446,6 +2676,21 @@ class AWLGeneratorApp:
                 sym = entry["symbol"]
                 comment = entry["comment"]
                 lines.append(L(sym, AB(type_char, addr_num), "BOOL", comment))
+
+        # Robot IO symbols
+        robot_names = self._get_robot_names()
+        io_addrs = self.project.get("robot_io_addrs", [])
+        for i, rname in enumerate(robot_names):
+            io_addr = io_addrs[i] if i < len(io_addrs) else ""
+            if not io_addr:
+                continue
+            do_entries, di_entries = self._build_robot_io_table(rname, io_addr)
+            for entry in do_entries + di_entries:
+                addr = entry["address"]
+                type_char = addr[0]
+                addr_num = addr[1:]
+                lines.append(L(entry["symbol"], AB(type_char, addr_num), "BOOL", entry["comment"]))
+
         return "\n".join(lines) + "\n" if lines else ""
 
     def generate_station_gui(self):
@@ -2655,6 +2900,7 @@ class AWLGeneratorApp:
         }
         self.project["robot_count"] = int(self.robot_count_var.get())
         self.project["robot_names"] = [v.get().strip() for v in self.robot_name_vars]
+        self.project["robot_io_addrs"] = [v.get().strip() for v in self.robot_io_addr_vars]
 
         # Save island config
         for isl_idx in range(MAX_ISLANDS):
@@ -2716,6 +2962,7 @@ class AWLGeneratorApp:
         self.project.setdefault("pick_part_robot", {"enabled": False, "count": "1", "robot_names": [], "toolings": [], "jobs": []})
         self.project.setdefault("robot_count", 0)
         self.project.setdefault("robot_names", [])
+        self.project.setdefault("robot_io_addrs", [])
         self.project.setdefault("islands", [
             {"enabled": True, "valve_count": 1,
              "valves": [{"type": "Clamp", "units": ""} for _ in range(MAX_VALVES)]},
@@ -2763,6 +3010,9 @@ class AWLGeneratorApp:
         for i, var in enumerate(self.robot_name_vars):
             if i < len(self.project.get("robot_names", [])):
                 var.set(self.project["robot_names"][i])
+        for i, var in enumerate(self.robot_io_addr_vars):
+            if i < len(self.project.get("robot_io_addrs", [])):
+                var.set(self.project["robot_io_addrs"][i])
 
         # Island config
         for isl_idx in range(MAX_ISLANDS):
