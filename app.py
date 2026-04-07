@@ -2384,11 +2384,36 @@ class AWLGeneratorApp:
         db_num = DB_FIRST + idx
         self._generate_db(db_num)
 
+    @staticmethod
+    def _asc_line(symbol, address_str, datatype_str, comment=""):
+        """Format one Step7 ASC symbol list line with exact fixed-width columns.
+        After '126,' prefix: symbol(24) + address(12) + datatype(10) + comment(80) = 126 chars.
+        """
+        return f"126,{symbol:<24}{address_str:<12}{datatype_str:<10}{comment:<80}"
+
+    @staticmethod
+    def _asc_addr_bool(type_char, byte_bit):
+        """Format address field (12 chars) for BOOL types: M, I, Q."""
+        return f"{type_char}{byte_bit:>10} "
+
+    @staticmethod
+    def _asc_addr_block(type_str, num):
+        """Format address field (12 chars) for FB/DB types."""
+        return f"{type_str}{num:>7}   "
+
+    @staticmethod
+    def _asc_dtype_block(type_str, num):
+        """Format data type field (10 chars) for FB/DB types."""
+        return f"{type_str}{num:>7} "
+
     def _generate_symbol_list_content(self, station, active_db_num=None):
         """Build ASC symbol list content from all enabled island I/O entries.
         active_db_num: the DB page number the user is working on (drives FB/VIS numbers).
         DB11→FB319/IDB319/VIS501, DB12→FB329/IDB329/VIS502, DB13→FB339/IDB339/VIS503.
         Formula: fb_num = db_num*10+209,  vis_num = db_num+490
+
+        Step7 ASC format: each line = '126,' + 126 fixed-width chars:
+          symbol(24) + address(12) + datatype(10) + comment(80)
         """
         if active_db_num is None:
             active_db_num = DB_FIRST
@@ -2397,14 +2422,19 @@ class AWLGeneratorApp:
         fb_name  = f"ST-{station}_OUTPUT"
         idb_name = f"I-DB-ST{station}_OUTPUT"
         vis_name = f"VIS_{station}"
-
         gdb_name = f"G-DB_{station}"
+
+        L = self._asc_line
+        AB = self._asc_addr_bool
+        ABL = self._asc_addr_block
+        DB = self._asc_dtype_block
+
         lines = [
-            f"126,{'PERSO':<24}M    2508.0 BOOL      PERSONALIZE BIT",
-            f"126,{fb_name:<24}FB    {fb_num}   FB    {fb_num}",
-            f"126,{idb_name:<24}DB    {fb_num}   DB    {fb_num}",
-            f"126,{vis_name:<24}DB    {vis_num}   DB    {vis_num}",
-            f"126,{gdb_name:<24}DB    {active_db_num}   DB    {active_db_num}",
+            L("PERSO", AB("M", "2508.0"), "BOOL", "PERSONALIZE BIT"),
+            L(fb_name,  ABL("FB", fb_num),  DB("FB", fb_num)),
+            L(idb_name, ABL("DB", fb_num),  DB("DB", fb_num)),
+            L(vis_name, ABL("DB", vis_num), DB("DB", vis_num)),
+            L(gdb_name, ABL("DB", active_db_num), DB("DB", active_db_num)),
         ]
 
         for isl_idx in range(MAX_ISLANDS):
@@ -2415,7 +2445,7 @@ class AWLGeneratorApp:
                 addr_num = addr[1:]       # "4000.0"
                 sym = entry["symbol"]
                 comment = entry["comment"]
-                lines.append(f"126,{sym:<24}{type_char}    {addr_num} BOOL      {comment}")
+                lines.append(L(sym, AB(type_char, addr_num), "BOOL", comment))
         return "\n".join(lines) + "\n" if lines else ""
 
     def generate_station_gui(self):
